@@ -1,0 +1,44 @@
+package com.pcee.logger;
+
+import com.pcee.common.Time;
+import com.pcee.logger.logObjectImpl.ConsoleLogObject;
+
+public class Logger {
+
+	public static LogObject logObject = new ConsoleLogObject(); //Default Logging Functionality
+	
+	public static void setLogObject (LogObject object){
+		Logger.logObject = object;
+	}
+	
+	public static void logWarning(String msg) {
+		// System.out.println(msg);
+	}
+
+	public static void logConnectionEstablishment(String msg) {
+		// System.out.println(msg);
+	}
+
+	public static void logError(String msg) {
+		// System.out.println(msg);
+	}
+
+	public static void logGUINotifications(String msg) {
+		String timeStamp = Time.timeStamp();
+//		System.out.println(timeStamp + " " + msg);
+		logObject.logMsg(timeStamp + " " + msg);
+	}
+
+	public static synchronized void logSystemEvents(String msg) {
+		String timeStamp = Time.timeStamp();
+//		System.out.println(timeStamp + " " + msg);
+		logObject.logMsg(timeStamp + " " + msg);
+	}
+
+	public static void debugger(String msg) {
+		String timeStamp = Time.timeStamp();
+//		System.out.println(timeStamp + " " + msg);
+		logObject.logMsg(timeStamp + " " + msg);
+	}
+
+}

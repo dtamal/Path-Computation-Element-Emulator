@@ -1,0 +1,18 @@
+package com.pcep.error;
+
+
+public class PCEPErrorFrameFactory {
+
+	/**
+	 * Function to classify the error string, create and return the
+	 * corresponding error object
+	 * 
+	 * @param error
+	 * @return
+	 * @throws InvalidMessageStringException
+	 */
+	public PCEPErrorFrame getError(String error){
+		// Add Code Block Here
+		return null;
+	}
+}

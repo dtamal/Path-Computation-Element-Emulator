@@ -1,0 +1,296 @@
+package com.pcep.response;
+
+import java.util.LinkedList;
+
+import com.pcep.message.PCEPMessageFrame;
+import com.pcep.message.objectframe.PCEPObjectFrame;
+import com.pcep.message.objectframe.impl.PCEPBandwidthObject;
+import com.pcep.message.objectframe.impl.PCEPExplicitRouteObject;
+import com.pcep.message.objectframe.impl.PCEPIncludeRouteObject;
+import com.pcep.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
+import com.pcep.message.objectframe.impl.PCEPLoadBalancingObject;
+import com.pcep.message.objectframe.impl.PCEPMetricObject;
+import com.pcep.message.objectframe.impl.PCEPNoPathObject;
+import com.pcep.message.objectframe.impl.PCEPReportedRouteObject;
+import com.pcep.message.objectframe.impl.PCEPRequestParametersObject;
+import com.pcep.message.objectframe.impl.PCEPSynchronizationVectorObject;
+
+public class PCEPResponseFrame implements PCEPMessageFrame {
+
+	public final int MESSAGE_TYPE = 4;
+
+	PCEPRequestParametersObject RP;
+
+	PCEPNoPathObject noPath;
+	PCEPLabelSwitchedPathAttributesObject LSPA;
+	PCEPBandwidthObject bandwidth;
+	LinkedList<PCEPMetricObject> metricList;
+	PCEPIncludeRouteObject IRO;
+	
+//	responseFrame.getattributelist().insertlasp();
+
+
+	LinkedList<PCEPExplicitRouteObject> EROList;
+
+	public PCEPResponseFrame(PCEPRequestParametersObject RP) {
+		this.RP = RP;
+	}
+
+	// VARIOUS CONVENIENT METHODS
+	
+	public int getRequestID() {
+		return RP.getRequestIDNumberDecimalValue();
+	}
+	
+	public String getTraversedVertexes(){
+		if(containsExplicitRouteObjectList()){
+			String traversedVertexes = new String();
+			
+			for(PCEPExplicitRouteObject ERO: EROList){
+				String currentPath = "[" + ERO.getTraversedVertexes() + "]";
+				traversedVertexes = traversedVertexes + currentPath;
+			}
+			
+			return traversedVertexes;
+		}
+		else{
+			return "NO PATH";
+		}
+	}
+	
+	
+	// INSERT METHODS
+
+	public void insertNoPathObject(PCEPNoPathObject noPath) {
+		this.noPath = noPath;
+	}
+
+	public void insertLabelSwitchedPathAttributesObject(PCEPLabelSwitchedPathAttributesObject LSPA) {
+		this.LSPA = LSPA;
+	}
+
+	public void insertBandwidthObject(PCEPBandwidthObject bandwidth) {
+		this.bandwidth = bandwidth;
+	}
+
+	public void insertMetricObject(PCEPMetricObject metricObject) {
+		if (containsMetricObjectList()) {
+			extractMetricObjectList().add(metricObject);
+		} else {
+			metricList = new LinkedList<PCEPMetricObject>();
+			metricList.add(metricObject);
+		}
+	}
+
+	public void insertMetricObjectList(LinkedList<PCEPMetricObject> metricList) {
+		this.metricList = metricList;
+	}
+
+	public void insertIncludeRouteObject(PCEPIncludeRouteObject IRO) {
+		this.IRO = IRO;
+	}
+
+	public void insertExplicitRouteObject(PCEPExplicitRouteObject ERO) {
+		if (containsExplicitRouteObjectList()) {
+			extractExplicitRouteObjectList().add(ERO);
+		} else {
+			EROList = new LinkedList<PCEPExplicitRouteObject>();
+			EROList.add(ERO);
+		}
+
+	}
+
+	public void insertExplicitRouteObjectList(LinkedList<PCEPExplicitRouteObject> EROList) {
+		this.EROList = EROList;
+	}
+
+	// EXTRACT METHODS
+
+	public PCEPNoPathObject extractNoPathObject() {
+		if (containsNoPathObject()) {
+			return noPath;
+		}
+		return null;
+	}
+
+	public PCEPLabelSwitchedPathAttributesObject extractLabelSwitchedPathAttributesObject() {
+		if (containsLabelSwitchedPathAttributesObject()) {
+			return LSPA;
+		}
+		return null;
+	}
+
+	public PCEPBandwidthObject extractBandwidthObject() {
+		if (containsBandwidthObject()) {
+			return bandwidth;
+		}
+		return null;
+	}
+
+	public LinkedList<PCEPMetricObject> extractMetricObjectList() {
+		if (containsMetricObjectList()) {
+			return metricList;
+		}
+		return null;
+	}
+
+	public PCEPIncludeRouteObject extractIncludeRouteObject() {
+		if (containsIncludeRouteObject()) {
+			return IRO;
+		}
+		return null;
+	}
+
+	public LinkedList<PCEPExplicitRouteObject> extractExplicitRouteObjectList() {
+		if (containsMetricObjectList()) {
+			return EROList;
+		}
+		return null;
+	}
+
+	// CONTAINS METHODS
+
+	public boolean containsNoPathObject() {
+		if (noPath == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean containsLabelSwitchedPathAttributesObject() {
+		if (LSPA == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean containsBandwidthObject() {
+		if (bandwidth == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean containsMetricObjectList() {
+		if (metricList == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean containsIncludeRouteObject() {
+		if (IRO == null) {
+			return false;
+		}
+		return true;
+	}
+
+	public boolean containsExplicitRouteObjectList() {
+		if (EROList == null) {
+			return false;
+		}
+		return true;
+	}
+
+	// INTERFACE METHODS
+
+	public int getByteLength() {
+		int length = 0;
+
+		length += RP.getObjectFrameByteLength();
+
+		if (containsNoPathObject()) {
+			length += noPath.getObjectFrameByteLength();
+		}
+		if (containsLabelSwitchedPathAttributesObject()) {
+			length += LSPA.getObjectFrameByteLength();
+		}
+		if (containsBandwidthObject()) {
+			length += bandwidth.getObjectFrameByteLength();
+		}
+		if (containsMetricObjectList()) {
+			for (int i = 0; i < metricList.size(); i++) {
+				length += metricList.get(i).getObjectFrameByteLength();
+			}
+		}
+		if (containsIncludeRouteObject()) {
+			length += IRO.getObjectFrameByteLength();
+		}
+		if (containsExplicitRouteObjectList()) {
+			for (int i = 0; i < EROList.size(); i++) {
+				length += EROList.get(i).getObjectFrameByteLength();
+			}
+		}
+
+		return length;
+	}
+
+	public String getBinaryString() {
+
+		StringBuffer objectsString = new StringBuffer();
+
+		objectsString.append(RP.getObjectFrameBinaryString());
+
+		if (containsNoPathObject()) {
+			objectsString.append(noPath.getObjectFrameBinaryString());
+		}
+		if (containsLabelSwitchedPathAttributesObject()) {
+			objectsString.append(LSPA.getObjectFrameBinaryString());
+		}
+		if (containsBandwidthObject()) {
+			objectsString.append(bandwidth.getObjectFrameBinaryString());
+		}
+		if (containsMetricObjectList()) {
+			for (int i = 0; i < metricList.size(); i++) {
+				objectsString.append(metricList.get(i).getObjectFrameBinaryString());
+			}
+		}
+		if (containsIncludeRouteObject()) {
+			objectsString.append(IRO.getObjectFrameBinaryString());
+		}
+		if (containsExplicitRouteObjectList()) {
+			for (int i = 0; i < EROList.size(); i++) {
+				objectsString.append(EROList.get(i).getObjectFrameBinaryString());
+			}
+		}
+
+		return objectsString.toString();
+	}
+
+	public LinkedList<PCEPObjectFrame> getObjectFrameLinkedList() {
+
+		LinkedList<PCEPObjectFrame> respondObjects = new LinkedList<PCEPObjectFrame>();
+
+		respondObjects.add(RP);
+
+		if (containsNoPathObject()) {
+			respondObjects.add(noPath);
+		}
+		if (containsLabelSwitchedPathAttributesObject()) {
+			respondObjects.add(LSPA);
+		}
+		if (containsBandwidthObject()) {
+			respondObjects.add(bandwidth);
+		}
+		if (containsMetricObjectList()) {
+			for (int i = 0; i < metricList.size(); i++) {
+				respondObjects.add(metricList.get(i));
+			}
+		}
+		if (containsIncludeRouteObject()) {
+			respondObjects.add(IRO);
+		}
+		if (containsExplicitRouteObjectList()) {
+			for (int i = 0; i < EROList.size(); i++) {
+				respondObjects.add(EROList.get(i));
+			}
+		}
+
+		return respondObjects;
+	}
+
+	public int getMessageType() {
+		return MESSAGE_TYPE;
+	}
+
+}

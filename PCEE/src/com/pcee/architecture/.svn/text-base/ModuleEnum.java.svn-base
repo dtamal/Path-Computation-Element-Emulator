@@ -1,0 +1,6 @@
+package com.pcee.architecture;
+
+public enum ModuleEnum{
+	NETWORK_MODULE, SESSION_MODULE, COMPUTATION_MODULE, CLIENT_MODULE;
+}
+

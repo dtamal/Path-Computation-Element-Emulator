@@ -1,0 +1,18 @@
+package com.pcee.server;
+
+import com.pcee.architecture.ModuleManagement;
+
+/**Example class to demonstrate the launch of the PCE Server
+ * 
+ * @author Mohit Chamania
+ *
+ */
+public class PCEServer {
+
+	/**Launch Point of the PCEE Server*/
+	public static void main(String[] args) {
+		new ModuleManagement(true);
+	}
+
+
+}

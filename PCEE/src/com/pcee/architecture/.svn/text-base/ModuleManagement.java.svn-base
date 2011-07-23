@@ -1,0 +1,72 @@
+package com.pcee.architecture;
+
+import com.pcee.architecture.clientmodule.ClientModule;
+import com.pcee.architecture.clientmodule.ClientModuleImpl;
+import com.pcee.architecture.computationmodule.ComputationModule;
+import com.pcee.architecture.computationmodule.ComputationModuleImpl;
+import com.pcee.architecture.networkmodule.NetworkModule;
+import com.pcee.architecture.networkmodule.NetworkModuleImpl;
+import com.pcee.architecture.sessionmodule.SessionModule;
+import com.pcee.architecture.sessionmodule.SessionModuleImpl;
+
+public class ModuleManagement {
+
+	private NetworkModule networkModule;
+	private SessionModule sessionModule;
+	private ComputationModule computationModule;
+	private ClientModule clientModule;
+
+	boolean running = false;
+	boolean isServer = false;
+
+	public ModuleManagement(boolean isServer) {
+		if (running == false) {
+
+			this.isServer = isServer;
+			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
+			if (isServer==false)
+				sessionModule = new SessionModuleImpl(this);
+			else
+				sessionModule = new SessionModuleImpl(this);
+			if (isServer == true) {
+				computationModule = new ComputationModuleImpl(this);
+			} else {
+				clientModule = new ClientModuleImpl(this);
+			}
+			running = true;
+		}
+	}
+
+	public void stop() {
+		running = false;
+		sessionModule.stop();
+		networkModule.stop();
+		if (isServer == true) {
+			computationModule.stop();
+		} else {
+			clientModule.stop();
+		}
+
+	}
+
+	public NetworkModule getNetworkModule() {
+		return networkModule;
+	}
+
+	public SessionModule getSessionModule() {
+		return sessionModule;
+	}
+
+	public ComputationModule getComputationModule() {
+		return computationModule;
+	}
+
+	public ClientModule getClientModule() {
+		return clientModule;
+	}
+
+	public boolean isServer() {
+		return isServer;
+	}
+
+}

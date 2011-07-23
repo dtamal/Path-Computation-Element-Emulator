@@ -1,0 +1,21 @@
+package com.pcep.keepalive;
+
+import com.pcee.logger.Logger;
+
+public class PCEPKeepaliveFrameFactory {
+
+	public static PCEPKeepaliveFrame generateKeepaliveFrame() {
+
+		PCEPKeepaliveFrame keepaliveFrame = new PCEPKeepaliveFrame();
+
+		return keepaliveFrame;
+	}
+
+	private static void localLogger(String event) {
+		Logger.logSystemEvents("[PCEPKeepaliveFrameFactory] " + event);
+	}
+
+	private static void localDebugger(String event) {
+		Logger.debugger("[PCEPKeepaliveFrameFactory] " + event);
+	}
+}

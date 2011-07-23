@@ -1,0 +1,5 @@
+package com.pcee.logger;
+
+public abstract class LogObject {
+	public abstract void logMsg(String msg);
+}

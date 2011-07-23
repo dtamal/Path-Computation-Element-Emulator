@@ -1,0 +1,12 @@
+package com.pcee.logger.logObjectImpl;
+
+import com.pcee.logger.LogObject;
+
+public class ConsoleLogObject extends LogObject {
+
+	public void logMsg(String msg) {
+		System.out.println(msg);
+	}
+	
+
+}

@@ -1,0 +1,19 @@
+package com.pcee.logger.gui;
+
+import com.pcee.gui.ConnectorGUI;
+import com.pcee.logger.LogObject;
+
+public class GUILogObject extends LogObject {
+
+	@Override
+	public void logMsg(String msg) {
+		System.out.println(msg);
+		try {
+			ConnectorGUI.updateTextArea(msg);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+	}
+
+}

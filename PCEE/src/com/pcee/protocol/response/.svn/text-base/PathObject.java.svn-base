@@ -1,0 +1,50 @@
+package com.pcep.response;
+
+import java.util.LinkedList;
+import com.pcep.message.objectframe.PCEPObjectFrame;
+import com.pcep.message.objectframe.impl.PCEPExplicitRouteObject;
+
+public class PathObject {
+
+	PCEPExplicitRouteObject ERO;
+	AttributeListObject attributeList;
+
+	public PathObject(PCEPExplicitRouteObject ERO, AttributeListObject attributeList) {
+		this.ERO = ERO;
+		this.attributeList = attributeList;
+	}
+
+	public LinkedList<PCEPObjectFrame> getObjectFrameList() {
+
+		LinkedList<PCEPObjectFrame> pathObjectsLinkedList = new LinkedList<PCEPObjectFrame>();
+		LinkedList<PCEPObjectFrame> attributesLinkedList = attributeList.getObjectFrameList();
+
+		pathObjectsLinkedList.add(ERO);
+
+		for (int i = 0; i < attributesLinkedList.size(); i++) {
+			pathObjectsLinkedList.add(attributesLinkedList.get(i));
+		}
+
+		return pathObjectsLinkedList;
+	}
+
+	public int getByteLength() {
+		int length = 0;
+
+		length += ERO.getObjectFrameByteLength();
+		length += attributeList.getByteLength();
+
+		return length;
+	}
+
+	public String getBinaryString() {
+
+		StringBuffer objectsString = new StringBuffer();
+
+		objectsString.append(ERO.getObjectFrameBinaryString());
+		objectsString.append(attributeList.getBinaryString());
+
+		return objectsString.toString();
+	}
+
+}

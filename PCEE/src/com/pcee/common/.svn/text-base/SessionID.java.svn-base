@@ -1,0 +1,35 @@
+package com.pcee.common;
+
+/**
+ * Implemented as Singleton. Range: 1-255 (8 Bit)
+ * 
+ * @author mdr
+ */
+public class SessionID {
+
+	static private SessionID _instance;
+	private int idCounter;
+
+	private SessionID() {
+		initCounter();
+	}
+
+	static public SessionID getInstance() {
+		if (_instance == null)
+			_instance = new SessionID();
+		return _instance;
+	}
+
+	private void initCounter() {
+		idCounter = 0;
+	}
+
+	synchronized public int getID() {
+		idCounter = (idCounter + 1) % 256;
+		if (idCounter == 0) {
+			idCounter++;
+		}
+		return idCounter;
+	}
+
+}
