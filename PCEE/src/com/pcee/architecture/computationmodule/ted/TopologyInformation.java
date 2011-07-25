@@ -22,56 +22,73 @@ import java.io.File;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
+import com.graph.topology.importers.impl.BRITEImportTopology;
 import com.graph.topology.importers.impl.SNDLibImportTopology;
 import com.pcee.logger.Logger;
 
-/**Class to provide Topology Instances to the computation layer 
+/**
+ * Class to provide Topology Instances to the computation layer
  * 
  * @author Marek Drogon
- *
+ * 
  */
 public class TopologyInformation {
 
-	//Static oject instance of the TopologyInformation Class
+	// Static oject instance of the TopologyInformation Class
 	static private TopologyInformation _instance;
 
-	//Graph Instance 
+	// Graph Instance
 	private Gcontroller graph;
-	
-	//Topology Importer used to populate the graph instance
-	private ImportTopology topology;
+
+	// Topology Importer used to populate the graph instance
+	private static ImportTopology topology;
 
 	// path to the topology description file
 	private static String topoPath = "atlanta.txt";
-	
-	
+
 	/**
-	 * @param input the topoPath to be used by the TED
+	 * @param input
+	 *            the topoPath to be used by the TED
 	 */
 	public static void setTopoPath(String input) {
 		topoPath = input;
 	}
 
+	/**
+	 * @param importer
+	 *            ONLY SNDLib or BRITE supported as input
+	 */
+	public static void setImporter(String importer) {
+		if (importer.equals("SNDLib")) {
+			topology = new SNDLibImportTopology();
+		} else if (importer.equals("BRITE")) {
+			topology = new BRITEImportTopology();
+		} else {
+			topology = new SNDLibImportTopology();
+		}
+	}
 
-	/**default constructor*/
+	/** default constructor */
 	private TopologyInformation() {
-		topology = new SNDLibImportTopology();
+		// topology = new SNDLibImportTopology();
 		// topology = new BRITEImportTopology();
 		graph = new GcontrollerImpl();
 
-		//Source file used to instantiate the topology 
+		// Source file used to instantiate the topology
 		File file = new File(topoPath);
 
-		///Function to import the topology stored in the text file into the graph object
+		// /Function to import the topology stored in the text file into the
+		// graph object
 		topology.importTopology(graph, file.getAbsolutePath());
-		if (graph==null)		
+		if (graph == null)
 			localDebugger("Error in loading graph from file");
 		else
 			localLogger("NetworkSize: " + networkSize());
 	}
 
-	
-	/**Function to update the graph instance used inside the Topology Information object
+	/**
+	 * Function to update the graph instance used inside the Topology
+	 * Information object
 	 * 
 	 * @param newGraph
 	 */
@@ -79,31 +96,34 @@ public class TopologyInformation {
 		graph = newGraph;
 	}
 
-	/**Function to determine the network size*/
+	/** Function to determine the network size */
 	public int networkSize() {
 		return graph.getVertexSet().size();
 	}
 
-	/**Function to get the instance of the TopologyInformation class*/
+	/** Function to get the instance of the TopologyInformation class */
 	public static TopologyInformation getInstance() {
 		if (_instance == null)
 			_instance = new TopologyInformation();
 		return _instance;
 	}
 
-	/**Function to get the graph object used*/
+	/** Function to get the graph object used */
 	public Gcontroller getGraph() {
 		return graph;
 	}
 
-	/**Function to get the topology importer used in the implementation
+	/**
+	 * Function to get the topology importer used in the implementation
 	 * 
 	 * @return topology importer
 	 */
 	public ImportTopology getTopologyImporter() {
 		return topology;
 	}
-	/**Function for logging events 
+
+	/**
+	 * Function for logging events
 	 * 
 	 * @param event
 	 */
@@ -111,7 +131,8 @@ public class TopologyInformation {
 		Logger.logSystemEvents("[TopologyInformation]     " + event);
 	}
 
-	/**Function for logging debug information 
+	/**
+	 * Function for logging debug information
 	 * 
 	 * @param event
 	 */
@@ -119,6 +140,4 @@ public class TopologyInformation {
 		Logger.debugger("[TopologyInformation]     " + event);
 	}
 
-	
-	
 }

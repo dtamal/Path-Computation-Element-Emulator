@@ -73,6 +73,7 @@ public class ModuleManagement {
 				sessionThreads = Integer.valueOf(reader.getProperty("sessionThreads"));
 				computationThreads = Integer.valueOf(reader.getProperty("computationThreads"));
 				TopologyInformation.setTopoPath(reader.getProperty("topology"));
+				TopologyInformation.setImporter(reader.getProperty("importer"));
 			} catch (Exception e) {
 				System.out.println("Wrong Configuration Inputs!");
 				System.exit(0);
