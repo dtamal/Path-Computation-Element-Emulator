@@ -38,6 +38,7 @@ public class BasicEdgeParams extends EdgeParams{
 	/**Available capacity on the link*/
 	private double availableCapacity=0;
 
+	private boolean isDynamicLink= false;
 	
 	public BasicEdgeParams(EdgeElement edge){
 		this.setEdgeElement(edge);
@@ -49,6 +50,15 @@ public class BasicEdgeParams extends EdgeParams{
 		this.setWeight(weight);
 		this.setMaxCapacity(maxCapacity);
 		this.setAvailableCapacity(maxCapacity);
+		this.isDynamicLink = false;
+	}
+
+	public boolean isDynamicLink() {
+	    return isDynamicLink;
+	}
+
+	public void setDynamicLink(boolean isDynamicLink) {
+	    this.isDynamicLink = isDynamicLink;
 	}
 
 	public BasicEdgeParams(double delay, double weight, double maxCapacity){
@@ -57,6 +67,7 @@ public class BasicEdgeParams extends EdgeParams{
 		this.setWeight(weight);
 		this.setMaxCapacity(maxCapacity);
 		this.setAvailableCapacity(maxCapacity);
+		this.isDynamicLink=false;
 	}
 	
 	
@@ -134,6 +145,7 @@ public class BasicEdgeParams extends EdgeParams{
 	public EdgeParams copyEdgeParams(EdgeElement newElement) {
 		EdgeParams params = new BasicEdgeParams(newElement, delay, weight, maxCapacity);
 		params.setAvailableCapacity(this.availableCapacity);
+		params.setDynamicLink(isDynamicLink);
 		return params;
 	}
 

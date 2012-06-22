@@ -29,25 +29,24 @@ import com.pcee.logger.gui.GUILogObject;
  */
 public class ClientLauncher {
 	
+	public static ModuleManagement lm = new ModuleManagement(false);
+	
 	/**Launch point to initialize the client GUI*/
 	public static void main(String[] args) throws Exception {
 		
-		//Address of the PCE server
 		String pceServerAddress = "127.0.0.1";
-		
 		//Default source and destination values for path computation requests
-		String defaultSourceAddress = "192.169.2.1";
-		String defaultDestinationAddress = "192.169.2.2";
+
+		String defaultSourceAddress = "172.10.1.10";
+		String defaultDestinationAddress = "172.10.1.40";
 		
 		//Set Logger to log to the GUI
 		Logger.setLogObject(new GUILogObject());
 		
 		//Initialize the layer management module
-		ModuleManagement lm = new ModuleManagement(false);
 		
 		//Start the GUI
 		new ConnectorGUI(lm, pceServerAddress, defaultSourceAddress, defaultDestinationAddress);
-		
 	}
 
 }

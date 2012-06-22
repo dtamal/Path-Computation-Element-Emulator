@@ -17,12 +17,12 @@
 
 package com.pcee.architecture;
 
-import com.pcee.common.Address;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 public interface ConnectionProcessingInterface {
 
 	//TODO Include Parameter
-	public void closeConnection(Address address);
-	public void registerConnection(Address address, boolean connected, boolean connectionInitialized);
+	public void closeConnection(PCEPAddress address);
+	public void registerConnection(PCEPAddress address, boolean connected, boolean connectionInitialized);
 	
 }

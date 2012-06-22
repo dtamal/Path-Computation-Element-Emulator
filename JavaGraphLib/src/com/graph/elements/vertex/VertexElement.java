@@ -192,7 +192,7 @@ public class VertexElement implements Comparable<VertexElement> {
 
 	
 	public int compareTo(VertexElement temp) {
-		if ((temp.getVertexID().compareTo(this.vertexID)==0)&&(temp.getGraphController()==this.graph))
+		if ((temp.getVertexID().compareTo(this.vertexID)==0))
 			return 0;
 		return 1;
 	}

@@ -18,6 +18,7 @@
 package com.graph.path.algorithms.impl;
 
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -43,6 +44,7 @@ public class SimplePathComputationAlgorithm implements PathComputationAlgorithm 
 		int count=0;
 		if (paths.size()==0)
 			return paths;
+		//bubble sorting?
 		while(flag==0){
 			flag=1;
 			for (int i=paths.size()-1;i>count;i--)
@@ -76,21 +78,22 @@ public class SimplePathComputationAlgorithm implements PathComputationAlgorithm 
 		}
 		SimplePathComputationConstraint constraint = (SimplePathComputationConstraint) constr;
 		VertexElement source = graph.getVertex(constraint.getSource().getVertexID());
-		ArrayList<PathElement> list = new ArrayList<PathElement> ();
 		if (source.getConnectedEdges()==null)
 			return null;
-		Iterator<EdgeElement> iter = source.getConnectedEdges().iterator();
 
+		ArrayList<PathElement> list = new ArrayList<PathElement> ();
+		Iterator<EdgeElement> iter = source.getConnectedEdges().iterator();
+		System.out.println("Connected Edges From source = " + source.getConnectedEdges().size());
 		while (iter.hasNext()){
 			EdgeElement edge = iter.next();
 			//Check Constraint for path computation
 			if (checkConstraint(constraint, edge)==1){
 				PathElementImpl tmp;
 				if (edge.getSourceVertex().compareTo(source)==0){
-					tmp = new PathElementImpl(graph, constraint.getSource(), edge.getDestinationVertex());
+					tmp = new PathElementImpl(graph, graph.getVertex(constraint.getSource().getVertexID()), edge.getDestinationVertex());
 				}
 				else
-					tmp = new PathElementImpl(graph, constraint.getSource(), edge.getSourceVertex());
+					tmp = new PathElementImpl(graph, graph.getVertex(constraint.getSource().getVertexID()), edge.getSourceVertex());
 				tmp.insertEdge(edge);
 				list.add(tmp);
 			}
@@ -108,9 +111,10 @@ public class SimplePathComputationAlgorithm implements PathComputationAlgorithm 
 				visitedVertices.add(temp.getDestination());
 				//If the shortest path terminates at the destination return this path
 				VertexElement destination = temp.getDestination();
-				if (destination.compareTo(graph.getVertex(constraint.getDestination().getVertexID()))==0){
+				//if (destination.compareTo(graph.getVertex(constraint.getDestination().getVertexID()))==0){
+				if (destination.compareTo(graph.getVertex(constraint.getDestination().getVertexID()))==0)	
 					return temp;
-				}
+				
 				//extend temp to its neighbours and insert into the list
 				if (destination.getConnectedEdges()!=null){
 					iter = destination.getConnectedEdges().iterator();
@@ -144,7 +148,8 @@ public class SimplePathComputationAlgorithm implements PathComputationAlgorithm 
 //				System.out.println("Size of sorted list = " + list.size());
 			}
 		}
-		GraphLogger.logError("No Path found from " + source.getVertexID() + " to " + constraint.getDestination().getVertexID(), classIdentifier);
+//		GraphLogger.logError("No Path found from " + source.getVertexID() + " to " + constraint.getDestination().getVertexID(), classIdentifier);
+		GraphLogger.logError("No Path found from " + constraint.getSource().getVertexID() + " to " + constraint.getDestination().getVertexID(), classIdentifier);
 		return null;
 	}
 

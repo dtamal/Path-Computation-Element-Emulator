@@ -25,12 +25,14 @@ import java.util.Properties;
 import com.pcee.architecture.clientmodule.ClientModule;
 import com.pcee.architecture.clientmodule.ClientModuleImpl;
 import com.pcee.architecture.computationmodule.ComputationModule;
-import com.pcee.architecture.computationmodule.ComputationModuleImpl;
+import com.pcee.architecture.computationmodule.ComputationModuleMLImpl;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.architecture.computationmodule.ted.TopologyUpdateListener;
 import com.pcee.architecture.networkmodule.NetworkModule;
 import com.pcee.architecture.networkmodule.NetworkModuleImpl;
 import com.pcee.architecture.sessionmodule.SessionModule;
 import com.pcee.architecture.sessionmodule.SessionModuleImpl;
+import com.pcee.logger.Logger;
 
 public class ModuleManagement {
 
@@ -47,15 +49,19 @@ public class ModuleManagement {
 
 			this.isServer = isServer;
 			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
-			if (isServer == false)
-				sessionModule = new SessionModuleImpl(this);
-			else
-				sessionModule = new SessionModuleImpl(this);
+			sessionModule = new SessionModuleImpl(this);
 			if (isServer == true) {
-				computationModule = new ComputationModuleImpl(this);
+				TopologyUpdateListener listener = new TopologyUpdateListener(
+						this);
+				listener.start();
+				computationModule = new ComputationModuleMLImpl(this);
+				clientModule = new ClientModuleImpl(this);
 			} else {
 				clientModule = new ClientModuleImpl(this);
+				Logger.logging = true;
+				Logger.debugging = true;
 			}
+
 			running = true;
 		}
 	}
@@ -69,11 +75,28 @@ public class ModuleManagement {
 			int port = 0, sessionThreads = 0, computationThreads = 0;
 
 			try {
+				String logger = reader.getProperty("logging");
+				if (logger.equalsIgnoreCase("on")) {
+					Logger.logging = true;
+				} else {
+					Logger.logging = false;
+				}
+
+				String debug = reader.getProperty("debug");
+				if (debug.equalsIgnoreCase("on")) {
+					Logger.debugging = true;
+				} else {
+					Logger.debugging = false;
+				}
+
 				port = Integer.valueOf(reader.getProperty("port"));
-				sessionThreads = Integer.valueOf(reader.getProperty("sessionThreads"));
-				computationThreads = Integer.valueOf(reader.getProperty("computationThreads"));
+				sessionThreads = Integer.valueOf(reader
+						.getProperty("sessionThreads"));
+				computationThreads = Integer.valueOf(reader
+						.getProperty("computationThreads"));
 				TopologyInformation.setTopoPath(reader.getProperty("topology"));
 				TopologyInformation.setImporter(reader.getProperty("importer"));
+
 			} catch (Exception e) {
 				System.out.println("Wrong Configuration Inputs!");
 				System.exit(0);
@@ -87,7 +110,13 @@ public class ModuleManagement {
 				else
 					sessionModule = new SessionModuleImpl(this, sessionThreads);
 				if (isServer == true) {
-					computationModule = new ComputationModuleImpl(this, computationThreads);
+					TopologyUpdateListener listener = new TopologyUpdateListener(
+							this);
+					listener.start();
+
+					computationModule = new ComputationModuleMLImpl(this,
+							computationThreads);
+					clientModule = new ClientModuleImpl(this);
 				} else {
 					clientModule = new ClientModuleImpl(this);
 				}
@@ -98,7 +127,6 @@ public class ModuleManagement {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public void stop() {
@@ -110,7 +138,6 @@ public class ModuleManagement {
 		} else {
 			clientModule.stop();
 		}
-
 	}
 
 	public NetworkModule getNetworkModule() {

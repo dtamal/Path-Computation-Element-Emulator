@@ -162,8 +162,6 @@ public class ShortestKDisjointMultiPathComputationAlgorithm implements MultiPath
 	public ArrayList<PathElement> computePath(Gcontroller controller, MultiPathConstraint constraints) {
 		Gcontroller graph =	controller.createCopy();
 		
-		
-		
 		VertexElement source = graph.getVertex(constraints.getSource().getVertexID());
 		VertexElement destination = graph.getVertex(constraints.getDestination().getVertexID());
 		ArrayList<PathElement> computedPaths = new ArrayList<PathElement>();
@@ -173,11 +171,12 @@ public class ShortestKDisjointMultiPathComputationAlgorithm implements MultiPath
 
 		PathComputationAlgorithm algo = new SimplePathComputationAlgorithm();
 
-		
 		for (int i=0;i<constraints.getPathCount();i++){
 			PathElement temp = algo.computePath(graph, constr);
-			if (temp!=null){
-
+			//if single path computation has a result and the bandwidth of the 
+			//computed path equals or larger than bandwidth specified in the constraints
+			//then it meets the final requirement and can be added to the result arraylist
+			if (temp!=null && temp.getPathParams().getAvailableCapacity()>= constraints.getBw()){
 				//Modify the neighbor map 
 //				System.out.println("Vertex Sequence :" + temp.getVertexSequence());
 				computedPaths.add(temp);
@@ -199,7 +198,7 @@ public class ShortestKDisjointMultiPathComputationAlgorithm implements MultiPath
 		importT.importTopology(graph, "c:\\trap.txt");
 		
 		ShortestKDisjointMultiPathComputationAlgorithm algo = new ShortestKDisjointMultiPathComputationAlgorithm();
-		MultiPathConstraint constr = new SimpleMultiPathComputationConstraint(graph.getVertex("1"), graph.getVertex("8"), 2);
+		MultiPathConstraint constr = new SimpleMultiPathComputationConstraint(graph.getVertex("1"), graph.getVertex("8"), 2, 10);
 		
 		ArrayList<PathElement> paths = algo.computePath(graph, constr);
 		for (int i=0;i<paths.size();i++){

@@ -17,8 +17,8 @@
 
 package com.pcee.architecture;
 
-import com.pcee.common.Address;
 import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 
 public interface Module {
@@ -29,7 +29,7 @@ public interface Module {
 	public abstract void start();
 
 	
-	public abstract void closeConnection(Address address);
-	public abstract void registerConnection(Address address, boolean connected, boolean connectionInitialized);
+	public abstract void closeConnection(PCEPAddress address);
+	public abstract void registerConnection(PCEPAddress address, boolean connected, boolean connectionInitialized);
 
 }

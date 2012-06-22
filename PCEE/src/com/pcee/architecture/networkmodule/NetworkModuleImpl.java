@@ -30,18 +30,17 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-
+import com.benchmark.ResultLogger;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.common.Address;
 import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPCommonMessageHeader;
 import com.pcee.protocol.message.PCEPComputationFactory;
 import com.pcee.protocol.message.PCEPMessage;
-
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 /**
- * Implementation of the Network Module 
+ * Implementation of the Network Module
  * 
  * @author Marek Drogon
  * @author Mohit Chamania
@@ -49,53 +48,63 @@ import com.pcee.protocol.message.PCEPMessage;
 
 public class NetworkModuleImpl extends NetworkModule {
 
-	//Management Object used to forward communications between the different modules
+	// Management Object used to forward communications between the different
+	// modules
 	private ModuleManagement lm;
 
-	//Java NIO selector object used to monitor incoming connection requests as well as data read requests
+	// Java NIO selector object used to monitor incoming connection requests as
+	// well as data read requests
 	private Selector selector;
 
-	//Thread instance used to operate the Selector
+	// Thread instance used to operate the Selector
 	private Thread selectorthread;
 
-
-	//Boolean flag used by the selector thread for graceful stop
+	// Boolean flag used by the selector thread for graceful stop
 	private boolean selectorStop = false;
 
-	//Port at which the selector threads listens for incoming PCEP connections, default value is 4189
+	// Port at which the selector threads listens for incoming PCEP connections,
+	// default value is 4189
 	private int port;
 
-
-	//Map to store correlation between the session ID and the corresponding Selection Key
+	// Map to store correlation between the session ID and the corresponding
+	// Selection Key
 	private HashMap<String, SelectionKey> addressToSelectionKeyHashMap = new HashMap<String, SelectionKey>();
 
-	//Map to store correlation between the session ID and the corresponding socket channel 
+	// Map to store correlation between the session ID and the corresponding
+	// socket channel
 	private HashMap<String, SocketChannel> addressToSocketChannelHashMap = new HashMap<String, SocketChannel>();
 
-	//Map based buffer to store partial messages received by the selector during a read cycle
+	// Map based buffer to store partial messages received by the selector
+	// during a read cycle
 	private HashMap<String, String> partialMessageHashMap = new HashMap<String, String>();
 
-
-	//Queues of Socket Channels for registering connections gracefully in the socket layer
+	// Queues of Socket Channels for registering connections gracefully in the
+	// socket layer
 	private LinkedBlockingQueue<SocketChannel> registerConnQueue = new LinkedBlockingQueue<SocketChannel>();
 
-
-	//Boolean flag to indicate if the Network Module is used on the server side (indicating if it should listen for new connection requests
+	// Boolean flag to indicate if the Network Module is used on the server side
+	// (indicating if it should listen for new connection requests
 	private boolean isServer;
 
-	/**Default Constructor
+	/**
+	 * Default Constructor
 	 * 
 	 * @param isServer
 	 * @param layerManagement
 	 */
 	public NetworkModuleImpl(boolean isServer, ModuleManagement layerManagement) {
+		localDebugger("Entering: NetworkModuleImpl(boolean isServer, ModuleManagement layerManagement)");
+
 		lm = layerManagement;
 		port = 4189;
 		this.isServer = isServer;
 		this.start();
 	}
-	
-	public NetworkModuleImpl(boolean isServer, ModuleManagement layerManagement, int port) {
+
+	public NetworkModuleImpl(boolean isServer,
+			ModuleManagement layerManagement, int port) {
+		localDebugger("Entering: NetworkModuleImpl(boolean isServer, ModuleManagement layerManagement, int port)");
+
 		lm = layerManagement;
 		this.port = port;
 		this.isServer = isServer;
@@ -103,7 +112,9 @@ public class NetworkModuleImpl extends NetworkModule {
 	}
 
 	public void stop() {
-		//Clear mappings 
+		localDebugger("Entering: stop()");
+
+		// Clear mappings
 		addressToSelectionKeyHashMap.clear();
 		addressToSocketChannelHashMap.clear();
 		partialMessageHashMap.clear();
@@ -114,26 +125,30 @@ public class NetworkModuleImpl extends NetworkModule {
 	}
 
 	public void start() {
+		localDebugger("Entering: start()");
+
 		initSelectorParams();
 		startSelectorThread();
 	}
 
-
 	public void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-		localDebugger("Entering: receiveMessage(PCEPMessage message)");
+		localDebugger("Entering: receiveMessage(PCEPMessage message, ModuleEnum sourceLayer)");
 		localDebugger("| message: " + message.contentInformation());
 		localDebugger("| sourceLayer: " + sourceLayer);
+
 		writeSocket(message);
 	}
 
 	public void sendMessage(PCEPMessage message, ModuleEnum targetLayer) {
-		localDebugger("Entering: sendMessage(PCEPMessage message)");
+		localDebugger("Entering: sendMessage(PCEPMessage message, ModuleEnum targetLayer)");
+		localDebugger("message:" + message.binaryInformation());
 		localDebugger("| message: " + message.contentInformation());
 		localDebugger("| targetLayer: " + targetLayer);
 
 		switch (targetLayer) {
 		case SESSION_MODULE:
-			lm.getSessionModule().receiveMessage(message, ModuleEnum.NETWORK_MODULE);
+			lm.getSessionModule().receiveMessage(message,
+					ModuleEnum.NETWORK_MODULE);
 			break;
 		case COMPUTATION_MODULE:
 			// Not possible
@@ -148,36 +163,48 @@ public class NetworkModuleImpl extends NetworkModule {
 		}
 	}
 
-
-	public void registerConnection(Address address, boolean connected, boolean connectionInitialized) {
+	public void registerConnection(PCEPAddress address, boolean connected,
+			boolean connectionInitialized) {
 		localDebugger("Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
-		localDebugger("| address: " + address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address(false));
 		localDebugger("| connected" + connected);
 		localDebugger("| connectionInitialized" + connectionInitialized);
 
-		//Register connection in the network only used when other modules want to establish connection with a remote peer. 
-		//Synchronization of session state assumed to be handled by the other modules 
-		localLogger("Trying to initialise a Connection to " + address.getAddress());
+		// Register connection in the network only used when other modules want
+		// to establish connection with a remote peer.
+		// Synchronization of session state assumed to be handled by the other
+		// modules
+		localLogger("Trying to initialise a Connection to "
+				+ address.getIPv4Address(false));
 		try {
-			//Opening a new connection to the remote peer
+			// Opening a new connection to the remote peer
 			SocketChannel socketChannel = SocketChannel.open();
 			socketChannel.socket().setReuseAddress(true);
-			socketChannel.connect(new InetSocketAddress(address.getAddressWithoutPort(), port));
+			socketChannel.connect(new InetSocketAddress(address
+					.getIPv4Address(false), address.getPort()));
 
 			if (socketChannel.isConnected() == true) {
-				localDebugger("Connected to " +address.getAddressWithoutPort() + ":" + port);
-				Address remoteAddress = new Address(socketChannel.socket().getInetAddress().getHostAddress(), socketChannel.socket().getPort());
+				localLogger("Connected to " + address.getIPv4Address(false)
+						+ ":" + address.getPort());
+				PCEPAddress remoteAddress = new PCEPAddress(socketChannel
+						.socket().getInetAddress().getHostAddress(),
+						socketChannel.socket().getPort());
 
-				//Configuring socket channel properties
+				// Configuring socket channel properties
 				socketChannel.configureBlocking(false);
 
-				//Register SocketChannel first
+				// Register SocketChannel first
 				insertSocketChannelToHashMap(remoteAddress, socketChannel);
 
-				//This step intimates the state machine that connection is established. State Machine can then send out The first OPEN message 
-				lm.getSessionModule().registerConnection(remoteAddress, true, true);
+				// This step intimates the state machine that connection is
+				// established. State Machine can then send out The first OPEN
+				// message
+				lm.getSessionModule().registerConnection(remoteAddress, true,
+						true);
 
-				//Socket is registered with the selector only after state machine is initialized so that an OPEN message is not received before an OPEN message has been sent out
+				// Socket is registered with the selector only after state
+				// machine is initialized so that an OPEN message is not
+				// received before an OPEN message has been sent out
 				registerConnQueue.add(socketChannel);
 				selector.wakeup();
 
@@ -188,34 +215,33 @@ public class NetworkModuleImpl extends NetworkModule {
 
 	}
 
-	public void closeConnection(Address address) {
+	public void closeConnection(PCEPAddress address) {
 		localDebugger("Entering: closeConnection(Address address)");
-		localDebugger("| address: " + address.getAddress());
-		
-		
-		SelectionKey key =  getSelectionKeyFromHashMap(address);
-		if (key !=null) {
-			SocketChannel socketChannel = (SocketChannel)key.channel();
+		localDebugger("| address: " + address.getIPv4Address());
+
+		SelectionKey key = getSelectionKeyFromHashMap(address);
+		if (key != null) {
+			SocketChannel socketChannel = (SocketChannel) key.channel();
 			if (socketChannel != null) {
 				try {
-					//close the socket channel
+					// close the socket channel
 					socketChannel.close();
-					//cancel the key with the selector
+					// cancel the key with the selector
 					key.cancel();
 				} catch (IOException e) {
-					localDebugger("IOException in closing socket ");
+					localDebugger("| IOException in closing socket ");
 				}
 			}
 		}
-		//Remove the mappings from the different Map structures
+		// Remove the mappings from the different Map structures
 		removePartialMessageFromHashMap(address);
 		removeSelectionKey(address);
 		removeSocketChannel(address);
 	}
 
-
-
 	private void startSelectorThread() {
+		localDebugger("Entering: startSelectorThread()");
+
 		// Anonymous Class
 		// volatile boolean selectorStop = false;
 		selectorthread = new Thread() {
@@ -224,33 +250,33 @@ public class NetworkModuleImpl extends NetworkModule {
 				while (!selectorStop) {
 					try {
 
-						localLogger("Listening for Events");
+						localLogger("| Listening for Events");
 						selector.select();
 
-						//Processing Events received from the selector
-						Iterator<SelectionKey> keyIterator = selector.selectedKeys().iterator();
+						// Processing Events received from the selector
+						Iterator<SelectionKey> keyIterator = selector
+								.selectedKeys().iterator();
 						while (keyIterator.hasNext()) {
 
 							SelectionKey key = keyIterator.next();
-							localDebugger("Removing Current key from the KeyIterator");
+							// localDebugger("| Removing Current key from the KeyIterator");
 							keyIterator.remove();
 
 							if (key.isValid()) {
 								if (key.isAcceptable()) {
-									localDebugger("Entering: key.isAcceptable()");
-									localDebugger("| key: " + key.toString());
 
-									SocketChannel socketChannel = ((ServerSocketChannel) key.channel()).accept();
+									SocketChannel socketChannel = ((ServerSocketChannel) key
+											.channel()).accept();
 									if (socketChannel != null) {
-										//Call function to receive a new Connection
+										// Call function to receive a new
+										// Connection
 										connectionReceived(socketChannel);
 									}
 
 								} else if (key.isReadable()) {
-									localDebugger("Entering: key.isReadable()");
-									localDebugger("| key: " + key.toString());
 
-									if (((SocketChannel) key.channel()).socket().isClosed() == false) {
+									if (((SocketChannel) key.channel())
+											.socket().isClosed() == false) {
 										readSocket(key);
 									} else
 										key.cancel();
@@ -259,32 +285,36 @@ public class NetworkModuleImpl extends NetworkModule {
 							}
 						}
 
-
-						//Register new sockets into the selector
+						// Register new sockets into the selector
 						while (registerConnQueue.size() != 0) {
 							localLogger("Registering new Connection");
-							SocketChannel socketChannel = registerConnQueue.take();
-							//Retreiving SelectionKey associated with socket channel 
-							SelectionKey key = socketChannel.register(selector, SelectionKey.OP_READ);
-							//Register the socket channel in the hash map
-							Address address = new Address(socketChannel.socket().getInetAddress().getHostAddress().trim(), socketChannel.socket().getPort());
+							SocketChannel socketChannel = registerConnQueue
+									.take();
+							// Retreiving SelectionKey associated with socket
+							// channel
+							SelectionKey key = socketChannel.register(selector,
+									SelectionKey.OP_READ);
+							// Register the socket channel in the hash map
+							PCEPAddress address = new PCEPAddress(socketChannel
+									.socket().getInetAddress().getHostAddress()
+									.trim(), socketChannel.socket().getPort());
 							insertSelectionKeyToHashMap(address, key);
 						}
 
-						//If selector is scheduled for stopping, close the selector and terminate the thread
-						if (selectorStop){
+						// If selector is scheduled for stopping, close the
+						// selector and terminate the thread
+						if (selectorStop) {
 							localLogger("Closing the Selector");
 							selector.close();
-							break;								
+							break;
 						}
 					} catch (IOException e) {
-						localDebugger("IOException with the selector");
+						localLogger("IOException with the selector");
 						e.printStackTrace();
 					} catch (InterruptedException e) {
-						localDebugger("Thread Interrupted when reading new connections from the register connection queue");
+						localLogger("Thread Interrupted when reading new connections from the register connection queue");
 					}
 				}
-
 
 			}
 
@@ -293,17 +323,20 @@ public class NetworkModuleImpl extends NetworkModule {
 		selectorthread.start();
 	}
 
-
-	/**Function to initialize the selector, and if server, start a serversocketchannel to recieve connections*/
+	/**
+	 * Function to initialize the selector, and if server, start a
+	 * serversocketchannel to recieve connections
+	 */
 	private void initSelectorParams() {
-		localDebugger("Entering: receiveConnection(boolean isServer)");
+		localDebugger("Entering: initSelectorParams()");
 		localDebugger("| isServer: " + isServer);
 
 		try {
 			selector = Selector.open();
 
 			if (isServer) {
-				ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+				ServerSocketChannel serverSocketChannel = ServerSocketChannel
+						.open();
 				serverSocketChannel.socket().bind(new InetSocketAddress(port));
 				serverSocketChannel.configureBlocking(false);
 				serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -313,32 +346,37 @@ public class NetworkModuleImpl extends NetworkModule {
 		}
 	}
 
-	/**Function to accept new Incoming connections from the serversocket
+	/**
+	 * Function to accept new Incoming connections from the serversocket
 	 * 
 	 * @param socketChannel
 	 * @throws IOException
 	 */
-	private void connectionReceived(SocketChannel socketChannel) throws IOException {
+	private void connectionReceived(SocketChannel socketChannel)
+			throws IOException {
 		localDebugger("Entering: connectionReceived(SocketChannel socketChannel)");
 		localDebugger("| socketChannel: " + socketChannel.toString());
 
-		String addressString = socketChannel.socket().getInetAddress().getHostAddress().trim();
+		String addressString = socketChannel.socket().getInetAddress()
+				.getHostAddress().trim();
 		int port = socketChannel.socket().getPort();
-		Address address = new Address(addressString, port);
-		
-		
-		//Check if a selection key is already registered
-		if (getSelectionKeyFromHashMap(address)==null) {
-			//Configure Socket Properties
+		PCEPAddress address = new PCEPAddress(addressString, port);
+
+		// Check if a selection key is already registered
+		if (getSelectionKeyFromHashMap(address) == null) {
+			// Configure Socket Properties
 			socketChannel.configureBlocking(false);
 			insertSocketChannelToHashMap(address, socketChannel);
 			lm.getSessionModule().registerConnection(address, true, false);
+
 			localLogger("New Connection Accepted, registering with selector");
-			SelectionKey key = socketChannel.register(selector, SelectionKey.OP_READ);
+			SelectionKey key = socketChannel.register(selector,
+					SelectionKey.OP_READ);
 			insertSelectionKeyToHashMap(address, key);
 
 		} else {
-			localLogger("Terminating incoming connection as a connection from the IP address" + address.getAddress() + " already exists.");
+			localLogger("Terminating incoming connection as a connection from the IP address"
+					+ address.getIPv4Address() + " already exists.");
 			socketChannel.close();
 		}
 	}
@@ -346,20 +384,25 @@ public class NetworkModuleImpl extends NetworkModule {
 	private void readSocket(SelectionKey key) {
 		localDebugger("Entering: readSocket(SelectionKey key)");
 		localDebugger("| key: " + key.toString());
+
 		ByteBuffer messageBuffer = ByteBuffer.allocate(2000);
 
 		SocketChannel inputSocketChannel = (SocketChannel) key.channel();
-		// System.out.println("Reading Data From remote address:" + inputSocketChannel.socket().getInetAddress().getHostAddress().trim() + ":" + inputSocketChannel.socket().getPort());
+		// System.out.println("Reading Data From remote address:" +
+		// inputSocketChannel.socket().getInetAddress().getHostAddress().trim()
+		// + ":" + inputSocketChannel.socket().getPort());
 
-		String addressString = inputSocketChannel.socket().getInetAddress().getHostAddress().trim();
+		String addressString = inputSocketChannel.socket().getInetAddress()
+				.getHostAddress().trim();
 		int port = inputSocketChannel.socket().getPort();
-		Address address = new Address(addressString, port);
+		PCEPAddress address = new PCEPAddress(addressString, port);
 
 		if (inputSocketChannel.isConnected()) {
 			try {
-				//Appends the initial buffer string to the incoming message string
+				// Appends the initial buffer string to the incoming message
+				// string
 				String messageString = getPartialMessageFromHashMap(address);
-				//Clear the buffer for this string
+				// Clear the buffer for this string
 				removePartialMessageFromHashMap(address);
 
 				int loopCount = 0;
@@ -370,17 +413,18 @@ public class NetworkModuleImpl extends NetworkModule {
 					messageBuffer.clear();
 					int byteCounter;
 					byteCounter = inputSocketChannel.read(messageBuffer);
-					localLogger("byteCounter = " + byteCounter);
 
 					if (byteCounter == -1) {
-						localDebugger("Socket Shut Down Cleanly, Closing Connection for address: " + address.getAddress());
+						localLogger("Socket Shut Down Cleanly, Closing Connection for address: "
+								+ address.getIPv4Address());
 						lm.getSessionModule().closeConnection(address);
 						break;
 					}
 
 					if (byteCounter < -1) {
-						//Unknown error
-						localDebugger("Unknown error in socket. Closing Connection from address: " + address.getAddress());
+						// Unknown error
+						localLogger("Unknown error in socket. Closing Connection from address: "
+								+ address.getIPv4Address());
 						lm.getSessionModule().closeConnection(address);
 						break;
 					}
@@ -390,23 +434,24 @@ public class NetworkModuleImpl extends NetworkModule {
 						if ((loopCount == 0) && (flag == 0)) {
 							flag = 1;
 							continue;
-						}
-						else if ((loopCount == 0) && (flag == 1)){
-							// Selector in read loop with no data to read, Closing Connection 
-							localDebugger("Selector in read loop with no data to read, Closing Connection from address: " + address.getAddress());
-							lm.getSessionModule().closeConnection(address);							
+						} else if ((loopCount == 0) && (flag == 1)) {
+							// Selector in read loop with no data to read,
+							// Closing Connection
+							localLogger("Selector in read loop with no data to read, Closing Connection from address: "
+									+ address.getIPv4Address());
+							lm.getSessionModule().closeConnection(address);
 							break;
 						}
 						break;
 					}
 					messageBuffer.flip();
-
 					receivedMessageByteArray = new byte[byteCounter];
-
 					messageBuffer.get(receivedMessageByteArray);
 
-					//Append the received string onto the existing buffered data
-					messageString += PCEPComputationFactory.byteArrayToRawMessage(receivedMessageByteArray);
+					// Append the received string onto the existing buffered
+					// data
+					messageString += PCEPComputationFactory
+							.byteArrayToRawMessage(receivedMessageByteArray);
 					// //System.out.println("MessageString = " + messageString);
 					loopCount++;
 				}
@@ -414,48 +459,63 @@ public class NetworkModuleImpl extends NetworkModule {
 				String messageStringTrimed = messageString.trim();
 
 				if (messageStringTrimed.length() != 0) {
-					LinkedList<String> messages = parseMultipleMessages(messageStringTrimed, address);
+					LinkedList<String> messages = parseMultipleMessages(
+							messageStringTrimed, address);
 					Iterator<String> iter = messages.iterator();
 					while (iter.hasNext()) {
 						String temp = iter.next();
-						byte[] messageByteArray = PCEPComputationFactory.rawMessageToByteArray(temp);
+						byte[] messageByteArray = PCEPComputationFactory
+								.rawMessageToByteArray(temp);
 
-						PCEPMessage receivedMessage = new PCEPMessage(messageByteArray);
+						PCEPMessage receivedMessage = new PCEPMessage(
+								messageByteArray);
 						receivedMessage.setAddress(address);
 
-						localLogger("Reading Message from " + address.getAddress());
-						localLogger("| " + receivedMessage.contentInformation());
-						localLogger("| " + receivedMessage.binaryInformation());
-						localLogger("| " + receivedMessage.toString());
+						ResultLogger.logResult(receivedMessage); // FIXME remove
+																	// after
+																	// test
 
-						sendMessage(receivedMessage, ModuleEnum.SESSION_MODULE);
+/*						System.out.println("Received Message type  = "
+								+ receivedMessage.getMessageHeader()
+										.getTypeDecimalValue());
+						System.out.println("Received message data " + temp);
+*/						sendMessage(receivedMessage, ModuleEnum.SESSION_MODULE);
 
 					}
-				} 
+				}
 			} catch (IOException e) {
-				localDebugger("Error when reading from socket for address " + address.getAddress() + " Closing connection");
+				localLogger("Error when reading from socket for address "
+						+ address.getIPv4Address() + " Closing connection");
 				lm.getSessionModule().closeConnection(address);
 			}
 
 		} else {
-			localDebugger("Input Channel Closed for " + address.getAddress() + " Closing connection");
+			localDebugger("| Input Channel Closed for "
+					+ address.getIPv4Address() + " Closing connection");
 			lm.getSessionModule().closeConnection(address);
 		}
 	}
 
-
-	/**Function to check if the incoming string has multiple concatenated messages
-	 * if one of the messages is smaller than a full message, adds this message to the insertPartialMessageToHashMap based buffer
+	/**
+	 * Function to check if the incoming string has multiple concatenated
+	 * messages if one of the messages is smaller than a full message, adds this
+	 * message to the insertPartialMessageToHashMap based buffer
+	 * 
 	 * @param binaryString
 	 * @param address
 	 * @return LinkedList<String> containing the complete concatenated messages
 	 */
-	private LinkedList<String> parseMultipleMessages(String binaryString, Address address) {
+	private LinkedList<String> parseMultipleMessages(String binaryString,
+			PCEPAddress address) {
+		localDebugger("Entering: parseMultipleMessages(String binaryString, Address address)");
+
 		LinkedList<String> output = new LinkedList<String>();
 		while (binaryString.length() > 0) {
 			if (binaryString.length() >= 32) {
 				String currentHeaderString = binaryString.substring(0, 32);
-				PCEPCommonMessageHeader messageHeader = new PCEPCommonMessageHeader(currentHeaderString);
+				PCEPCommonMessageHeader messageHeader = new PCEPCommonMessageHeader(
+						currentHeaderString);
+
 				int bitLength = messageHeader.getLengthDecimalValue() * 8;
 
 				if (binaryString.length() >= bitLength) {
@@ -476,27 +536,36 @@ public class NetworkModuleImpl extends NetworkModule {
 		return output;
 	}
 
-	/** Function to write a PCEPMessage to the network
+	/**
+	 * Function to write a PCEPMessage to the network
 	 * 
 	 * @param message
 	 */
 	private void writeSocket(PCEPMessage message) {
 		localDebugger("Entering: writeSocket(PCEPMessage message)");
 		localDebugger("| message: " + message.contentInformation());
+		localDebugger("| " + message.binaryInformation());
+		localDebugger("| " + message.toString());
 
+		try {
+			ResultLogger.logResult(message); // FIXME remove after test
+			ResultLogger.flush(message);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 
-		SocketChannel outputSocketChannel = getSocketChannelFromHashMap(message.getAddress());
+		SocketChannel outputSocketChannel = getSocketChannelFromHashMap(message
+				.getAddress());
 
 		if (outputSocketChannel != null) {
 			if (outputSocketChannel.isConnected() == true) {
-				localLogger("Preparing to send message to " + message.getAddress().getAddress());
-				localLogger("| " + message.contentInformation());
-				localLogger("| " + message.binaryInformation());
-				localLogger("| " + message.toString());
 
 				byte[] messageByteArray = message.getMessageByteArray();
-				// System.out.println("Sending data to " + message.getAddress().getAddress() + ", Size = " + messageByteArray.length);
-				ByteBuffer messageBuffer = ByteBuffer.allocate(messageByteArray.length);
+				// System.out.println("Sending data to " +
+				// message.getAddress().getAddress() + ", Size = " +
+				// messageByteArray.length);
+				ByteBuffer messageBuffer = ByteBuffer
+						.allocate(messageByteArray.length);
 				messageBuffer.clear();
 
 				messageBuffer.put(messageByteArray);
@@ -516,152 +585,173 @@ public class NetworkModuleImpl extends NetworkModule {
 					}
 				}
 			} else {
-				localLogger("Socket Channel is not connected");
+				localLogger("| Socket Channel is not connected");
 				lm.getSessionModule().closeConnection(message.getAddress());
 			}
 		} else {
-			localLogger("Did not find Socket Channel in Hash map");
+			localLogger("| Did not find Socket Channel in Hash map");
 			lm.getSessionModule().closeConnection(message.getAddress());
 		}
 
 	}
 
-	/**Function to retrieve a socket channel from the hash map
+	/**
+	 * Function to retrieve a socket channel from the hash map
 	 * 
 	 * @param address
 	 * @return
 	 */
-	private SocketChannel getSocketChannelFromHashMap(Address address) {
+	private SocketChannel getSocketChannelFromHashMap(PCEPAddress address) {
 		localDebugger("Entering: getSocketChannel(Address address)");
-		localDebugger("| address: " + address.getAddress());
-		localLogger("Getting SocketChannel for " + address.getAddress());
-		//Check if mapping exists
-		if (addressToSocketChannelHashMap.containsKey(address.getAddress()))
-			return addressToSocketChannelHashMap.get(address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address());
+
+		localLogger("Getting SocketChannel for " + address.getIPv4Address());
+		// Check if mapping exists
+		if (addressToSocketChannelHashMap.containsKey(address.getIPv4Address()))
+			return addressToSocketChannelHashMap.get(address.getIPv4Address());
 		else
 			return null;
 	}
 
-	/**Function to retrieve a Selection Key from the hash map
+	/**
+	 * Function to retrieve a Selection Key from the hash map
 	 * 
 	 * @param address
 	 * @return
 	 */
-	private SelectionKey getSelectionKeyFromHashMap(Address address) {
+	private SelectionKey getSelectionKeyFromHashMap(PCEPAddress address) {
 		localDebugger("Entering: getSelectionKey(Address address)");
-		localDebugger("| address: " + address.getAddress());
-		localLogger("Getting SelectionKey for " + address.getAddress());
 
-		//Check if mapping exists
-		if (addressToSelectionKeyHashMap.containsKey(address.getAddress()))
-			return addressToSelectionKeyHashMap.get(address.getAddress());
+		localLogger("| Getting SelectionKey for " + address.getIPv4Address());
+		// Check if mapping exists
+		if (addressToSelectionKeyHashMap.containsKey(address.getIPv4Address()))
+			return addressToSelectionKeyHashMap.get(address.getIPv4Address());
 		else
 			return null;
 	}
 
-	/** Function to insert a selection key to the hash map
+	/**
+	 * Function to insert a selection key to the hash map
 	 * 
 	 * @param address
 	 * @param key
 	 */
-	private void insertSelectionKeyToHashMap(Address address, SelectionKey key) {
+	private void insertSelectionKeyToHashMap(PCEPAddress address,
+			SelectionKey key) {
 		localDebugger("Entering: insertSelectionKeyToHashMap(Address address, SelectionKey key)");
-		localDebugger("| address: " + address.getAddress());
-		addressToSelectionKeyHashMap.put(address.getAddress(), key);
+		localDebugger("| address: " + address.getIPv4Address());
+
+		addressToSelectionKeyHashMap.put(address.getIPv4Address(), key);
 	}
 
-	/** Function to insert the socket channel to hash map
+	/**
+	 * Function to insert the socket channel to hash map
 	 * 
 	 * @param address
 	 * @param channel
 	 */
-	private void insertSocketChannelToHashMap(Address address, SocketChannel channel) {
-		localDebugger("Entering: insertSocketChannelToHashMap(Address address, SocketChannel socketChannel)");
-		localDebugger("| address: " + address.getAddress());
-		addressToSocketChannelHashMap.put(address.getAddress(), channel);
+	private void insertSocketChannelToHashMap(PCEPAddress address,
+			SocketChannel channel) {
+		localDebugger("Entering: insertSocketChannelToHashMap(PCEPAddress address, SocketChannel channel)");
+		localDebugger("| address: " + address.getIPv4Address(false));
+
+		addressToSocketChannelHashMap.put(address.getIPv4Address(), channel);
 	}
 
-
-	/**Function to remove the selection key from hash map
+	/**
+	 * Function to remove the selection key from hash map
 	 * 
 	 * @param address
 	 */
-	private void removeSelectionKey(Address address) {
+	private void removeSelectionKey(PCEPAddress address) {
 		localDebugger("Entering: removeSelectionKey(Address address)");
-		localDebugger("| address: " + address.getAddress());
-		addressToSelectionKeyHashMap.remove(address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address());
+
+		addressToSelectionKeyHashMap.remove(address.getIPv4Address());
 	}
 
-	/**Function to remove the socket channel from hash map
+	/**
+	 * Function to remove the socket channel from hash map
 	 * 
 	 * @param address
 	 */
-	private void removeSocketChannel(Address address) {
+	private void removeSocketChannel(PCEPAddress address) {
 		localDebugger("Entering: removeSocketChannelToHashMap(Address address)");
-		localDebugger("| address: " + address.getAddress());
-		addressToSocketChannelHashMap.remove(address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address());
+
+		addressToSocketChannelHashMap.remove(address.getIPv4Address());
 	}
 
-	/**Function to retrieve a partial message string from the hash map based buffer
+	/**
+	 * Function to retrieve a partial message string from the hash map based
+	 * buffer
 	 * 
 	 * @param address
 	 * @return
 	 */
-	private String getPartialMessageFromHashMap(Address address) {
+	private String getPartialMessageFromHashMap(PCEPAddress address) {
 		localDebugger("Entering: getPartialMessageFromHashMap(Address address)");
-		localDebugger("| address: " + address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address());
 
-		localLogger("Getting String for " + address.getAddress());
-		if (partialMessageHashMap.containsKey(address.getAddress()))
-			return partialMessageHashMap.get(address.getAddress());
-		else
+		localLogger("Getting String for " + address.getIPv4Address());
+		if (partialMessageHashMap.containsKey(address.getIPv4Address())) {
+			return partialMessageHashMap.get(address.getIPv4Address());
+		} else {
 			return "";
+		}
 	}
 
-	/**Function to insert a partial message string into the hash map based buffer
+	/**
+	 * Function to insert a partial message string into the hash map based
+	 * buffer
 	 * 
 	 * @param address
 	 * @param partialMessage
 	 */
-	private void insertPartialMessageToHashMap(Address address, String partialMessage) {
+	private void insertPartialMessageToHashMap(PCEPAddress address,
+			String partialMessage) {
 		localDebugger("Entering: insertPartialMessageToHashMap(Address address, String partialMessage)");
-		localDebugger("| address: " + address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address());
 		localDebugger("| Partial Message: " + partialMessage);
 
-		localLogger("Inserting Partial String for " + address.getAddress());
-		// System.out.println("Inserting Partial String for " + address.getAddress() + ", Stirng = " + partialMessage);
-		partialMessageHashMap.put(address.getAddress(), partialMessage);
+		localLogger("Inserting Partial String for " + address.getIPv4Address());
+		// System.out.println("Inserting Partial String for " +
+		// address.getAddress() + ", Stirng = " + partialMessage);
+		partialMessageHashMap.put(address.getIPv4Address(), partialMessage);
 	}
 
-	/**Function to remove the partial message entry from the hash map based buffer
+	/**
+	 * Function to remove the partial message entry from the hash map based
+	 * buffer
 	 * 
 	 * @param address
 	 */
-	private void removePartialMessageFromHashMap(Address address) {
+	private void removePartialMessageFromHashMap(PCEPAddress address) {
 		localDebugger("Entring: removePartialMessageFromHashMap(Address address)");
-		localDebugger("| address: " + address.getAddress());
+		localDebugger("| address: " + address.getIPv4Address());
 
-		localLogger("Removing Partial Message for " + address.getAddress());
+		localLogger("Removing Partial Message for " + address.getIPv4Address());
 
-		if (partialMessageHashMap.containsKey(address.getAddress()))
-			partialMessageHashMap.remove(address.getAddress());
+		if (partialMessageHashMap.containsKey(address.getIPv4Address()))
+			partialMessageHashMap.remove(address.getIPv4Address());
 	}
 
-	/**Logger Event for logging events inside the network module
+	/**
+	 * Logger Event for logging events inside the network module
 	 * 
 	 * @param event
 	 */
 	private void localLogger(String event) {
-		Logger.logSystemEvents("[NetworkLayer]     " + event);
+		////Logger.logSystemEvents("[NetworkModule] " + event);
 	}
 
-	/**Logger Event for logging debugging information inside the network module
+	/**
+	 * Logger Event for logging debugging information inside the network module
 	 * 
 	 * @param event
 	 */
 	private void localDebugger(String event) {
-		Logger.debugger("[NetworkLayer]     " + event);
+		//Logger.debugger("[NetworkModule] " + event);
 	}
-
 
 }

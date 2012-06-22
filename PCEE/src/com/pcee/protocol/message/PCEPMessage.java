@@ -18,10 +18,9 @@
 package com.pcee.protocol.message;
 
 import java.util.LinkedList;
-
-import com.pcee.common.Address;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 public class PCEPMessage {
 	
@@ -30,7 +29,7 @@ public class PCEPMessage {
 	
 	private PCEPCommonMessageHeader messageHeader;
 	private LinkedList<PCEPObjectFrame> objectsList;
-	private Address address;
+	private PCEPAddress address;
 	
 	public PCEPMessage(byte[] messageByteArray){
 		String rawMessageString = PCEPComputationFactory.byteArrayToRawMessage(messageByteArray);
@@ -89,11 +88,11 @@ public class PCEPMessage {
 		return byteArray;
 	}
 
-	public Address getAddress() {
+	public PCEPAddress getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(PCEPAddress address) {
 		this.address = address;
 	}
 
@@ -126,6 +125,10 @@ public class PCEPMessage {
 		objectFrameBuffer.append("[" + NAME + "]");
 
 		for (short i = 0; i < objectsList.size(); i++) {
+/*			System.out.println("*****************************************************");
+			System.out.println("objectList.size() = " + objectsList.size());
+			System.out.println("contentInformation() "+ i + " : " + objectsList.get(i));
+			System.out.println("*****************************************************"); */
 			String msg = objectsList.get(i).contentInformation();
 			objectFrameBuffer.append(msg);
 		}

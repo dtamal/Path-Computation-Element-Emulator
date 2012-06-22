@@ -37,13 +37,13 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 
 	PCEPNoPathObject noPath;
 	PCEPLabelSwitchedPathAttributesObject LSPA;
-	PCEPBandwidthObject bandwidth;
+	// PCEPBandwidthObject bandwidth;
 	LinkedList<PCEPMetricObject> metricList;
 	PCEPIncludeRouteObject IRO;
-	
-//	responseFrame.getattributelist().insertlasp();
 
+	// responseFrame.getattributelist().insertlasp();
 
+	LinkedList<PCEPBandwidthObject> bwList;
 	LinkedList<PCEPExplicitRouteObject> EROList;
 
 	public PCEPResponseFrame(PCEPRequestParametersObject RP) {
@@ -51,40 +51,49 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 	}
 
 	// VARIOUS CONVENIENT METHODS
-	
+
 	public int getRequestID() {
 		return RP.getRequestIDNumberDecimalValue();
 	}
-	
-	public String getTraversedVertexes(){
-		if(containsExplicitRouteObjectList()){
+
+	public String getTraversedVertexes() {
+		if (containsExplicitRouteObjectList()) {
 			String traversedVertexes = new String();
-			
-			for(PCEPExplicitRouteObject ERO: EROList){
-				String currentPath = "[" + ERO.getTraversedVertexes() + "]";
-				traversedVertexes = traversedVertexes + currentPath;
+
+			for (PCEPExplicitRouteObject ERO : EROList) {
+				String path = "[" + ERO.printPath() + "]";
+				traversedVertexes += path;
 			}
-			
+
 			return traversedVertexes;
-		}
-		else{
+		} else {
 			return "NO PATH";
 		}
 	}
-	
-	
+
 	// INSERT METHODS
 
 	public void insertNoPathObject(PCEPNoPathObject noPath) {
 		this.noPath = noPath;
 	}
 
-	public void insertLabelSwitchedPathAttributesObject(PCEPLabelSwitchedPathAttributesObject LSPA) {
+	public void insertLabelSwitchedPathAttributesObject(
+			PCEPLabelSwitchedPathAttributesObject LSPA) {
 		this.LSPA = LSPA;
 	}
 
 	public void insertBandwidthObject(PCEPBandwidthObject bandwidth) {
-		this.bandwidth = bandwidth;
+		if (containsBandwidthObjectList()) {
+			this.bwList.add(bandwidth);
+		} else {
+			bwList = new LinkedList<PCEPBandwidthObject>();
+			bwList.add(bandwidth);
+		}
+
+	}
+	
+	public void insertBandwidthObjectList(LinkedList<PCEPBandwidthObject> bwList){
+		this.bwList = bwList;
 	}
 
 	public void insertMetricObject(PCEPMetricObject metricObject) {
@@ -114,7 +123,8 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 
 	}
 
-	public void insertExplicitRouteObjectList(LinkedList<PCEPExplicitRouteObject> EROList) {
+	public void insertExplicitRouteObjectList(
+			LinkedList<PCEPExplicitRouteObject> EROList) {
 		this.EROList = EROList;
 	}
 
@@ -134,9 +144,9 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		return null;
 	}
 
-	public PCEPBandwidthObject extractBandwidthObject() {
-		if (containsBandwidthObject()) {
-			return bandwidth;
+	public LinkedList<PCEPBandwidthObject> extractBandwidthObjectList() {
+		if (containsBandwidthObjectList()) { // TODO FIX This bug !!
+			return bwList;
 		}
 		return null;
 	}
@@ -156,14 +166,14 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 	}
 
 	public LinkedList<PCEPExplicitRouteObject> extractExplicitRouteObjectList() {
-		if (containsMetricObjectList()) {
+		if (containsExplicitRouteObjectList()) { // TODO FIX This bug !!
 			return EROList;
 		}
 		return null;
 	}
 
 	// CONTAINS METHODS
-
+	
 	public boolean containsNoPathObject() {
 		if (noPath == null) {
 			return false;
@@ -178,8 +188,8 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		return true;
 	}
 
-	public boolean containsBandwidthObject() {
-		if (bandwidth == null) {
+	public boolean containsBandwidthObjectList() {
+		if (bwList == null) {
 			return false;
 		}
 		return true;
@@ -219,8 +229,10 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		if (containsLabelSwitchedPathAttributesObject()) {
 			length += LSPA.getObjectFrameByteLength();
 		}
-		if (containsBandwidthObject()) {
-			length += bandwidth.getObjectFrameByteLength();
+		if (containsBandwidthObjectList()) {
+			for (int i = 0; i < bwList.size(); i++) {
+				length += bwList.get(i).getObjectFrameByteLength();
+			}
 		}
 		if (containsMetricObjectList()) {
 			for (int i = 0; i < metricList.size(); i++) {
@@ -235,7 +247,6 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 				length += EROList.get(i).getObjectFrameByteLength();
 			}
 		}
-
 		return length;
 	}
 
@@ -251,12 +262,16 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		if (containsLabelSwitchedPathAttributesObject()) {
 			objectsString.append(LSPA.getObjectFrameBinaryString());
 		}
-		if (containsBandwidthObject()) {
-			objectsString.append(bandwidth.getObjectFrameBinaryString());
+		if (containsBandwidthObjectList()) {
+			for (int i = 0; i < bwList.size(); i++) {
+				objectsString
+						.append(bwList.get(i).getObjectFrameBinaryString());
+			}
 		}
 		if (containsMetricObjectList()) {
 			for (int i = 0; i < metricList.size(); i++) {
-				objectsString.append(metricList.get(i).getObjectFrameBinaryString());
+				objectsString.append(metricList.get(i)
+						.getObjectFrameBinaryString());
 			}
 		}
 		if (containsIncludeRouteObject()) {
@@ -264,7 +279,8 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		}
 		if (containsExplicitRouteObjectList()) {
 			for (int i = 0; i < EROList.size(); i++) {
-				objectsString.append(EROList.get(i).getObjectFrameBinaryString());
+				objectsString.append(EROList.get(i)
+						.getObjectFrameBinaryString());
 			}
 		}
 
@@ -283,8 +299,11 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		if (containsLabelSwitchedPathAttributesObject()) {
 			respondObjects.add(LSPA);
 		}
-		if (containsBandwidthObject()) {
-			respondObjects.add(bandwidth);
+
+		if (containsBandwidthObjectList()) {
+			for (int i = 0; i < bwList.size(); i++) {
+				respondObjects.add(bwList.get(i));
+			}
 		}
 		if (containsMetricObjectList()) {
 			for (int i = 0; i < metricList.size(); i++) {
@@ -299,7 +318,6 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 				respondObjects.add(EROList.get(i));
 			}
 		}
-
 		return respondObjects;
 	}
 

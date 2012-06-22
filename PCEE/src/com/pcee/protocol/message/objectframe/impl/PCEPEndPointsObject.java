@@ -17,11 +17,11 @@
 
 package com.pcee.protocol.message.objectframe.impl;
 
-import com.pcee.common.Address;
 import com.pcee.protocol.message.PCEPComputationFactory;
 import com.pcee.protocol.message.PCEPConstantValues;
 import com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 /**
  * <pre>
@@ -53,16 +53,19 @@ public class PCEPEndPointsObject implements PCEPObjectFrame {
 	private int destinationAddressEndBit = PCEPConstantValues.END_POINTS_OBJECT_DESTINATION_ADDRESS_END_BIT;
 	private int destinationAddressLength = PCEPConstantValues.END_POINTS_OBJECT_DESTINATION_ADDRESS_LENGTH;
 
-	public PCEPEndPointsObject(PCEPCommonObjectHeader objectHeader, String binaryString) {
+	public PCEPEndPointsObject(PCEPCommonObjectHeader objectHeader,
+			String binaryString) {
 		this.setObjectHeader(objectHeader);
 		this.setObjectBinaryString(binaryString);
 		this.updateHeaderLength();
 	}
 
-	public PCEPEndPointsObject(PCEPCommonObjectHeader objectHeader, Address sourceAddress, Address destinationAddress) {
+	public PCEPEndPointsObject(PCEPCommonObjectHeader objectHeader,
+			PCEPAddress sourceAddress, PCEPAddress destinationAddress) {
 		this.setObjectHeader(objectHeader);
-		this.setSourceAddressBinaryString(sourceAddress.getBinaryAddress());
-		this.setDestinationAddressBinaryString(destinationAddress.getBinaryAddress());
+		this.setSourceAddressBinaryString(sourceAddress.getIPv4BinaryAddress());
+		this.setDestinationAddressBinaryString(destinationAddress
+				.getIPv4BinaryAddress());
 		this.updateHeaderLength();
 	}
 
@@ -88,8 +91,10 @@ public class PCEPEndPointsObject implements PCEPObjectFrame {
 	}
 
 	public void setObjectBinaryString(String binaryString) {
-		String sourceAddressBinaryString = binaryString.substring(sourceAddressStartBit, sourceAddressEndBit + 1);
-		String destinationAddressBinaryString = binaryString.substring(destinationAddressStartBit, destinationAddressEndBit + 1);
+		String sourceAddressBinaryString = binaryString.substring(
+				sourceAddressStartBit, sourceAddressEndBit + 1);
+		String destinationAddressBinaryString = binaryString.substring(
+				destinationAddressStartBit, destinationAddressEndBit + 1);
 
 		this.setSourceAddressBinaryString(sourceAddressBinaryString);
 		this.setDestinationAddressBinaryString(destinationAddressBinaryString);
@@ -103,7 +108,8 @@ public class PCEPEndPointsObject implements PCEPObjectFrame {
 	}
 
 	public String getObjectFrameBinaryString() {
-		String headerBinaryString = this.getObjectHeader().getHeaderBinaryString();
+		String headerBinaryString = this.getObjectHeader()
+				.getHeaderBinaryString();
 		String objectBinaryString = this.getObjectBinaryString();
 
 		return headerBinaryString + objectBinaryString;
@@ -129,15 +135,18 @@ public class PCEPEndPointsObject implements PCEPObjectFrame {
 	// binaryLength);
 	// }
 	public void setSourceAddressBinaryString(String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, sourceAddressLength);
+		String checkedBinaryString = PCEPComputationFactory.setBinaryString(
+				binaryString, sourceAddressLength);
 		this.sourceAddress = checkedBinaryString;
 	}
 
-	public void setSourceAddressBinaryString(int startingBit, String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(sourceAddress, startingBit, binaryString, sourceAddressLength);
-		this.sourceAddress = checkedBinaryString;
-	}
-
+	/*
+	 * public void setSourceAddressBinaryString(int startingBit, String
+	 * binaryString) { String checkedBinaryString =
+	 * PCEPComputationFactory.setBinaryString(sourceAddress, startingBit,
+	 * binaryString, sourceAddressLength); this.sourceAddress =
+	 * checkedBinaryString; }
+	 */
 	/**
 	 * destinationAddress
 	 */
@@ -158,35 +167,46 @@ public class PCEPEndPointsObject implements PCEPObjectFrame {
 	// binaryLength);
 	// }
 	public void setDestinationAddressBinaryString(String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, destinationAddressLength);
+		String checkedBinaryString = PCEPComputationFactory.setBinaryString(
+				binaryString, destinationAddressLength);
 		this.destinationAddress = checkedBinaryString;
 	}
 
-	public void setDestinationAddressBinaryString(int startingBit, String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(destinationAddress, startingBit, binaryString, destinationAddressLength);
+	public void setDestinationAddressBinaryString(int startingBit,
+			String binaryString) {
+		String checkedBinaryString = PCEPComputationFactory.setBinaryString(
+				destinationAddress, startingBit, binaryString,
+				destinationAddressLength);
 		this.destinationAddress = checkedBinaryString;
 	}
 
 	public String toString() {
 
-		Address sourceAddress = new Address(this.getSourceAddressBinaryString());
-		Address destinationAddress = new Address(this.getDestinationAddressBinaryString());
+		PCEPAddress sourceAddress = new PCEPAddress(
+				this.getSourceAddressBinaryString());
+		PCEPAddress destinationAddress = new PCEPAddress(
+				this.getDestinationAddressBinaryString());
 
-		String sourceAddressInfo = "SourceAddress=" + sourceAddress.getAddress();
-		String destinationAddressInfo = ",DestinationAddress=" + destinationAddress.getAddress();
+		String sourceAddressInfo = "SourceAddress="
+				+ sourceAddress.getIPv4Address(false);
+		String destinationAddressInfo = ",DestinationAddress="
+				+ destinationAddress.getIPv4Address(false);
 
 		String headerInfo = this.getObjectHeader().toString();
-		String objectInfo = "<End-Points:" + sourceAddressInfo + destinationAddressInfo + ">";
+		String objectInfo = "<End-Points:" + sourceAddressInfo
+				+ destinationAddressInfo + ">";
 
 		return headerInfo + objectInfo;
 	}
 
 	public String binaryInformation() {
 		String sourceAddressBinaryInfo = getSourceAddressBinaryString();
-		String destinationAddressBinaryInfo = "'" + getDestinationAddressBinaryString();
+		String destinationAddressBinaryInfo = "'"
+				+ getDestinationAddressBinaryString();
 
 		String headerInfo = this.getObjectHeader().binaryInformation();
-		String objectInfo = "[" + sourceAddressBinaryInfo + destinationAddressBinaryInfo + "]";
+		String objectInfo = "[" + sourceAddressBinaryInfo
+				+ destinationAddressBinaryInfo + "]";
 
 		return headerInfo + objectInfo;
 	}

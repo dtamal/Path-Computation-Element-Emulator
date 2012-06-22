@@ -26,12 +26,20 @@ public class PCEPConstantValues {
 //	public static final short OPENWAIT_TIMER = 60;
 //	public static final short KEEPWAIT_TIMER = 60;
 	
-	// Debugging Values
-	public static final short CONNECT_TIMER = 1500;
-	public static final short KEEPALIVE_TIMER = 1500;
-	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
-	public static final short OPENWAIT_TIMER = 1500;
-	public static final short KEEPWAIT_TIMER = 1500;
+	//
+//	public static final short CONNECT_TIMER = 1500;
+//	public static final short KEEPALIVE_TIMER = 1500;
+//	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
+//	public static final short OPENWAIT_TIMER = 1500;
+//	public static final short KEEPWAIT_TIMER = 1500;
+	
+	// Testing Values
+	public static final short CONNECT_TIMER = 300;
+	public static final short KEEPALIVE_TIMER = 60;
+//	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
+	public static final short DEAD_TIMER = 12000;
+	public static final short OPENWAIT_TIMER = 100;
+	public static final short KEEPWAIT_TIMER = 100;
 
 	// Common Message Header
 	public static final short COMMON_MESSAGE_HEADER_LENGTH = 32;
@@ -82,7 +90,89 @@ public class PCEPConstantValues {
 	public static final short COMMON_OBJECT_HEADER_LENGTH_LENGTH = 16;
 	public static final short COMMON_OBJECT_HEADER_LENGTH_START_BIT = 16;
 	public static final short COMMON_OBJECT_HEADER_LENGTH_END_BIT = 31;
+	
+	//IT Resource Object
+	public static final short IT_RESOURCE_OBJECT_LENGTH = 32;
+	
+	public static final short IT_RESOURCE_OBJECT_RESERVED_LENGTH = 6;
+	public static final short IT_RESOURCE_OBJECT_RESERVED_START_BIT = 0;
+	public static final short IT_RESOURCE_OBJECT_RESERVED_END_BIT = 5;
+	
+	public static final short IT_RESOURCE_OBJECT_CPU_LENGTH = 8;
+	public static final short IT_RESOURCE_OBJECT_CPU_START_BIT = 6;
+	public static final short IT_RESOURCE_OBJECT_CPU_END_BIT = 13;
+	
+	public static final short IT_RESOURCE_OBJECT_RAM_LENGTH = 8;
+	public static final short IT_RESOURCE_OBJECT_RAM_START_BIT = 14;
+	public static final short IT_RESOURCE_OBJECT_RAM_END_BIT = 21;
+	
+	public static final short IT_RESOURCE_OBJECT_STORAGE_LENGTH = 10;
+	public static final short IT_RESOURCE_OBJECT_STORAGE_START_BIT = 22;
+	public static final short IT_RESOURCE_OBJECT_STORAGE_END_BIT = 31;
+	
 
+	//PCEPTNASourceObject
+	public static final short TNA_SOURCE_OBJECT_TYPE_START_BIT = 0;
+	public static final short TNA_SOURCE_OBJECT_TYPE_END_BIT = 15;
+	public static final short TNA_SOURCE_OBJECT_TYPE_LENGTH = 16;
+	
+	public static final short TNA_SOURCE_OBJECT_LENGTH_START_BIT = 16;
+	public static final short TNA_SOURCE_OBJECT_LENGTH_END_BIT = 31;
+	public static final short TNA_SOURCE_OBJECT_LENGTH_LENGTH = 16;
+	
+	public static final short TNA_SOURCE_OBJECT_ADDRESS_LENGTH_START_BIT = 32;
+	public static final short TNA_SOURCE_OBJECT_ADDRESS_LENGTH_END_BIT = 39;
+	public static final short TNA_SOURCE_OBJECT_ADDRESS_LENGTH_LENGTH = 8;
+	
+	public static final short TNA_SOURCE_OBJECT_RESERVED_START_BIT = 40;
+	public static final short TNA_SOURCE_OBJECT_RESERVED_END_BIT = 63;
+	public static final short TNA_SOURCE_OBJECT_RESERVED_LENGTH = 24;
+	
+	public static final short TNA_SOURCE_OBJECT_SRC_IP_START_BIT = 64;
+	public static final short TNA_SOURCE_OBJECT_SRC_IP_END_BIT = 95;
+	public static final short TNA_SOURCE_OBJECT_SRC_IP_LENGTH = 32;
+	
+	//PCEPTNADestinationObject
+	public static final short TNA_DESTINATION_OBJECT_TYPE_START_BIT = 0;
+	public static final short TNA_DESTINATION_OBJECT_TYPE_END_BIT = 15;
+	public static final short TNA_DESTINATION_OBJECT_TYPE_LENGTH = 16;
+	
+	public static final short TNA_DESTINATION_OBJECT_LENGTH_START_BIT = 16;
+	public static final short TNA_DESTINATION_OBJECT_LENGTH_END_BIT = 31;
+	public static final short TNA_DESTINATION_OBJECT_LENGTH_LENGTH = 16;
+	
+	public static final short TNA_DESTINATION_OBJECT_ADDRESS_LENGTH_START_BIT = 32;
+	public static final short TNA_DESTINATION_OBJECT_ADDRESS_LENGTH_END_BIT = 39;
+	public static final short TNA_DESTINATION_OBJECT_ADDRESS_LENGTH_LENGTH = 8;
+	
+	public static final short TNA_DESTINATION_OBJECT_RESERVED_START_BIT = 40;
+	public static final short TNA_DESTINATION_OBJECT_RESERVED_END_BIT = 63;
+	public static final short TNA_DESTINATION_OBJECT_RESERVED_LENGTH = 24;
+	
+	public static final short TNA_DESTINATION_OBJECT_DEST_IP_START_BIT = 64;
+	public static final short TNA_DESTINATION_OBJECT_DEST_IP_END_BIT = 95;
+	public static final short TNA_DESTINATION_OBJECT_DEST_IP_LENGTH = 32;
+	
+	//PCEPGeneralizedEndPointsTNAObject
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_RESERVED_START_BIT = 0;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_RESERVED_END_BIT = 23;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_RESERVED_LENGTH = 24;
+	
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_END_POINT_TYPE_START_BIT = 24;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_END_POINT_TYPE_END_BIT = 31;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_END_POINT_TYPE_LENGTH = 8;
+	
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_SOURCE_POINT_START_BIT = 32;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_SOURCE_POINT_END_BIT = 127;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_SOURCE_POINT_LENGTH = 96;
+	
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_DESTINATION_POINT_START_BIT = 128;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_DESTINATION_POINT_END_BIT = 223;
+	public static final short GENERALIZED_END_POINTS_TNA_OBJECT_DESTINATION_POINT_LENGTH = 96;
+	
+	
+	
+	
 	// Open Object
 	public static final short OPEN_OBJECT_LENGTH = 32;
 

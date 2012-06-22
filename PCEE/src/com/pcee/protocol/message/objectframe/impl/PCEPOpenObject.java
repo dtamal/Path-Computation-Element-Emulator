@@ -46,7 +46,7 @@ public class PCEPOpenObject implements PCEPObjectFrame {
 	private String flags;
 
 	private PCEPCommonObjectHeader objectHeader;
-	// private LinkedList<PCEPTLVObject> tlvList;
+//	private LinkedList<PCEPTLVObject> tlvList;
 
 	private int versionStartBit = PCEPConstantValues.OPEN_OBJECT_VERSION_START_BIT;
 	private int versionEndBit = PCEPConstantValues.OPEN_OBJECT_VERSION_END_BIT;
@@ -144,7 +144,7 @@ public class PCEPOpenObject implements PCEPObjectFrame {
 	public String getVersionBinaryString() {
 		return this.version;
 	}
-
+	
 	public void setVersionDecimalValue(int decimalValue) {
 		int binaryLength = versionLength;
 		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength);

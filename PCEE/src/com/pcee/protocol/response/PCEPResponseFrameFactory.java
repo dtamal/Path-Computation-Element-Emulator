@@ -24,6 +24,7 @@ import com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.impl.PCEPBandwidthObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPExplicitRouteObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPGenericExplicitRouteObjectImpl;
 import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
@@ -32,19 +33,21 @@ import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 
 public class PCEPResponseFrameFactory {
 
-	public static PCEPResponseFrame generatePathComputationRequestFrame(PCEPRequestParametersObject RP) {
+	public static PCEPResponseFrame generatePathComputationRequestFrame(
+			PCEPRequestParametersObject RP) {
 
 		PCEPResponseFrame responseFrame = new PCEPResponseFrame(RP);
 
 		return responseFrame;
 	}
 
-	public static PCEPResponseFrame getPathComputationResponseFrame(PCEPMessage message) {
+	public static PCEPResponseFrame getPathComputationResponseFrame(
+			PCEPMessage message) {
 
 		PCEPRequestParametersObject RP = null;
 		PCEPNoPathObject noPath = null;
 		PCEPLabelSwitchedPathAttributesObject LSPA = null;
-		PCEPBandwidthObject bandwidth = null;
+		LinkedList<PCEPBandwidthObject> bwList = null;
 		LinkedList<PCEPMetricObject> metricList = null;
 		PCEPIncludeRouteObject IRO = null;
 		LinkedList<PCEPExplicitRouteObject> EROList = null;
@@ -54,7 +57,8 @@ public class PCEPResponseFrameFactory {
 		for (int i = 0; i < objectList.size(); i++) {
 
 			PCEPObjectFrame objectFrame = objectList.get(i);
-			PCEPCommonObjectHeader objectFrameHeader = objectFrame.getObjectHeader();
+			PCEPCommonObjectHeader objectFrameHeader = objectFrame
+					.getObjectHeader();
 
 			switch (objectFrameHeader.getClassDecimalValue()) {
 
@@ -74,7 +78,10 @@ public class PCEPResponseFrameFactory {
 			}
 
 			case 5: {
-				bandwidth = (PCEPBandwidthObject) objectFrame;
+				PCEPBandwidthObject bw = (PCEPBandwidthObject) objectFrame;
+				if (bwList == null)
+					bwList = new LinkedList<PCEPBandwidthObject>();
+				bwList.add(bw);
 				break;
 			}
 
@@ -97,7 +104,7 @@ public class PCEPResponseFrameFactory {
 			}
 
 			case 7: {
-				PCEPExplicitRouteObject ERO = (PCEPExplicitRouteObject) objectFrame;
+				PCEPExplicitRouteObject ERO = (PCEPGenericExplicitRouteObjectImpl) objectFrame;
 
 				if (EROList != null) {
 					EROList.add(ERO);
@@ -112,9 +119,7 @@ public class PCEPResponseFrameFactory {
 			default: {
 				break;
 			}
-
 			}
-
 		}
 
 		PCEPResponseFrame responseFrame = new PCEPResponseFrame(RP);
@@ -122,22 +127,27 @@ public class PCEPResponseFrameFactory {
 		if (noPath != null) {
 			responseFrame.insertNoPathObject(noPath);
 		}
+		
 		if (LSPA != null) {
 			responseFrame.insertLabelSwitchedPathAttributesObject(LSPA);
 		}
-		if (bandwidth != null) {
-			responseFrame.insertBandwidthObject(bandwidth);
+		
+		if (bwList != null) {
+			responseFrame.insertBandwidthObjectList(bwList);
 		}
+		
 		if (metricList != null) {
 			responseFrame.insertMetricObjectList(metricList);
 		}
+		
 		if (IRO != null) {
 			responseFrame.insertIncludeRouteObject(IRO);
 		}
+		
 		if (EROList != null) {
 			responseFrame.insertExplicitRouteObjectList(EROList);
 		}
-
+		
 		return responseFrame;
 	}
 

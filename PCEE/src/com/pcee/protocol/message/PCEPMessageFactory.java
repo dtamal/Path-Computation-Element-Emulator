@@ -18,7 +18,6 @@
 package com.pcee.protocol.message;
 
 import java.util.LinkedList;
-
 import com.pcee.protocol.message.objectframe.*;
 import com.pcee.protocol.message.objectframe.impl.*;
 
@@ -34,15 +33,6 @@ public class PCEPMessageFactory {
 	public static String getPCEPObjectCollectionString(String rawMessageString) {
 		return rawMessageString.substring(MESSAGE_HEADER_LENGTH);
 	}
-
-//	public static String analyzeMessage(String rawMessageString) {
-	//	String messageHeaderString = getPCEPCommonMessageHeaderString(rawMessageString);
-		//String objectCollectionString = getPCEPObjectCollectionString(rawMessageString);
-
-		//PCEPCommonMessageHeader messageHeader = new PCEPCommonMessageHeader(messageHeaderString);
-
-	//	return null;
-//	}
 
 	/**
 	 * Simplificated Error fabrication
@@ -68,18 +58,15 @@ public class PCEPMessageFactory {
 		return new PCEPMessage(byteArray);
 	}
 
-	public static PCEPMessage generateMessage(PCEPMessageFrame messageFrame) {
-
+	public static PCEPMessage generateMessage(PCEPMessageFrame messageFrame){
 		PCEPCommonMessageHeader messageHeader = new PCEPCommonMessageHeader(1, messageFrame.getMessageType());
 		LinkedList<PCEPObjectFrame> objectsList = messageFrame.getObjectFrameLinkedList();
-
 		int messageHeaderByteLength = PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH / 8;
 		int objectsByteLength = messageFrame.getByteLength();
 
 		messageHeader.setLengthDecimalValue(messageHeaderByteLength + objectsByteLength);
 
 		return new PCEPMessage(messageHeader, objectsList);
-
 	}
 
 }

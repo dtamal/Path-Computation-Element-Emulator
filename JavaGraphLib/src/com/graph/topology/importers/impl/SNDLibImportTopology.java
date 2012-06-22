@@ -32,240 +32,254 @@ import com.graph.graphcontroller.Gcontroller;
 import com.graph.logger.GraphLogger;
 import com.graph.topology.importers.ImportTopology;
 
-public class SNDLibImportTopology extends ImportTopology{
+public class SNDLibImportTopology extends ImportTopology {
 
 	private static final String classIdentifier = "SNDLibImportTopology";
 
-
 	@Override
 	public void importTopology(Gcontroller graph, String filename) {
-		//add vertices to the graph
+		// add vertices to the graph
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			String temp;
 			VertexElement vertex1, vertex2;
 
+			// Read till we get to Node definition)
+			while ((temp = reader.readLine()).trim().compareTo("NODES (") != 0) {
+			}
 
-			//Read till we get to Node definition)
-			while ((temp=reader.readLine()).trim().compareTo("NODES (")!=0){
-			}			
-
-			//read till we reach the end of node definitions
-			while ((temp=reader.readLine())!=null){
-				temp=temp.trim();
-				//				System.out.println(temp);
-				//				if (temp.length()==1){ 
-				//					break;
-				//				}
-				if (temp.trim().compareTo(")")==0){ 
+			// read till we reach the end of node definitions
+			while ((temp = reader.readLine()) != null) {
+				temp = temp.trim();
+				// System.out.println(temp);
+				// if (temp.length()==1){
+				// break;
+				// }
+				if (temp.trim().compareTo(")") == 0) {
 					break;
 				}
 
 				Pattern p;
-				Matcher m ;
+				Matcher m;
 
 				String sourceID = "";
 				p = Pattern.compile("[a-zA-Z0-9\\.]+");
 				m = p.matcher(temp);
 				if (m.find()) {
-					sourceID=m.group(0);
+					sourceID = m.group(0);
 				}
 
-				//				p = Pattern.compile("[0-9\\.]+");
-				//				m = p.matcher(temp);
+				// p = Pattern.compile("[0-9\\.]+");
+				// m = p.matcher(temp);
 				double[] temp1 = new double[2];
-				int count=0;
-				while(m.find()) {
-					temp1[count]=Double.parseDouble(m.group(0));
+				int count = 0;
+				while (m.find()) {
+					temp1[count] = Double.parseDouble(m.group(0));
 					count++;
-					if (count==2) break;
+					if (count == 2)
+						break;
 				}
 
 				vertex1 = new VertexElement(sourceID, graph, temp1[0], temp1[1]);
 				graph.addVertex(vertex1);
-				//				System.out.println("Vertex Added: VertexID=" + vertex1.getVertexID()+ ", X=" + vertex1.getXCoord() + ", Y=" + vertex1.getYCoord());
+				// System.out.println("Vertex Added: VertexID=" +
+				// vertex1.getVertexID()+ ", X=" + vertex1.getXCoord() + ", Y="
+				// + vertex1.getYCoord());
 			}
 
-			//Read till we get to Edge definition)
-			while ((temp=reader.readLine()).trim().compareTo("LINKS (")!=0){
-			}			
+			// Read till we get to Edge definition)
+			while ((temp = reader.readLine()).trim().compareTo("LINKS (") != 0) {
+			}
 
-			//read till we reach the end of the edge definition
-			while ((temp=reader.readLine())!=null){
-				temp=temp.trim();
-				if (temp.length()==1){ 
+			// read till we reach the end of the edge definition
+			while ((temp = reader.readLine()) != null) {
+				temp = temp.trim();
+				if (temp.length() == 1) {
 					break;
 				}
 
 				Pattern p;
-				Matcher m ;
+				Matcher m;
 
 				p = Pattern.compile("[a-zA-Z0-9\\.]+");
 				m = p.matcher(temp);
 				String[] temp1 = new String[3];
-				int count=0;
-				while(m.find()) {
-					temp1[count]=m.group(0);
+				int count = 0;
+				while (m.find()) {
+					temp1[count] = m.group(0);
 					count++;
-					if (count==3) break;
+					if (count == 3)
+						break;
 				}
-
-
 
 				vertex1 = graph.getVertex(temp1[1]);
 				vertex2 = graph.getVertex(temp1[2]);
 
-				EdgeElement edge = new EdgeElement(temp1[0], vertex1, vertex2, graph);
+				EdgeElement edge = new EdgeElement(temp1[0], vertex1, vertex2,
+						graph);
 
-				//				System.out.println("Edge Added: Edge ID=" + edge.getEdgeID() + ", sourceID=" + vertex1.getVertexID() + ", destinationID = " + vertex2.getVertexID());
-				//Compute delay using X and Y Coords from Vertices
-				double distance = Math.sqrt(Math.pow(vertex1.getXCoord() - vertex2.getXCoord(), 2) + Math.pow(vertex1.getYCoord() - vertex2.getYCoord(), 2));
+				// System.out.println("Edge Added: Edge ID=" + edge.getEdgeID()
+				// + ", sourceID=" + vertex1.getVertexID() +
+				// ", destinationID = " + vertex2.getVertexID());
+				// Compute delay using X and Y Coords from Vertices
+				double distance = Math.sqrt(Math.pow(vertex1.getXCoord()
+						- vertex2.getXCoord(), 2)
+						+ Math
+								.pow(vertex1.getYCoord() - vertex2.getYCoord(),
+										2));
 
-				double delay = distance  / 29.9792458; //(in ms)
-				//@TODO import parameters for link weight and delay from brite
+				double delay = distance / 29.9792458; // (in ms)
+				// @TODO import parameters for link weight and delay from brite
 				EdgeParams params = new BasicEdgeParams(edge, delay, 1, 40);
 				edge.setEdgeParams(params);
 				graph.addEdge(edge);
-			}			
+			}
 			reader.close();
 
-			//			Iterator <VertexElement> iter = graph.getVertexSet().iterator();
-			//			while(iter.hasNext()){
-			//				iter.next().updateNeighbourMap();
-			//			}
+			// Iterator <VertexElement> iter = graph.getVertexSet().iterator();
+			// while(iter.hasNext()){
+			// iter.next().updateNeighbourMap();
+			// }
 
 		} catch (FileNotFoundException e) {
-			GraphLogger.logError("The file " + filename + " could not be found", classIdentifier);
+			GraphLogger.logError(
+					"The file " + filename + " could not be found",
+					classIdentifier);
 			e.printStackTrace();
 		} catch (IOException e) {
-			GraphLogger.logError("IO Exception while reading file ", classIdentifier);
+			GraphLogger.logError("IO Exception while reading file ",
+					classIdentifier);
 			e.printStackTrace();
 		}
 
 	}
 
-
 	@Override
 	public void importTopologyFromString(Gcontroller graph, String[] topology) {
 		// TODO Auto-generated method stub
-		//add vertices to the graph
+		// add vertices to the graph
 		String temp;
 		VertexElement vertex1, vertex2;
 
-
-
-		int counter=0;
-		int flag=0;
-		while (counter<topology.length){
-			if (topology[counter].trim().compareTo("NODES (")==0){
-				flag=1;
+		int counter = 0;
+		int flag = 0;
+		while (counter < topology.length) {
+			if (topology[counter].trim().compareTo("NODES (") == 0) {
+				flag = 1;
 				break;
 			}
 			counter++;
-		}	
-		if (flag==0){
-			GraphLogger.logError("Invalid Topology Information", classIdentifier);
-			System.exit (-1);
+		}
+		if (flag == 0) {
+			GraphLogger.logError("Invalid Topology Information",
+					classIdentifier);
+			System.exit(-1);
 		}
 		counter++;
-		//read till we reach the end of node definitions
-		while (counter<topology.length){
-			temp=topology[counter].trim();
-			//				System.out.println(temp);
-			//				if (temp.length()==1){ 
-			//					break;
-			//				}
-			if (temp.trim().compareTo(")")==0){ 
+		// read till we reach the end of node definitions
+		while (counter < topology.length) {
+			temp = topology[counter].trim();
+			// System.out.println(temp);
+			// if (temp.length()==1){
+			// break;
+			// }
+			if (temp.trim().compareTo(")") == 0) {
 				break;
 			}
 
 			Pattern p;
-			Matcher m ;
+			Matcher m;
 
 			String sourceID = "";
 			p = Pattern.compile("[a-zA-Z0-9\\.]+");
 			m = p.matcher(temp);
 			if (m.find()) {
-				sourceID=m.group(0);
+				sourceID = m.group(0);
 			}
 
-			//				p = Pattern.compile("[0-9\\.]+");
-			//				m = p.matcher(temp);
+			// p = Pattern.compile("[0-9\\.]+");
+			// m = p.matcher(temp);
 			double[] temp1 = new double[2];
-			int count=0;
-			while(m.find()) {
-				temp1[count]=Double.parseDouble(m.group(0));
+			int count = 0;
+			while (m.find()) {
+				temp1[count] = Double.parseDouble(m.group(0));
 				count++;
-				if (count==2) break;
+				if (count == 2)
+					break;
 			}
 
 			vertex1 = new VertexElement(sourceID, graph, temp1[0], temp1[1]);
 			graph.addVertex(vertex1);
-			System.out.println("Vertex Added: VertexID=" + vertex1.getVertexID()+ ", X=" + vertex1.getXCoord() + ", Y=" + vertex1.getYCoord());
+			System.out.println("Vertex Added: VertexID="
+					+ vertex1.getVertexID() + ", X=" + vertex1.getXCoord()
+					+ ", Y=" + vertex1.getYCoord());
 			counter++;
 		}
 
-
-
-		//Read till we get to Edge definition)
-		flag=0;
-		while (counter<topology.length){
-			if (topology[counter].trim().compareTo("LINKS (")==0){
-				flag=1;
+		// Read till we get to Edge definition)
+		flag = 0;
+		while (counter < topology.length) {
+			if (topology[counter].trim().compareTo("LINKS (") == 0) {
+				flag = 1;
 				break;
 			}
 			counter++;
-		}			
+		}
 
-		if (flag==0){
-			GraphLogger.logError("Invalid Topology Information", classIdentifier);
-			System.exit (-1);
+		if (flag == 0) {
+			GraphLogger.logError("Invalid Topology Information",
+					classIdentifier);
+			System.exit(-1);
 		}
 
 		counter++;
-		//read till we reach the end of the edge definition
-		while (counter<topology.length){
-			temp=topology[counter].trim();
-			if (temp.length()==1){ 
+		// read till we reach the end of the edge definition
+		while (counter < topology.length) {
+			temp = topology[counter].trim();
+			if (temp.length() == 1) {
 				break;
 			}
 
 			Pattern p;
-			Matcher m ;
+			Matcher m;
 
 			p = Pattern.compile("[a-zA-Z0-9\\.]+");
 			m = p.matcher(temp);
 			String[] temp1 = new String[3];
-			int count=0;
-			while(m.find()) {
-				temp1[count]=m.group(0);
+			int count = 0;
+			while (m.find()) {
+				temp1[count] = m.group(0);
 				count++;
-				if (count==3) break;
+				if (count == 3)
+					break;
 			}
-
-
 
 			vertex1 = graph.getVertex(temp1[1]);
 			vertex2 = graph.getVertex(temp1[2]);
 
-			EdgeElement edge = new EdgeElement(temp1[0], vertex1, vertex2, graph);
+			EdgeElement edge = new EdgeElement(temp1[0], vertex1, vertex2,
+					graph);
 
-			System.out.println("Edge Added: Edge ID=" + edge.getEdgeID() + ", sourceID=" + vertex1.getVertexID() + ", destinationID = " + vertex2.getVertexID());
-			//Compute delay using X and Y Coords from Vertices
-			double distance = Math.sqrt(Math.pow(vertex1.getXCoord() - vertex2.getXCoord(), 2) + Math.pow(vertex1.getYCoord() - vertex2.getYCoord(), 2));
+			System.out.println("Edge Added: Edge ID=" + edge.getEdgeID()
+					+ ", sourceID=" + vertex1.getVertexID()
+					+ ", destinationID = " + vertex2.getVertexID());
+			// Compute delay using X and Y Coords from Vertices
+			double distance = Math.sqrt(Math.pow(vertex1.getXCoord()
+					- vertex2.getXCoord(), 2)
+					+ Math.pow(vertex1.getYCoord() - vertex2.getYCoord(), 2));
 
-			double delay = distance  / 29.9792458; //(in ms)
-			//@TODO import parameters for link weight and delay from brite
+			double delay = distance / 29.9792458; // (in ms)
+			// @TODO import parameters for link weight and delay from brite
 			EdgeParams params = new BasicEdgeParams(edge, delay, 1, 40);
 			edge.setEdgeParams(params);
 			graph.addEdge(edge);
 			counter++;
-		}			
+		}
 
-		//Iterator <VertexElement> iter = graph.getVertexSet().iterator();
-		//while(iter.hasNext()){
-		//	iter.next().updateNeighbourMap();
-		//}
+		// Iterator <VertexElement> iter = graph.getVertexSet().iterator();
+		// while(iter.hasNext()){
+		// iter.next().updateNeighbourMap();
+		// }
 
 	}
 

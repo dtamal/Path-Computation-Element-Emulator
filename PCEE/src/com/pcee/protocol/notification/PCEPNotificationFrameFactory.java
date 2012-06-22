@@ -17,6 +17,21 @@
 
 package com.pcee.protocol.notification;
 
+
+import java.util.LinkedList;
+import com.pcee.protocol.message.objectframe.impl.PCEPNotificationObject;
+
 public class PCEPNotificationFrameFactory {
 
+	public static PCEPNotificationFrame generateNotificationFrame(PCEPNotificationObject notifyObject) {
+
+		LinkedList<PCEPNotificationObject> list = new LinkedList<PCEPNotificationObject>();
+		
+		list.add(notifyObject);
+		
+		PCEPNotificationFrame notificationFrame = new PCEPNotificationFrame(list);
+
+		return notificationFrame;
+	}
 }
+

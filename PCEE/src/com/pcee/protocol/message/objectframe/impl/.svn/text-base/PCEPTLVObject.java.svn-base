@@ -1,5 +1,0 @@
-package com.pcep.message.objectframe.impl;
-
-public class PCEPTLVObject {
-
-}

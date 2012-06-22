@@ -19,11 +19,12 @@ package com.pcee.architecture.computationmodule.ted;
 
 import java.io.File;
 
+import com.global.GlobalCfg;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.graph.topology.importers.impl.BRITEImportTopology;
-import com.graph.topology.importers.impl.SNDLibImportTopology;
+import com.graph.topology.importers.impl.MLSNDLibImportTopology;
 import com.pcee.logger.Logger;
 
 /**
@@ -44,7 +45,7 @@ public class TopologyInformation {
 	private static ImportTopology topology;
 
 	// path to the topology description file
-	private static String topoPath = "atlanta.txt";
+	private static String topoPath = GlobalCfg.serverTopoPath;
 
 	/**
 	 * @param input
@@ -60,24 +61,23 @@ public class TopologyInformation {
 	 */
 	public static void setImporter(String importer) {
 		if (importer.equals("SNDLib")) {
-			topology = new SNDLibImportTopology();
+			topology = new MLSNDLibImportTopology();
 		} else if (importer.equals("BRITE")) {
 			topology = new BRITEImportTopology();
 		} else {
-			topology = new SNDLibImportTopology();
+			topology = new MLSNDLibImportTopology();
 		}
 	}
 
 	/** default constructor */
 	private TopologyInformation() {
-		// topology = new SNDLibImportTopology();
-		// topology = new BRITEImportTopology();
+		topology = new MLSNDLibImportTopology();
 		graph = new GcontrollerImpl();
 
 		// Source file used to instantiate the topology
 		File file = new File(topoPath);
 
-		// /Function to import the topology stored in the text file into the
+		// Function to import the topology stored in the text file into the
 		// graph object
 		topology.importTopology(graph, file.getAbsolutePath());
 		if (graph == null)
@@ -128,7 +128,7 @@ public class TopologyInformation {
 	 * @param event
 	 */
 	private void localLogger(String event) {
-		Logger.logSystemEvents("[TopologyInformation]     " + event);
+		// Logger.logSystemEvents("[TopologyInformation]     " + event);
 	}
 
 	/**
@@ -137,7 +137,15 @@ public class TopologyInformation {
 	 * @param event
 	 */
 	private void localDebugger(String event) {
-		Logger.debugger("[TopologyInformation]     " + event);
+		// Logger.debugger("[TopologyInformation]     " + event);
 	}
 
+	/**
+	 * test case
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		System.out.println(new File(topoPath).getAbsolutePath());
+	}
 }

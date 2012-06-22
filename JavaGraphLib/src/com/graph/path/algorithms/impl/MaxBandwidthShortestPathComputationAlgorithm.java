@@ -19,8 +19,10 @@ package com.graph.path.algorithms.impl;
 
 import java.util.ArrayList;
 
+import com.graph.elements.edge.EdgeElement;
 import com.graph.path.PathElement;
 import com.graph.path.algorithms.common.StaticPathSortImpl;
+import com.graph.path.algorithms.constraints.Constraint;
 
 /**Algorithm to compute the path with the MaximumBandwidth from a source to a destination*/
 
@@ -29,5 +31,20 @@ public class MaxBandwidthShortestPathComputationAlgorithm extends SimplePathComp
 	/**Sort paths by ascending order of weight*/
 	protected ArrayList<PathElement> sortPaths(ArrayList<PathElement> paths){
 		return StaticPathSortImpl.sortPathsByBandwidth(paths);
+	}
+	
+	protected int checkConstraint (Constraint constraint, EdgeElement edge, PathElement path){
+		if ((constraint.getBw()<edge.getEdgeParams().getAvailableCapacity()) && (constraint.getBw()<path.getPathParams().getAvailableCapacity())) 
+			return 1;
+		else
+			return 0;
+	}
+	
+	/**Function to check constraint for the inserted edge and existing path*/
+	protected int checkConstraint (Constraint constraint, EdgeElement edge){
+		if (constraint.getBw()<edge.getEdgeParams().getAvailableCapacity())
+			return 1;
+		else
+			return 0;
 	}
 }

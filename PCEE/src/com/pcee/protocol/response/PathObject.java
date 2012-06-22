@@ -20,14 +20,14 @@ package com.pcee.protocol.response;
 import java.util.LinkedList;
 
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
-import com.pcee.protocol.message.objectframe.impl.PCEPExplicitRouteObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPExplicitRouteObjectWSON;
 
 public class PathObject {
 
-	PCEPExplicitRouteObject ERO;
+	PCEPExplicitRouteObjectWSON ERO;
 	AttributeListObject attributeList;
 
-	public PathObject(PCEPExplicitRouteObject ERO, AttributeListObject attributeList) {
+	public PathObject(PCEPExplicitRouteObjectWSON ERO, AttributeListObject attributeList) {
 		this.ERO = ERO;
 		this.attributeList = attributeList;
 	}

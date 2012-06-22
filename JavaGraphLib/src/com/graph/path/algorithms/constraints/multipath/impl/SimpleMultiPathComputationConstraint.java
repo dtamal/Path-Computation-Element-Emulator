@@ -25,6 +25,10 @@ public class SimpleMultiPathComputationConstraint extends MultiPathConstraint{
 	
 	public static final String classIdentifier = "SimpleMultiPathComputationConstraint";
 	
+	/**bandwidth for connection **/
+	private double bw;
+	
+
 	/**Vertex Elements to define source and destination*/
 	private VertexElement source, destination;
 	
@@ -49,7 +53,7 @@ public class SimpleMultiPathComputationConstraint extends MultiPathConstraint{
 	}
 
 	/**Constructor to set the source and destination*/
-	public SimpleMultiPathComputationConstraint(VertexElement source, VertexElement destination, int pathCount){
+	public SimpleMultiPathComputationConstraint(VertexElement source, VertexElement destination, int pathCount, double bw){
 		if (source==null){
 			GraphLogger.logError("null source", classIdentifier);
 		}
@@ -59,11 +63,26 @@ public class SimpleMultiPathComputationConstraint extends MultiPathConstraint{
 		this.source = source;
 		this.destination = destination;
 		this.pathCount=pathCount;
+		this.bw = bw;
 	}
 
 	/**Function to get the max paths to be computed*/
 	public int getPathCount() {
 		return this.pathCount;
+	}
+
+	/**
+	 * @return the bw
+	 */
+	public double getBw() {
+		return bw;
+	}
+
+	/**
+	 * @param bw the bw to set
+	 */
+	public void setBw(double bw) {
+		this.bw = bw;
 	}
 
 	

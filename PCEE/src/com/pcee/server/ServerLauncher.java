@@ -34,6 +34,4 @@ public class ServerLauncher {
 			new ModuleManagement(true, args[0]);
 		}
 	}
-
-
 }

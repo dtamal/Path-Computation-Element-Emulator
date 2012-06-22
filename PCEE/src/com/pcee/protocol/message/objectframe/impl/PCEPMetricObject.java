@@ -33,7 +33,6 @@ import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * </pre>
  */
-
 public class PCEPMetricObject implements PCEPObjectFrame {
 
 	private final String NAME = "Metric";
@@ -70,23 +69,39 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 	private int metricValueEndBit = PCEPConstantValues.METRIC_OBJECT_METRIC_VALUE_END_BIT;
 	private int metricValueLength = PCEPConstantValues.METRIC_OBJECT_METRIC_VALUE_LENGTH;
 
+	/**
+	 * @param objectHeader
+	 * @param binaryString
+	 */
 	public PCEPMetricObject(PCEPCommonObjectHeader objectHeader, String binaryString) {
 		this.setObjectHeader(objectHeader);
 		this.setObjectBinaryString(binaryString);
 		this.updateHeaderLength();
 	}
 
-	public PCEPMetricObject(PCEPCommonObjectHeader objectHeader, String cFlag, String bFlag, int type, String metricValue) {
+	/**
+	 * @param objectHeader
+	 * @param cFlag
+	 * @param bFlag
+	 * @param type
+	 * @param metricValue
+	 */
+	public PCEPMetricObject(PCEPCommonObjectHeader objectHeader, String cFlag, String bFlag, int type, float metricValue) {
 		this.setObjectHeader(objectHeader);
 		this.setReservedBinaryString(PCEPComputationFactory.generateZeroString(reservedLength));
 		this.setFlagsBinaryString(PCEPComputationFactory.generateZeroString(flagsLength));
 		this.setCFlagBinaryString(cFlag);
 		this.setBFlagBinaryString(bFlag);
 		this.setTypeDecimalValue(type);
-		this.setMetricValueBinaryString(metricValue);
+		this.setMetricValueBinaryString(Integer.toBinaryString(Float.floatToIntBits(metricValue)));
 		this.updateHeaderLength();
 	}
+	
+	public PCEPMetricObject(){}
 
+	/**
+	 * 
+	 */
 	private void updateHeaderLength() {
 		int objectFrameByteLength = this.getObjectFrameByteLength();
 		this.getObjectHeader().setLengthDecimalValue(objectFrameByteLength);
@@ -99,15 +114,24 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return objectHeader;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#setObjectHeader(com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader)
+	 */
 	public void setObjectHeader(PCEPCommonObjectHeader objectHeader) {
 		this.objectHeader = objectHeader;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#getObjectBinaryString()
+	 */
 	public String getObjectBinaryString() {
 		String binaryString = reserved + flags + type + metricValue;
 		return binaryString;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#setObjectBinaryString(java.lang.String)
+	 */
 	public void setObjectBinaryString(String binaryString) {
 		String reservedBinaryString = binaryString.substring(reservedStartBit, reservedEndBit + 1);
 		String flagsBinaryString = binaryString.substring(flagsStartBit, flagsEndBit + 1);
@@ -124,13 +148,19 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		this.setMetricValueBinaryString(metricValueBinaryString);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#getObjectFrameByteLength()
+	 */
 	public int getObjectFrameByteLength() {
-		int objectLength = reserved.length() + flags.length() + type.length() + metricValue.length();
+		int objectLength = reserved.length() + flags.length() + type.length() + (metricValue+"").length();
 		int headerLength = PCEPConstantValues.COMMON_OBJECT_HEADER_LENGTH;
 		int objectFrameByteLength = (objectLength + headerLength) / 8;
 		return objectFrameByteLength;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#getObjectFrameBinaryString()
+	 */
 	public String getObjectFrameBinaryString() {
 		String headerBinaryString = this.getObjectHeader().getHeaderBinaryString();
 		String objectBinaryString = this.getObjectBinaryString();
@@ -141,27 +171,22 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 	/**
 	 * reserved
 	 */
-	// public int getReservedDecimalValue() {
-	// int decimalValue = (int) getDecimalValue(reserved);
-	// return decimalValue;
-	// }
 	public String getReservedBinaryString() {
 		return this.reserved;
 	}
 
-	// public void setReservedDecimalValue(int decimalValue) {
-	// int binaryLength = reservedLength;
-	// int maxValue = (int)
-	// PCEPConstantValues.MaxValueFabrication(binaryLength);
-	//
-	// this.reserved = this.setDecimalValue(decimalValue, maxValue,
-	// binaryLength);
-	// }
+	/**
+	 * @param binaryString
+	 */
 	public void setReservedBinaryString(String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, reservedLength);
 		this.reserved = checkedBinaryString;
 	}
 
+	/**
+	 * @param startingBit
+	 * @param binaryString
+	 */
 	public void setReservedBinaryString(int startingBit, String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(reserved, startingBit, binaryString, reservedLength);
 		this.reserved = checkedBinaryString;
@@ -175,10 +200,16 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return decimalValue;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getTypeBinaryString() {
 		return this.type;
 	}
 
+	/**
+	 * @param decimalValue
+	 */
 	public void setTypeDecimalValue(int decimalValue) {
 		int binaryLength = typeLength;
 		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength);
@@ -186,11 +217,18 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		this.type = PCEPComputationFactory.setDecimalValue(decimalValue, maxValue, binaryLength);
 	}
 
+	/**
+	 * @param binaryString
+	 */
 	public void setTypeBinaryString(String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, typeLength);
 		this.type = checkedBinaryString;
 	}
 
+	/**
+	 * @param startingBit
+	 * @param binaryString
+	 */
 	public void setTypeBinaryString(int startingBit, String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(type, startingBit, binaryString, typeLength);
 		this.type = checkedBinaryString;
@@ -199,32 +237,27 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 	/**
 	 * metricValue
 	 */
-	// public int getMetricValueDecimalValue() {
-	// int decimalValue = (int) getDecimalValue(metricValue);
-	// return decimalValue;
-	// }
 	public String getMetricValueBinaryString() {
-		return this.metricValue;
+		return this.metricValue+"";
 	}
 
-	// public void setMetricValueDecimalValue(int decimalValue) {
-	// int binaryLength = metricValueLength;
-	// int maxValue = (int)
-	// PCEPConstantValues.MaxValueFabrication(binaryLength);
-	//
-	// this.metricValue = this.setDecimalValue(decimalValue, maxValue,
-	// binaryLength);
-	// }
+	/**
+	 * @param binaryString
+	 */
 	public void setMetricValueBinaryString(String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, metricValueLength);
+		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString,metricValueLength);
 		this.metricValue = checkedBinaryString;
 	}
-
+	
+	/**
+	 * @param startingBit
+	 * @param binaryString
+	 */
 	public void setMetricValueBinaryString(int startingBit, String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(metricValue, startingBit, binaryString, metricValueLength);
+		String checkedBinaryString = PCEPComputationFactory.setBinaryString(String.valueOf(metricValue), startingBit, binaryString, metricValueLength);
 		this.metricValue = checkedBinaryString;
 	}
-
+	
 	/**
 	 * flags
 	 */
@@ -233,10 +266,16 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return decimalValue;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getFlagsBinaryString() {
 		return this.flags;
 	}
 
+	/**
+	 * @param decimalValue
+	 */
 	public void setFlagsDecimalValue(int decimalValue) {
 		int binaryLength = flagsLength;
 		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength);
@@ -244,11 +283,18 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		this.flags = PCEPComputationFactory.setDecimalValue(decimalValue, maxValue, binaryLength);
 	}
 
+	/**
+	 * @param binaryString
+	 */
 	public void setFlagsBinaryString(String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, flagsLength);
 		this.flags = checkedBinaryString;
 	}
 
+	/**
+	 * @param startingBit
+	 * @param binaryString
+	 */
 	public void setFlagsBinaryString(int startingBit, String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(flags, startingBit, binaryString, flagsLength);
 		this.flags = checkedBinaryString;
@@ -265,11 +311,17 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return decimalValue;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getCFlagBinaryString() {
 		String binaryString = flags.substring(0, (cFlagStartBit - flagsStartBit) + cFlagLength);
 		return binaryString;
 	}
 
+	/**
+	 * @param binaryString
+	 */
 	public void setCFlagBinaryString(String binaryString) {
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(this.flags, (cFlagStartBit - flagsStartBit), binaryString, flagsLength);
 		this.flags = checkedBinaryString;
@@ -285,18 +337,27 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return decimalValue;
 	}
 
+	/**
+	 * @return
+	 */
 	public String getBFlagBinaryString() {
 		int relativeStartBit = (bFlagStartBit - flagsStartBit);
 		String binaryString = flags.substring(relativeStartBit, relativeStartBit + bFlagLength);
 		return binaryString;
 	}
 
+	/**
+	 * @param binaryString
+	 */
 	public void setBFlagBinaryString(String binaryString) {
 		int relativeStartBit = (bFlagStartBit - flagsStartBit);
 		String checkedBinaryString = PCEPComputationFactory.setBinaryString(flags, relativeStartBit, binaryString, flagsLength);
 		this.flags = checkedBinaryString;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		String reservedInfo = "Reserved=" + this.getReservedBinaryString();
 		String flagsInfo = ",Flags=" + this.getFlagsBinaryString();
@@ -309,6 +370,9 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return headerInfo + objectInfo;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#binaryInformation()
+	 */
 	public String binaryInformation() {
 		String reservedBinaryInfo = getReservedBinaryString();
 		String flagsInfo = "'" + this.getFlagsBinaryString();
@@ -321,8 +385,23 @@ public class PCEPMetricObject implements PCEPObjectFrame {
 		return headerInfo + objectInfo;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.pcee.protocol.message.objectframe.PCEPObjectFrame#contentInformation()
+	 */
 	public String contentInformation() {
 		return "[" + NAME + "]";
 	}
+	
+	public static void main(String[] args){
+		PCEPMetricObject object = new PCEPMetricObject();
+		object.setMetricValueBinaryString(Integer.toBinaryString(Float.floatToIntBits((float)245.9)));
+		String value = Integer.toBinaryString(Float.floatToIntBits(245.9f));
+		Integer.valueOf(value,2);
+		System.out.println("length: "+ Integer.toBinaryString(Float.floatToIntBits(245.9f)).length());
+		System.out.println("float value : " + Integer.toBinaryString(Float.floatToIntBits(245.9f)));
+		System.out.println("Binary presentation of metric value: " + Integer.valueOf(object.metricValue,2));
+		System.out.println("value of value after : "+ Integer.valueOf(value,2));
+	}
+
 
 }

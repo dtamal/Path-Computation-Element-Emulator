@@ -31,6 +31,8 @@ public class PathParams {
 	/**Pointer to the path element*/
 	private PathElement path;
 	
+	private double reserve;
+	
 	public PathParams(PathElement path){
 		this.path = path;
 	}
@@ -40,6 +42,21 @@ public class PathParams {
 		return this.path;
 	}
 	
+	
+	/**
+	 * @return the capacity
+	 */
+	public double getReserve() {
+		return reserve;
+	}
+
+	/**
+	 * @param capacity the capacity to set
+	 */
+	public void setReserve(double reserve) {
+		this.reserve = reserve;
+	}
+
 	/**Function to check if iterator over edges is valid*/
 	private boolean validateEdgeIterator(Iterator<EdgeElement> iter){
 		if (iter==null){

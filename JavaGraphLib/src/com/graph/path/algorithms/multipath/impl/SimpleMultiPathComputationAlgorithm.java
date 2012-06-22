@@ -19,10 +19,9 @@ package com.graph.path.algorithms.multipath.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import com.graph.elements.edge.EdgeElement;
-import com.graph.elements.edge.params.EdgeParams;
-import com.graph.elements.edge.params.impl.BasicEdgeParams;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.graphcontroller.impl.GcontrollerImpl;
@@ -30,89 +29,129 @@ import com.graph.logger.GraphLogger;
 import com.graph.path.PathElement;
 import com.graph.path.algorithms.MultiPathComputationAlgorithm;
 import com.graph.path.algorithms.common.StaticPathSortImpl;
+import com.graph.path.algorithms.constraints.Constraint;
 import com.graph.path.algorithms.constraints.MultiPathConstraint;
+import com.graph.path.algorithms.constraints.impl.SimplePathComputationConstraint;
 import com.graph.path.algorithms.constraints.multipath.impl.SimpleMultiPathComputationConstraint;
+import com.graph.path.algorithms.impl.MaxBandwidthShortestPathComputationAlgorithm;
 import com.graph.path.pathelementimpl.PathElementImpl;
+import com.graph.resv.ResvElement;
 import com.graph.topology.importers.ImportTopology;
-import com.graph.topology.importers.impl.SNDLibImportTopology;
+import com.graph.topology.importers.impl.MLSNDLibImportTopology;
 
-public class SimpleMultiPathComputationAlgorithm implements MultiPathComputationAlgorithm {
+public class SimpleMultiPathComputationAlgorithm implements
+		MultiPathComputationAlgorithm {
 	private static final String classIdentifier = "SimplePathComputationAlgorithm";
 
-	/**Sort paths by ascending order of weight*/
-	protected ArrayList<PathElement> sortPaths(ArrayList<PathElement> paths){
-		return StaticPathSortImpl.sortPathsByWeight(paths);
+	/** Sort paths by ascending order of weight */
+	protected ArrayList<PathElement> sortPaths(ArrayList<PathElement> paths) {
+		return StaticPathSortImpl.sortPathsByBandwidth(paths);
 	}
 
-	/**Function to check constraint for the inserted edge and existing path*/
-	protected int checkConstraint (MultiPathConstraint constraint, EdgeElement edge, PathElement path){
-		return 1;
-	}
 
+	protected int checkConstraint(MultiPathConstraint contraint, EdgeElement edge, PathElement path){
+		if(path.getTraversedEdges().size()>=8)
+			return 0;
+		if((edge.getEdgeParams().getAvailableCapacity()>=1)&&(path.getPathParams().getAvailableCapacity()>=1))
+			return 1;
+		else return 0;
+	}
 	
-	public ArrayList<PathElement> computePath(Gcontroller graph, MultiPathConstraint constr) {
+	/** Function to check constraint for the inserted edge and existing path */
+	protected int checkConstraint(MultiPathConstraint constraint,
+			EdgeElement edge) {
+		if (edge.getEdgeParams().getAvailableCapacity() >= 1)
+			return 1;
+		else
+			return 0;
+	}
 
-		//Check if constraint is of type SimplePathComputationConstraint
-		if (constr.getClass()!=SimpleMultiPathComputationConstraint.class){
-			GraphLogger.logError("Invalid Constraint type used in Algorithm.", classIdentifier);
+	public ArrayList<PathElement> computePath(Gcontroller graph,
+			MultiPathConstraint constr) {
+		// Check if constraint is of type SimplePathComputationConstraint
+		if (constr.getClass() != SimpleMultiPathComputationConstraint.class) {
+			GraphLogger.logError("Invalid Constraint type used in Algorithm.",
+					classIdentifier);
 			return null;
 		}
+
 		SimpleMultiPathComputationConstraint constraint = (SimpleMultiPathComputationConstraint) constr;
-		VertexElement source = constraint.getSource();
-		ArrayList<PathElement> list = new ArrayList<PathElement> ();
+
+		if (constr.getPathCount() == 1) {
+			MaxBandwidthShortestPathComputationAlgorithm algo = new MaxBandwidthShortestPathComputationAlgorithm();
+			Constraint constr1 = new SimplePathComputationConstraint(
+					constr.getSource(), constr.getDestination(), constr.getBw());
+			PathElement temp = algo.computePath(graph, constr1);
+			if (temp == null)
+				return null;
+			else
+				temp.getPathParams().setReserve(constr1.getBw());
+			ArrayList<PathElement> temp1 = new ArrayList<PathElement>();
+			temp1.add(temp);
+			return temp1;
+		}
+		VertexElement source = graph.getVertex(constraint.getSource()
+				.getVertexID());
+		if (constraint.getSource() == null) {
+			System.out.println("error");
+			System.exit(-1);
+		}
+		
+		System.out.println("Source not NULL");
+		
+		ArrayList<PathElement> list = new ArrayList<PathElement>();
 		Iterator<EdgeElement> iter = source.getConnectedEdges().iterator();
-		while (iter.hasNext()){
+		while (iter.hasNext()) {
 			EdgeElement edge = iter.next();
 			PathElementImpl tmp;
-			if (edge.getSourceVertex().compareTo(source)==0){
-				tmp = new PathElementImpl(graph, constraint.getSource(), edge.getDestinationVertex());
-				System.out.println(edge.getDestinationVertex().getVertexID());
-			}
-			else
-			{
-				tmp = new PathElementImpl(graph, constraint.getSource(), edge.getSourceVertex());
-				System.out.println(edge.getSourceVertex().getVertexID());
-
+			if (edge.getSourceVertex().compareTo(source) == 0) {
+				tmp = new PathElementImpl(graph, constraint.getSource(),
+						edge.getDestinationVertex());
+			} else {
+				tmp = new PathElementImpl(graph, constraint.getSource(),
+						edge.getSourceVertex());
 			}
 			tmp.insertEdge(edge);
 			list.add(tmp);
 		}
 		list = sortPaths(list);
 
-		//ArrayList for listing all paths to a destination
+		// ArrayList for listing all paths to a destination
 		ArrayList<PathElement> output = new ArrayList<PathElement>();
-
-		while(list.size()>0){
-			PathElementImpl temp = (PathElementImpl)list.get(0);
+		while (list.size() > 0) {
+			PathElementImpl temp = (PathElementImpl) list.get(0);
 			list.remove(0);
 
-			//If the path terminates at the destination return this path
+			// If the path terminates at the destination return this path
 			VertexElement destination = temp.getDestination();
-			if (destination.compareTo(constraint.getDestination())==0){
+			if (destination.compareTo(graph.getVertex(constraint
+					.getDestination().getVertexID())) == 0) {
 				output.add(temp);
-				if ((constraint.getPathCount()>0)&&(output.size()==constraint.getPathCount()))
-						return output;
-			}
-			else 
-			{
-				//extend temp to its neighbours and insert into the list
+				if ((constraint.getPathCount() > 0)
+						&& (output.size() == constraint.getPathCount()))
+					return modifyPathElements(output, constr.getBw());
+			} else {
+				// extend temp to its neighbours and insert into the list
 				iter = destination.getConnectedEdges().iterator();
-				while (iter.hasNext()){
+				
+				while (iter.hasNext()) {
+					
 					EdgeElement edge = iter.next();
 					PathElementImpl tmp;
 
-					//Check which vertex is the new destination
+					// Check which vertex is the new destination
 					VertexElement nextDestination;
-					if (edge.getSourceVertex().compareTo(destination)==0){
+					if (edge.getSourceVertex().compareTo(destination) == 0) {
 						nextDestination = edge.getDestinationVertex();
-					}
-					else
+					} else
 						nextDestination = edge.getSourceVertex();
-					
-					if (temp.containsVertex(nextDestination)==false){
-						//Check with constraint if edge can be added
-						if (checkConstraint(constraint, edge, temp)==1){
-							tmp = new PathElementImpl(graph, constraint.getSource(), nextDestination, temp.getTraversedEdges());
+
+					if (temp.containsVertex(nextDestination) == false) {
+						// Check with constraint if edge can be added
+						if (checkConstraint(constraint, edge, temp) == 1) {
+							tmp = new PathElementImpl(graph,
+									constraint.getSource(), nextDestination,
+									temp.getTraversedEdges());
 							tmp.insertEdge(edge);
 							list.add(tmp);
 						}
@@ -121,34 +160,122 @@ public class SimpleMultiPathComputationAlgorithm implements MultiPathComputation
 			}
 			list = sortPaths(list);
 		}
-		if (output.size()==0)
+		if (output.size() == 0) {
 			GraphLogger.logError("No Path found", classIdentifier);
-		output=sortPaths(output);
-		return output;
+			return null;
+		}
+		output = sortPaths(output);
+		return modifyPathElements(output, constr.getBw());
 	}
-	
-	public static void main(String[] args){
+
+	public ArrayList<PathElement> modifyPathElements(
+			ArrayList<PathElement> paths, double bw) {
+		
+		ArrayList<PathElement> finalOutput = null;
+		ArrayList<ResvElement> resv;
+
+		boolean delayFlag = true;
+		double totCapacityReq = bw;
+		double totCapacity;
+		if (paths.get(0).getPathParams().getAvailableCapacity() >= totCapacityReq) {
+			PathElement element = paths.get(0);
+			element.getPathParams().setReserve(totCapacityReq);
+			finalOutput = new ArrayList<PathElement>();
+			finalOutput.add(element);
+		} else {
+			for (int i = 0; i < paths.size(); i++) {
+				resv = new ArrayList<ResvElement>();
+
+				totCapacity = paths.get(i).getPathParams()
+						.getAvailableCapacity();
+				ResvElement temp = new ResvElement(paths.get(i), paths.get(i)
+						.getPathParams().getAvailableCapacity());
+				temp.resv();
+				resv.add(temp);
+				for (int j = 0; j < paths.size(); j++) {
+					if (j == i)
+						continue;
+					// Check if some other path still has available capacity
+					// after the first path would have been reserved
+					if (paths.get(j).getPathParams().getAvailableCapacity() > 0) {
+						// check if the about to be added path has a DD to all
+						// other path, which is already in the resvList, is
+						// larger than 128
+						// if yes, this can not be added to the resvList.
+						for (int k = 0; k < resv.size(); k++) {
+							if (Math.abs(paths.get(j).getPathParams()
+									.getPathDelay()
+									- resv.get(k).getElement().getPathParams()
+											.getPathDelay()) > 128) {
+								delayFlag = false;
+								break;
+							}
+						}
+						// if the path has larger DD to any path in the
+						// resvList, continue the outer for loop to check other
+						// paths.
+						if (!delayFlag)
+							continue;
+
+						if (paths.get(j).getPathParams().getAvailableCapacity() < totCapacityReq
+								- totCapacity) {
+							totCapacity += paths.get(j).getPathParams()
+									.getAvailableCapacity();
+							ResvElement temp1 = new ResvElement(paths.get(j),
+									paths.get(j).getPathParams()
+											.getAvailableCapacity());
+							temp1.resv();
+							resv.add(temp1);
+						} else {
+							ResvElement temp1 = new ResvElement(paths.get(j),
+									totCapacityReq - totCapacity);
+							totCapacity += totCapacityReq - totCapacity;
+							temp1.resv();
+							resv.add(temp1);
+						}
+					}
+					if (totCapacity >= totCapacityReq)
+						break;
+				}
+				if (totCapacity >= totCapacityReq) {
+					// reservation found
+					finalOutput = new ArrayList<PathElement>();
+					for (int k = 0; k < resv.size(); k++) {
+						PathElement element = resv.get(k).getElement();
+						element.getPathParams().setReserve(resv.get(k).getBw());
+						finalOutput.add(element);
+						resv.get(k).release();
+					}
+					break;
+				} else {
+					// reservation not found
+					for (int k = 0; k < resv.size(); k++) {
+						resv.get(k).release();
+					}
+				}
+			}
+		}
+		return finalOutput;
+	}
+
+	public static void main(String[] args) {
 		Gcontroller graph = new GcontrollerImpl();
-		ImportTopology importTopology = new SNDLibImportTopology();
-		importTopology.importTopology(graph, "c:\\germany50.txt");
-
-		EdgeElement element = new EdgeElement("temp", graph.getVertex("Nuernberg"), graph.getVertex("Muenchen"), graph);
-		EdgeParams params = new BasicEdgeParams(element, 1, 1, 1);
-		element.setEdgeParams(params);
-		graph.addEdge(element);
-		
-		element = new EdgeElement("temp1", graph.getVertex("Nuernberg"), graph.getVertex("Muenchen"), graph);
-		params = new BasicEdgeParams(element, 1, 1, 1);
-		element.setEdgeParams(params);
-		graph.addEdge(element);
-		
-		SimpleMultiPathComputationAlgorithm algorithm = new SimpleMultiPathComputationAlgorithm();
-		MultiPathConstraint constr = new SimpleMultiPathComputationConstraint(graph.getVertex("Nuernberg"), graph.getVertex("Muenchen"), 4);
-
-		ArrayList<PathElement> paths = algorithm.computePath(graph, constr);
-		
-		for (int i=0;i<paths.size();i++){
-			System.out.println(paths.get(i).getVertexSequence());
+		ImportTopology importTopology = new MLSNDLibImportTopology();
+		importTopology.importTopology(graph, ".//germany50.txt");
+		Random random = new Random();
+		int src,dest;
+		int j = 0;
+		int loopCount = 0;
+		while (j<=loopCount) {
+			src = random.nextInt(50)+1;
+			dest = random.nextInt(50)+1;
+			while(dest == src){
+				dest = random.nextInt(51);
+			}
+			src = 24;
+			dest = 8;
+			
+			j++;
 		}
 	}
 

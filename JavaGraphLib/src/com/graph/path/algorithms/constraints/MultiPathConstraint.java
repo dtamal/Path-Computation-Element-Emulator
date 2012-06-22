@@ -25,5 +25,6 @@ public abstract class MultiPathConstraint {
 	public abstract VertexElement getDestination();
 	
 	public abstract int getPathCount();
-	//public abstract double getBw();
+	
+	public abstract double getBw();
 }

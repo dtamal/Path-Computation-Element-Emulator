@@ -21,6 +21,7 @@ import com.pcee.protocol.message.PCEPComputationFactory;
 import com.pcee.protocol.message.PCEPConstantValues;
 import com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
+import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
 
 /**
  * <pre>
@@ -85,10 +86,15 @@ public class PCEPRequestParametersObject implements PCEPObjectFrame {
 		this.setBFlagBinaryString(bFlag);
 		this.setRFlagBinaryString(rFlag);
 		this.setPriFlagBinaryString(priFlag);
-		this.setRequestIDNumberBinaryString(requestIDNumber);
+		this.setRequestIDNumberDecimalValue(Integer.parseInt(requestIDNumber));
 		this.updateHeaderLength();
 	}
 
+	public static void main (String [] args){
+	    PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "1", "0", "0", "1", "32");
+	    System.out.println(RP.getRequestIDNumberDecimalValue());
+	}
+	
 	private void updateHeaderLength() {
 		int objectFrameByteLength = this.getObjectFrameByteLength();
 		this.getObjectHeader().setLengthDecimalValue(objectFrameByteLength);
@@ -154,7 +160,7 @@ public class PCEPRequestParametersObject implements PCEPObjectFrame {
 
 	public void setRequestIDNumberDecimalValue(int decimalValue) {
 		int binaryLength = requestIDNumberLength;
-		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength);
+		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength-1);
 
 		this.requestIDNumber = PCEPComputationFactory.setDecimalValue(decimalValue, maxValue, binaryLength);
 	}

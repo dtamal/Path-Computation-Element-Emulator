@@ -25,7 +25,7 @@ public abstract class VertexParams {
 	private VertexElement vertex;
 	
 	/**Function to set the Edge Element */
-	public void setEdgeElement(VertexElement vertex){
+	public void setVertexElement(VertexElement vertex){
 		this.vertex=vertex;
 	}
 	
@@ -37,5 +37,8 @@ public abstract class VertexParams {
 	/**Function to to copy the vertex Params*/
 	public abstract VertexParams copyVertexParams(VertexElement newVertex);
 	
-
+	public abstract String getType();
+	
+	public abstract int getFreePorts();
+	
 }

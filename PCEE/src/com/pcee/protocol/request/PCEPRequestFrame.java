@@ -18,12 +18,12 @@
 package com.pcee.protocol.request;
 
 import java.util.LinkedList;
-
-import com.pcee.common.Address;
 import com.pcee.protocol.message.PCEPMessageFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.impl.PCEPBandwidthObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPEndPointsObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPGeneralizedEndPointsTNAObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPITResourceObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLoadBalancingObject;
@@ -31,6 +31,7 @@ import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPReportedRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPSynchronizationVectorObject;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 /**
  * <pre>
@@ -68,43 +69,99 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 	PCEPReportedRouteObject RRO;
 	PCEPIncludeRouteObject IRO;
 	PCEPLoadBalancingObject loadBalancing;
+	/* added for ITResourceObject */
+	PCEPITResourceObject itResource;
+	PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNA;
 
-	public PCEPRequestFrame(PCEPRequestParametersObject RP, PCEPEndPointsObject endPoints) {
+	public PCEPRequestFrame(PCEPRequestParametersObject RP,
+			PCEPEndPointsObject endPoints) {
 		this.RP = RP;
 		this.endPoints = endPoints;
 	}
 
+	/**
+	 * added for ITResourceObject
+	 */
+	public PCEPRequestFrame(PCEPRequestParametersObject RP,
+			PCEPITResourceObject itResource) {
+		this.RP = RP;
+		this.itResource = itResource;
+	}
+
+	public PCEPRequestFrame(PCEPRequestParametersObject RP,
+			PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNA) {
+		this.RP = RP;
+		this.generalizedEndPointsTNA = generalizedEndPointsTNA;
+	}
+
+	public PCEPRequestFrame(PCEPRequestParametersObject RP,
+			PCEPEndPointsObject endPoints, PCEPBandwidthObject bandwidth) {
+		this.RP = RP;
+		this.endPoints = endPoints;
+		this.bandwidth = bandwidth;
+	}
+
 	// VARIOUS CONVENIENT METHODS
+
+	public PCEPRequestFrame(PCEPRequestParametersObject RP,
+			PCEPEndPointsObject endPoints, PCEPBandwidthObject bandwidth,
+			PCEPMetricObject metric) {
+		this.RP = RP;
+		this.endPoints = endPoints;
+		this.bandwidth = bandwidth;
+		this.metricList = new LinkedList<PCEPMetricObject>();
+		this.insertMetricObject(metric);
+	}
 
 	public int getRequestID() {
 		return RP.getRequestIDNumberDecimalValue();
 	}
 
-	public Address getSourceAddress() {
-		return new Address(endPoints.getSourceAddressBinaryString());
+	public PCEPAddress getSourceAddress() {
+		// return new PCEPAddress(endPoints.getSourceAddressBinaryString());
+		if (endPoints != null)
+			return new PCEPAddress(endPoints.getSourceAddressBinaryString());
+		return new PCEPAddress(
+				generalizedEndPointsTNA.getSourcePointBinaryString());
 	}
 
-	public Address getDestinationAddress() {
-		return new Address(endPoints.getDestinationAddressBinaryString());
+	public PCEPAddress getDestinationAddress() {
+		// return new
+		// PCEPAddress(endPoints.getDestinationAddressBinaryString());
+		if (endPoints != null)
+			return new PCEPAddress(
+					endPoints.getDestinationAddressBinaryString());
+		return new PCEPAddress(
+				generalizedEndPointsTNA.getDestinationPointBinaryString());
+	}
+
+	public PCEPGeneralizedEndPointsTNAObject getGeneralizedEndPointsTNAObject() {
+		return this.generalizedEndPointsTNA;
 	}
 
 	// INSERT METHODS
 
-	public void insertSynchronizationVectorObject(PCEPSynchronizationVectorObject SVECObject) {
+	public void insertSynchronizationVectorObject(
+			PCEPSynchronizationVectorObject SVECObject) {
 		if (containsSynchronizationVectorObjectList()) {
 			extractSynchronizationVectorObjectList().add(SVECObject);
-		}
-		else{
+		} else {
 			SVECList = new LinkedList<PCEPSynchronizationVectorObject>();
 			SVECList.add(SVECObject);
 		}
 	}
 
-	public void insertSynchronizationVectorObjectList(LinkedList<PCEPSynchronizationVectorObject> SVECList) {
+	public void insertEndPointsObject(PCEPEndPointsObject endPoints) {
+		this.endPoints = endPoints;
+	}
+
+	public void insertSynchronizationVectorObjectList(
+			LinkedList<PCEPSynchronizationVectorObject> SVECList) {
 		this.SVECList = SVECList;
 	}
 
-	public void insertLabelSwitchedPathAttributesObject(PCEPLabelSwitchedPathAttributesObject LSPA) {
+	public void insertLabelSwitchedPathAttributesObject(
+			PCEPLabelSwitchedPathAttributesObject LSPA) {
 		this.LSPA = LSPA;
 	}
 
@@ -115,8 +172,7 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 	public void insertMetricObject(PCEPMetricObject metricObject) {
 		if (containsMetricObjectList()) {
 			extractMetricObjectList().add(metricObject);
-		}
-		else{
+		} else {
 			metricList = new LinkedList<PCEPMetricObject>();
 			metricList.add(metricObject);
 		}
@@ -138,12 +194,27 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		this.loadBalancing = loadBalancing;
 	}
 
+	public void insertITResourceObject(PCEPITResourceObject itResource) {
+		this.itResource = itResource;
+	}
+
+	public void insertGeneralizedEndPointsTNAObject(
+			PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNA) {
+		this.generalizedEndPointsTNA = generalizedEndPointsTNA;
+	}
+
 	// EXTRACT METHODS
 
 	public LinkedList<PCEPSynchronizationVectorObject> extractSynchronizationVectorObjectList() {
 		if (containsSynchronizationVectorObjectList()) {
 			return SVECList;
 		}
+		return null;
+	}
+
+	public PCEPEndPointsObject extractEndPointsObject() {
+		if (containsEndPointsObject())
+			return endPoints;
 		return null;
 	}
 
@@ -189,7 +260,31 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return null;
 	}
 
+	public PCEPITResourceObject extractITResourceObject() {
+		if (containsITResourceObject())
+			return itResource;
+		return null;
+	}
+
+	public PCEPGeneralizedEndPointsTNAObject extractGeneralizedEndPointsTNAObject() {
+		if (containsGeneralizedEndPointsTNAObject())
+			return generalizedEndPointsTNA;
+		return null;
+	}
+
 	// CONTAINS METHODS
+
+	public boolean containsITResourceObject() {
+		if (itResource == null)
+			return false;
+		return true;
+	}
+
+	public boolean containsEndPointsObject() {
+		if (endPoints == null)
+			return false;
+		return true;
+	}
 
 	public boolean containsSynchronizationVectorObjectList() {
 		if (SVECList == null) {
@@ -240,6 +335,12 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return true;
 	}
 
+	public boolean containsGeneralizedEndPointsTNAObject() {
+		if (generalizedEndPointsTNA == null)
+			return false;
+		return true;
+	}
+
 	// INTERFACE METHODS
 
 	public int getByteLength() {
@@ -252,7 +353,11 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		}
 
 		length += RP.getObjectFrameByteLength();
-		length += endPoints.getObjectFrameByteLength();
+		if (containsEndPointsObject())
+			length += endPoints.getObjectFrameByteLength();
+
+		if (containsGeneralizedEndPointsTNAObject())
+			length += generalizedEndPointsTNA.getObjectFrameByteLength();
 
 		if (containsLabelSwitchedPathAttributesObject()) {
 			length += LSPA.getObjectFrameByteLength();
@@ -284,7 +389,8 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 
 		if (containsSynchronizationVectorObjectList()) {
 			for (int i = 0; i < SVECList.size(); i++) {
-				objectsString.append(SVECList.get(i).getObjectFrameBinaryString());
+				objectsString.append(SVECList.get(i)
+						.getObjectFrameBinaryString());
 			}
 		}
 
@@ -299,7 +405,8 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		}
 		if (containsMetricObjectList()) {
 			for (int i = 0; i < metricList.size(); i++) {
-				objectsString.append(metricList.get(i).getObjectFrameBinaryString());
+				objectsString.append(metricList.get(i)
+						.getObjectFrameBinaryString());
 			}
 		}
 		if (containsReportedRouteObject()) {
@@ -326,7 +433,12 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		}
 
 		requestObjects.add(RP);
-		requestObjects.add(endPoints);
+
+		if (containsEndPointsObject())
+			requestObjects.add(endPoints);
+
+		if (containsGeneralizedEndPointsTNAObject())
+			requestObjects.add(generalizedEndPointsTNA);
 
 		if (containsLabelSwitchedPathAttributesObject()) {
 			requestObjects.add(LSPA);

@@ -17,53 +17,80 @@
 
 package com.pcee.architecture.computationmodule.threadpool;
 
+import java.util.ArrayList;
+
 import com.graph.path.PathElement;
-import com.pcee.common.Address;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 public class Response {
 
-	//Variable ideintifying the requestID used inside the PCEP protocol
-	private String requestID;
-	//Variable indicating the computed path
-	private PathElement element;
-	//Address to identify the PCEP session 
-	private Address address;
-	/**
-	 * @return the requestID
-	 */
-	public String getRequestID() {
-		return requestID;
-	}
-	/**
-	 * @param requestID the requestID to set
-	 */
-	public void setRequestID(String requestID) {
-		this.requestID = requestID;
-	}
-	/**
-	 * @return the element
-	 */
-	public PathElement getElement() {
-		return element;
-	}
-	/**
-	 * @param element the element to set
-	 */
-	public void setElement(PathElement element) {
-		this.element = element;
-	}
-	/**
-	 * @return the address
-	 */
-	public Address getAddress() {
-		return address;
-	}
-	/**
-	 * @param address the address to set
-	 */
-	public void setAddress(Address address) {
-		this.address = address;
-	}
+    // Variable ideintifying the requestID used inside the PCEP protocol
+    private String requestID;
+    // Variable indicating the computed path
+    private PathElement element;
+    // Variable indicating the computed paths
+    private ArrayList<PathElement> elements;
+    // Address to identify the PCEP session
+    private PCEPAddress address;
 
+    /**
+     * @return the requestID
+     */
+    public String getRequestID() {
+	return requestID;
+    }
 
+    /**
+     * @param requestID
+     *            the requestID to set
+     */
+    public void setRequestID(String requestID) {
+	this.requestID = requestID;
+    }
+
+    /**
+     * @return the element
+     */
+    public PathElement getElement() {
+	return element;
+    }
+
+    /**
+     * @param element
+     *            the element to set
+     */
+    public void setElement(PathElement element) {
+	this.element = element;
+    }
+
+    /**
+     * @return the address
+     */
+    public PCEPAddress getAddress() {
+	return address;
+    }
+
+    /**
+     * @param address
+     *            the address to set
+     */
+    public void setAddress(PCEPAddress address) {
+	this.address = address;
+    }
+
+    /**
+     * set the computed arraylist containing paths
+     * @param elements
+     */
+    public void setPathElements(ArrayList<PathElement> elements){
+    	this.elements = elements;
+    }
+    
+    /**
+     * return the computed arraylist of paths
+     * @return
+     */
+    public ArrayList<PathElement> getPathElements(){
+    	return this.elements;
+    }
 }

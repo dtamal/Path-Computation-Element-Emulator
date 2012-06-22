@@ -22,16 +22,15 @@ import java.awt.event.*;
 import java.io.IOException;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.common.Address;
 import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.PCEPMessageFactory;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
 import com.pcee.protocol.message.objectframe.impl.PCEPEndPointsObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 import com.pcee.protocol.request.PCEPRequestFrame;
 import com.pcee.protocol.request.PCEPRequestFrameFactory;
 
@@ -58,13 +57,13 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 	static JTextArea messageTextArea;
 	JScrollPane scrollPane;
 
-	Address address, sourceAddress, destAddress;
+	PCEPAddress address, sourceAddress, destAddress;
 
 	public ConnectorGUI(ModuleManagement layerManagement, String address, String sourceAddress, String destAddress) {
 		lm = layerManagement;
-		this.address = new Address(address, port);
-		this.sourceAddress = new Address(sourceAddress);
-		this.destAddress = new Address(destAddress);
+		this.address = new PCEPAddress(address, port);
+		this.sourceAddress = new PCEPAddress(sourceAddress, false);
+		this.destAddress = new PCEPAddress(destAddress, false);
 
 		gridbag = new GridBagLayout();
 
@@ -126,7 +125,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		serverLabel.setVerticalAlignment(SwingConstants.CENTER);
 		serverLabel.setPreferredSize(labelDimension);
 
-		serverAddressTextField = new JTextField(address.getAddressWithoutPort());
+		serverAddressTextField = new JTextField(address.getIPv4Address(false));
 		serverAddressTextField.setPreferredSize(textFieldDimension);
 
 		connectButton = new JButton("Connect");
@@ -235,7 +234,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 
 		//JLabel title = new JLabel("Request Message:");
 		new JLabel("Request Message:");
-		requestMessagePFlagCheckBox = new JCheckBox();
+		requestMessagePFlagCheckBox = new JCheckBox("", true);
 		requestMessagePFlagCheckBox.setToolTipText("p");
 
 		requestMessageIFlagCheckBox = new JCheckBox();
@@ -244,7 +243,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		piPanel.add(requestMessagePFlagCheckBox);
 		piPanel.add(requestMessageIFlagCheckBox);
 
-		oFlagCheckBox = new JCheckBox();
+		oFlagCheckBox = new JCheckBox("", true);
 		oFlagCheckBox.setToolTipText("o");
 
 		bFlagCheckBox = new JCheckBox();
@@ -253,7 +252,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		rFlagCheckBox = new JCheckBox();
 		rFlagCheckBox.setToolTipText("r");
 
-		priTextField = new JTextField("Pri");
+		priTextField = new JTextField("1");
 		priTextField.setPreferredSize(new Dimension(30, 20));
 
 		obrPriPanel.add(oFlagCheckBox);
@@ -261,7 +260,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		obrPriPanel.add(rFlagCheckBox);
 		obrPriPanel.add(priTextField);
 
-		endPointsPFlag = new JCheckBox();
+		endPointsPFlag = new JCheckBox("", true);
 		endPointsPFlag.setToolTipText("p");
 
 		endPointsIFlag = new JCheckBox();
@@ -273,10 +272,10 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		requestMessageIFlagCheckBox = new JCheckBox();
 		requestMessageIFlagCheckBox.setToolTipText("i");
 
-		sourceTextField = new JTextField(sourceAddress.getAddressWithoutPort());
+		sourceTextField = new JTextField(sourceAddress.getIPv4Address(false));
 		sourceTextField.setPreferredSize(textFieldDimension);
 
-		destinationTextField = new JTextField(destAddress.getAddressWithoutPort());
+		destinationTextField = new JTextField(destAddress.getIPv4Address(false));
 		destinationTextField.setPreferredSize(textFieldDimension);
 
 		requestMessageButton = new JButton("Send");
@@ -361,10 +360,10 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		gridbag.setConstraints(this.requestMessagePanel, c);
 		this.windowPanel.add(this.requestMessagePanel);
 
-		c.gridx = 0;
-		c.gridy = 3;
-		gridbag.setConstraints(this.textAreaPanel, c);
-		this.windowPanel.add(this.textAreaPanel);
+//		c.gridx = 0;
+//		c.gridy = 3;
+//		gridbag.setConstraints(this.textAreaPanel, c);
+//		this.windowPanel.add(this.textAreaPanel);
 
 	}
 
@@ -373,7 +372,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 
 		windowFrame = new JFrame();
 		windowFrame.setTitle("Path Computation Element Emulator");
-		windowFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		windowFrame.add(getContentPane());
 		windowFrame.pack();
 		windowFrame.setLocationRelativeTo(null);
@@ -382,10 +381,9 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 	}
 
 	public void openConnection() throws Exception {
-		Address destAddress = new Address(serverAddressTextField.getText(), port);
-
+		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), port);
 		killIDALogo();
-		guiLogger("Trying to connect to " + destAddress.getAddress());
+		guiLogger("Trying to connect to " + destAddress.getIPv4Address(true));
 		lm.getClientModule().registerConnection(address, false, true);
 	}
 	
@@ -403,14 +401,14 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		String endPointsPFlag = booleanToStringConverter(false);
 		String endPointsIFlag = booleanToStringConverter(false);
 
-		Address sourceAddress = new Address(sourceTextField.getText().trim());
-		Address destinationAddress = new Address(destinationTextField.getText().trim());
+		PCEPAddress sourceAddress = new PCEPAddress(sourceTextField.getText().trim(), false);
+		PCEPAddress destinationAddress = new PCEPAddress(destinationTextField.getText().trim(), false);
 
-		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject(pFlag, iFlag, oFlag, bFlag, rFlag, priFlag);
+		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject(pFlag, iFlag, oFlag, bFlag, rFlag, priFlag, "432");
 		PCEPEndPointsObject endPoints = PCEPObjectFrameFactory.generatePCEPEndPointsObject(endPointsPFlag, endPointsIFlag, sourceAddress, destinationAddress);
 
 		// Address destAddress = new Address(serverAddressTextField.getText());
-		Address destAddress = new Address(serverAddressTextField.getText(), 4189);
+		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), 4189);
 
 		PCEPRequestFrame requestMessage = PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
 		PCEPMessage message = PCEPMessageFactory.generateMessage(requestMessage);
@@ -418,7 +416,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		message.setAddress(destAddress);
 
 		guiLogger("Sending Path Computation Request Message.");
-		guiLogger("Requesting a Way from " + sourceAddress.getAddress() + " to " + destinationAddress.getAddress());
+		guiLogger("Requesting a Way from " + sourceAddress.getIPv4Address(true) + " to " + destinationAddress.getIPv4Address(true));
 		lm.getClientModule().sendMessage(message, ModuleEnum.CLIENT_MODULE);
 	}
 

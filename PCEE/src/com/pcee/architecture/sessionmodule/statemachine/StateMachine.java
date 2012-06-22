@@ -17,14 +17,16 @@
 
 package com.pcee.architecture.sessionmodule.statemachine;
 
-import com.pcee.common.Address;
+import com.pcee.architecture.ModuleEnum;
 import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 public abstract class StateMachine {
 
 	public abstract void updateState(boolean connectionEstablished);
-	public abstract void updateState(PCEPMessage message);
+	//public abstract void updateState(PCEPMessage message);
+	public abstract void updateState(PCEPMessage message, ModuleEnum sourceLayer);
 
-	public abstract Address getAddress();
+	public abstract PCEPAddress getAddress();
 	public abstract void releaseResources();
 }

@@ -21,6 +21,10 @@ import com.graph.elements.edge.EdgeElement;
 
 public abstract class EdgeParams {
 	
+	public abstract boolean isDynamicLink();
+
+	public abstract void setDynamicLink(boolean isDynamicLink);
+    
 	/**Edge Element for the which paramteres are defined*/
 	private EdgeElement edge;
 	
@@ -69,5 +73,15 @@ public abstract class EdgeParams {
 
 	/**Function to copy the edge Parameters onto a new edge element */
 	public abstract EdgeParams copyEdgeParams(EdgeElement newElement);
+
+	public int getMaxCarriers() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getCarrierUsage(int i) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

@@ -46,7 +46,6 @@ public class PCEPErrorObject implements PCEPObjectFrame {
 	private String flags;
 
 	private PCEPCommonObjectHeader objectHeader;
-	// private LinkedList<PCEPTLVObject> tlvList;
 
 	private int reservedStartBit = PCEPConstantValues.ERROR_OBJECT_RESERVED_START_BIT;
 	private int reservedEndBit = PCEPConstantValues.ERROR_OBJECT_RESERVED_END_BIT;
