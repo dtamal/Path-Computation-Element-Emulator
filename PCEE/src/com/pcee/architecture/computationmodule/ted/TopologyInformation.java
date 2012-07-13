@@ -19,12 +19,11 @@ package com.pcee.architecture.computationmodule.ted;
 
 import java.io.File;
 
-import com.global.GlobalCfg;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.graph.topology.importers.impl.BRITEImportTopology;
-import com.graph.topology.importers.impl.MLSNDLibImportTopology;
+import com.graph.topology.importers.impl.SNDLibImportTopology;
 import com.pcee.logger.Logger;
 
 /**
@@ -45,7 +44,7 @@ public class TopologyInformation {
 	private static ImportTopology topology;
 
 	// path to the topology description file
-	private static String topoPath = GlobalCfg.serverTopoPath;
+	private static String topoPath = ".//atlanta.txt";
 
 	/**
 	 * @param input
@@ -61,17 +60,17 @@ public class TopologyInformation {
 	 */
 	public static void setImporter(String importer) {
 		if (importer.equals("SNDLib")) {
-			topology = new MLSNDLibImportTopology();
+			topology = new SNDLibImportTopology();
 		} else if (importer.equals("BRITE")) {
 			topology = new BRITEImportTopology();
 		} else {
-			topology = new MLSNDLibImportTopology();
+			topology = new SNDLibImportTopology();
 		}
 	}
 
 	/** default constructor */
 	private TopologyInformation() {
-		topology = new MLSNDLibImportTopology();
+		topology = new SNDLibImportTopology();
 		graph = new GcontrollerImpl();
 
 		// Source file used to instantiate the topology

@@ -37,7 +37,6 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 
 	PCEPNoPathObject noPath;
 	PCEPLabelSwitchedPathAttributesObject LSPA;
-	// PCEPBandwidthObject bandwidth;
 	LinkedList<PCEPMetricObject> metricList;
 	PCEPIncludeRouteObject IRO;
 

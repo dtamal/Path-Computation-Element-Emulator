@@ -195,51 +195,6 @@ public class PCEPObjectFrameFactory {
 		return object;
 	}
 
-	public static PCEPITResourceObject generatePCEPITResourceObject(
-			String pFlag, String iFlag, int reserved, int cpu, int ram,
-			int storage) {
-		PCEPCommonObjectHeader objectHeader = new PCEPCommonObjectHeader(16, 1,
-				pFlag, iFlag);
-		PCEPITResourceObject object = new PCEPITResourceObject(objectHeader,
-				reserved, cpu, ram, storage);
-
-		return object;
-	}
-
-	public static PCEPTNASourceObject generatePCEPTNASourceObject(String pFlag,
-			String iFlag, int type, int length, int addrLength, int reserved,
-			PCEPAddress sourceIP) {
-		PCEPCommonObjectHeader objectHeader = new PCEPCommonObjectHeader(17, 1,
-				pFlag, iFlag);
-		PCEPTNASourceObject object = new PCEPTNASourceObject(objectHeader,
-				type, length, addrLength, reserved, sourceIP);
-
-		return object;
-	}
-
-	public static PCEPTNADestinationObject generatePCEPTNADestinationObjct(
-			String pFlag, String iFlag, int type, int length, int addrLength,
-			int reserved, PCEPAddress destinationIP) {
-		PCEPCommonObjectHeader objectHeader = new PCEPCommonObjectHeader(18, 1,
-				pFlag, iFlag);
-		PCEPTNADestinationObject object = new PCEPTNADestinationObject(
-				objectHeader, type, length, addrLength, reserved, destinationIP);
-
-		return object;
-	}
-
-	public static PCEPGeneralizedEndPointsTNAObject generatePCEPGeneralizedEndPointsTNAObject(
-			String pFlag, String iFlag, int reserved, int endPointType,
-			PCEPTNASourceObject sourcePoint,
-			PCEPTNADestinationObject destinationPoint) {
-		PCEPCommonObjectHeader objectHeader = new PCEPCommonObjectHeader(4, 5,
-				pFlag, iFlag);
-		PCEPGeneralizedEndPointsTNAObject object = new PCEPGeneralizedEndPointsTNAObject(
-				objectHeader, reserved, endPointType, sourcePoint,
-				destinationPoint);
-
-		return object;
-	}
 
 	public static LinkedList<PCEPObjectFrame> PCEPObjectFabrication(
 			String objectsRawString) {
@@ -305,8 +260,6 @@ public class PCEPObjectFrameFactory {
 			return new PCEPLoadBalancingObject(objectHeader, objectString);
 		case 15:
 			return new PCEPCloseObject(objectHeader, objectString);
-		case 16:
-			return new PCEPITResourceObject(objectHeader, objectString);
 		default:
 			Logger.logWarning("Error at switch(objectHeader.getClassDecimalValue()). Value = "
 					+ objectHeader.getClassDecimalValue());

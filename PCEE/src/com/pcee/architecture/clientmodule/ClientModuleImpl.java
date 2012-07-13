@@ -20,7 +20,6 @@ package com.pcee.architecture.clientmodule;
 import java.util.concurrent.LinkedBlockingQueue;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.client.ClientTest;
 import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
@@ -147,7 +146,7 @@ public class ClientModuleImpl extends ClientModule {
 				}
 			} else if (message.getMessageHeader().getTypeDecimalValue() == 4) {
 				// Path Computation Ressponse received
-				ClientTest.messageQueue.add(message);
+				//ClientTest.messageQueue.add(message);
 				PCEPResponseFrame responseFrame = PCEPResponseFrameFactory
 						.getPathComputationResponseFrame(message);
 				localLogger("| COMPUTATION RECEIVED: "

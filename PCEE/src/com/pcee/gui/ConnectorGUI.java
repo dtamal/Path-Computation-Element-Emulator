@@ -360,10 +360,10 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		gridbag.setConstraints(this.requestMessagePanel, c);
 		this.windowPanel.add(this.requestMessagePanel);
 
-//		c.gridx = 0;
-//		c.gridy = 3;
-//		gridbag.setConstraints(this.textAreaPanel, c);
-//		this.windowPanel.add(this.textAreaPanel);
+		c.gridx = 0;
+		c.gridy = 3;
+		gridbag.setConstraints(this.textAreaPanel, c);
+		this.windowPanel.add(this.textAreaPanel);
 
 	}
 
@@ -381,9 +381,9 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 	}
 
 	public void openConnection() throws Exception {
-		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), port);
+		PCEPAddress address = new PCEPAddress(serverAddressTextField.getText(), port);
 		killIDALogo();
-		guiLogger("Trying to connect to " + destAddress.getIPv4Address(true));
+		guiLogger("Trying to connect to " + address.getIPv4Address(true));
 		lm.getClientModule().registerConnection(address, false, true);
 	}
 	

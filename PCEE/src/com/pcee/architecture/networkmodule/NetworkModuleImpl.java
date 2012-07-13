@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.benchmark.ResultLogger;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.logger.Logger;
@@ -471,9 +470,6 @@ public class NetworkModuleImpl extends NetworkModule {
 								messageByteArray);
 						receivedMessage.setAddress(address);
 
-						ResultLogger.logResult(receivedMessage); // FIXME remove
-																	// after
-																	// test
 
 /*						System.out.println("Received Message type  = "
 								+ receivedMessage.getMessageHeader()
@@ -546,13 +542,6 @@ public class NetworkModuleImpl extends NetworkModule {
 		localDebugger("| message: " + message.contentInformation());
 		localDebugger("| " + message.binaryInformation());
 		localDebugger("| " + message.toString());
-
-		try {
-			ResultLogger.logResult(message); // FIXME remove after test
-			ResultLogger.flush(message);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
 
 		SocketChannel outputSocketChannel = getSocketChannelFromHashMap(message
 				.getAddress());

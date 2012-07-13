@@ -25,9 +25,8 @@ import java.util.Properties;
 import com.pcee.architecture.clientmodule.ClientModule;
 import com.pcee.architecture.clientmodule.ClientModuleImpl;
 import com.pcee.architecture.computationmodule.ComputationModule;
-import com.pcee.architecture.computationmodule.ComputationModuleMLImpl;
+import com.pcee.architecture.computationmodule.ComputationModuleImpl;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
-import com.pcee.architecture.computationmodule.ted.TopologyUpdateListener;
 import com.pcee.architecture.networkmodule.NetworkModule;
 import com.pcee.architecture.networkmodule.NetworkModuleImpl;
 import com.pcee.architecture.sessionmodule.SessionModule;
@@ -51,10 +50,7 @@ public class ModuleManagement {
 			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
 			sessionModule = new SessionModuleImpl(this);
 			if (isServer == true) {
-				TopologyUpdateListener listener = new TopologyUpdateListener(
-						this);
-				listener.start();
-				computationModule = new ComputationModuleMLImpl(this);
+				computationModule = new ComputationModuleImpl(this);
 				clientModule = new ClientModuleImpl(this);
 			} else {
 				clientModule = new ClientModuleImpl(this);
@@ -110,11 +106,7 @@ public class ModuleManagement {
 				else
 					sessionModule = new SessionModuleImpl(this, sessionThreads);
 				if (isServer == true) {
-					TopologyUpdateListener listener = new TopologyUpdateListener(
-							this);
-					listener.start();
-
-					computationModule = new ComputationModuleMLImpl(this,
+					computationModule = new ComputationModuleImpl(this,
 							computationThreads);
 					clientModule = new ClientModuleImpl(this);
 				} else {
