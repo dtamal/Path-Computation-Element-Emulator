@@ -50,7 +50,8 @@ public class Logger {
 	}
 
 	public static void logError(String msg) {
-		// System.out.println(msg);
+		String timeStamp = Time.timeStamp();
+		logObject.logMsg(timeStamp + " " + msg);
 	}
 
 	public static void logGUINotifications(String msg) {

@@ -208,8 +208,10 @@ public class NetworkModuleImpl extends NetworkModule {
 				selector.wakeup();
 
 			}
+		}catch (java.net.ConnectException e){
+			Logger.logError("[NetworkModule] Count not connect to Server. Please Check if server is running on the remote address");
 		} catch (IOException e) {
-			e.printStackTrace();
+			Logger.logError("[NetworkModule] " + e.getMessage());
 		}
 
 	}
@@ -336,7 +338,12 @@ public class NetworkModuleImpl extends NetworkModule {
 			if (isServer) {
 				ServerSocketChannel serverSocketChannel = ServerSocketChannel
 						.open();
+				try {
 				serverSocketChannel.socket().bind(new InetSocketAddress(port));
+				} catch (java.net.BindException e){
+					Logger.logError("[NetworkModule] The PCEP Port is Already in use by another application. Terminating Server Instance");
+					System.exit(-1);
+				}
 				serverSocketChannel.configureBlocking(false);
 				serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 			}
