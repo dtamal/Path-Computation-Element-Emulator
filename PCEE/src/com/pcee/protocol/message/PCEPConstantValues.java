@@ -36,8 +36,8 @@ public class PCEPConstantValues {
 	// Testing Values
 	public static final short CONNECT_TIMER = 300;
 	public static final short KEEPALIVE_TIMER = 60;
-//	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
-	public static final short DEAD_TIMER = 12000;
+	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
+//	public static final short DEAD_TIMER = 12000;
 	public static final short OPENWAIT_TIMER = 100;
 	public static final short KEEPWAIT_TIMER = 100;
 
@@ -502,4 +502,12 @@ public class PCEPConstantValues {
 	public static final short TEMPLATE_OBJECT_FLAG_6_FLAG_C_START_BIT = 23;
 	public static final short TEMPLATE_OBJECT_FLAG_6_FLAG_C_END_BIT = 23;
 
+	
+	public static final short OF_OBJECT_OFCODE_START_BIT=0;
+	public static final short OF_OBJECT_OFCODE_END_BIT=15;
+	public static final short OF_OBJECT_OFCODE_LENGTH=16;
+	
+	public static final short OF_OBJECT_RESERVED_START_BIT=16;
+	public static final short OF_OBJECT_RESERVED_END_BIT=31;
+	public static final short OF_OBJECT_RESERVED_LENGTH=16;
 }

@@ -654,7 +654,8 @@ public class StateMachineImpl extends StateMachine {
 		}
 		case 6: {
 			localLogger("Received Error Message");
-			// MessageHandler.processRequestMessage(message);
+			if (lm.isServer()==false)
+				lm.getClientModule().receiveMessage(message, ModuleEnum.SESSION_MODULE);
 
 			break;
 		}

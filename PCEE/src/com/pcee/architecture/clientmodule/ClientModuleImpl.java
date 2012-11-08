@@ -151,7 +151,7 @@ public class ClientModuleImpl extends ClientModule {
 						.getPathComputationResponseFrame(message);
 				localLogger("| COMPUTATION RECEIVED: "
 						+ responseFrame.getTraversedVertexes());
-				
+				receiveQueue.add(message);
 				
 /*				TopologyUpdateLauncher.responseFrame = responseFrame;
 				TopologyUpdateLauncher.objectList = responseFrame.extractExplicitRouteObjectList();
@@ -161,6 +161,11 @@ public class ClientModuleImpl extends ClientModule {
 			} else if (message.getMessageHeader().getTypeDecimalValue() == 5) {
 				receiveQueue.add(message);
 				localLogger("| Notification message received");
+			} else if (message.getMessageHeader().getTypeDecimalValue() == 6) {
+				
+				receiveQueue.add(message);
+				localLogger("| Error message received");
+				
 			}
 			break;
 		default:
