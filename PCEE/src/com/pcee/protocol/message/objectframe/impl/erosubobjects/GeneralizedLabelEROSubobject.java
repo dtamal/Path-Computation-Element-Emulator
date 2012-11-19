@@ -65,7 +65,7 @@ public class GeneralizedLabelEROSubobject extends LabelEROSubobject {
 	 }
 
 	 public void setGridBinaryString(String binaryString) {
-		 this.channelSpacing= binaryString;
+		 this.grid= binaryString;
 	 }
 	 
 
