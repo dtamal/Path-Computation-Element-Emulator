@@ -24,6 +24,7 @@ import com.pcee.protocol.message.PCEPConstantValues;
 import com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROUnnumberedInterface;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.LabelEROSubobject;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.MLDelimiter;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
@@ -107,7 +108,9 @@ public class PCEPGenericExplicitRouteObjectImpl extends PCEPExplicitRouteObject 
 				temp = new EROUnnumberedInterface(tempString);
 			} else if (type==EROSubobjects.PCEPMLDelimiterType) {
 				temp = new MLDelimiter(tempString);
-			} 
+			} else if (type==EROSubobjects.PCEPLabelEROSubobjectType) {
+				temp = LabelEROSubobject.getObjectFromBinaryString(tempString);
+			}
 			
 			if (temp==null)
 				System.out.println("[" + NAME + "] Problem in parsing the ERO Subobject in the setObjectBinaryString Function");
