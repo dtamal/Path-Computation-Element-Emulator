@@ -417,7 +417,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 
 		guiLogger("Sending Path Computation Request Message.");
 		guiLogger("Requesting a Way from " + sourceAddress.getIPv4Address(true) + " to " + destinationAddress.getIPv4Address(true));
-		lm.getClientModule().sendMessage(message, ModuleEnum.CLIENT_MODULE);
+		lm.getClientModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
 	}
 
 	public void actionPerformed(ActionEvent event) {
