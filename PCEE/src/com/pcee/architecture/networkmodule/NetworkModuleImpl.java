@@ -163,7 +163,7 @@ public class NetworkModuleImpl extends NetworkModule {
 	}
 
 	public void registerConnection(PCEPAddress address, boolean connected,
-			boolean connectionInitialized) {
+			boolean connectionInitialized, boolean forceClient) {
 		localDebugger("Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
 		localDebugger("| address: " + address.getIPv4Address(false));
 		localDebugger("| connected" + connected);
@@ -199,7 +199,7 @@ public class NetworkModuleImpl extends NetworkModule {
 				// established. State Machine can then send out The first OPEN
 				// message
 				lm.getSessionModule().registerConnection(remoteAddress, true,
-						true);
+						true, forceClient);
 
 				// Socket is registered with the selector only after state
 				// machine is initialized so that an OPEN message is not
@@ -373,7 +373,9 @@ public class NetworkModuleImpl extends NetworkModule {
 			// Configure Socket Properties
 			socketChannel.configureBlocking(false);
 			insertSocketChannelToHashMap(address, socketChannel);
-			lm.getSessionModule().registerConnection(address, true, false);
+			
+			//if the server is receiving a connection then the remote peer is a client 
+			lm.getSessionModule().registerConnection(address, true, false, false);
 
 			localLogger("New Connection Accepted, registering with selector");
 			SelectionKey key = socketChannel.register(selector,

@@ -24,7 +24,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.sessionmodule.statemachine.StateMachine;
+import com.pcee.architecture.sessionmodule.statemachine.StateMachineClientImpl;
 import com.pcee.architecture.sessionmodule.statemachine.StateMachineImpl;
+import com.pcee.architecture.sessionmodule.statemachine.StateMachineServerImpl;
 import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
@@ -228,7 +230,7 @@ public class SessionModuleImpl extends SessionModule {
 	}
 
 	public void registerConnection(PCEPAddress address, boolean connected,
-			boolean connectionInitialized) {
+			boolean connectionInitialized, boolean forceClient) {
 		localDebugger("Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
 		localDebugger("| address: " + address.getIPv4Address());
 		localDebugger("| connected: " + connected);
@@ -240,13 +242,13 @@ public class SessionModuleImpl extends SessionModule {
 			// initializing the connection and is not connected initially
 			if ((connectionInitialized == true) && (connected == false)) {
 				lm.getNetworkModule().registerConnection(address, connected,
-						connectionInitialized);
+						connectionInitialized, forceClient);
 			}
 
 			// If the connection is connected, register the new state machine
 			// for the connection
 			if (connected == true) {
-				createNewStateMachine(address, connectionInitialized);
+				createNewStateMachine(address, connectionInitialized, forceClient);
 			}
 		}
 	}
@@ -276,15 +278,26 @@ public class SessionModuleImpl extends SessionModule {
 	 * @param connectionInitialized
 	 */
 	private void createNewStateMachine(PCEPAddress address,
-			boolean connectionInitialized) {
+			boolean connectionInitialized, boolean forceClient) {
 		localDebugger("Entering: createNewStateMachine(PCEPAddress address, boolean connectionInitialized)");
 		localDebugger("| address: " + address.getIPv4Address());
 		localDebugger("| connectionInitialized: " + connectionInitialized);
 
 		localLogger("New StateMachine for " + address.getIPv4Address());
 		// Creating new state machine
-		StateMachine stateMachine = new StateMachineImpl(lm, address,
-				stateMachineTimer, connectionInitialized);
+		// If LM is of type client, create a client state machine or else create a server state machine (by default) 
+		StateMachine stateMachine;
+		if (lm.isServer()) {
+			//If in the server a state machine is registered forcefully as a client then we create a client state machine or else we make 
+			// a server state machine
+			if (forceClient)
+				stateMachine = new StateMachineClientImpl(lm, address,stateMachineTimer, connectionInitialized);
+			else
+				stateMachine = new StateMachineServerImpl(lm, address,stateMachineTimer, connectionInitialized);
+		} else {
+			stateMachine = new StateMachineClientImpl(lm, address,stateMachineTimer, connectionInitialized);
+		}
+		
 		// adding state machine to hash map
 		insertStateMachineToHashMap(address, stateMachine);
 	}

@@ -384,7 +384,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		PCEPAddress address = new PCEPAddress(serverAddressTextField.getText(), port);
 		killIDALogo();
 		guiLogger("Trying to connect to " + address.getIPv4Address(true));
-		lm.getClientModule().registerConnection(address, false, true);
+		lm.getClientModule().registerConnection(address, false, true, true);
 	}
 	
 	public void requestMessage() throws IOException {
