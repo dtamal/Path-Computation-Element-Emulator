@@ -19,12 +19,11 @@ package com.pcee.architecture.computationmodule.ted;
 
 import java.io.File;
 
-import com.global.GlobalCfg;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.graph.topology.importers.impl.BRITEImportTopology;
-import com.graph.topology.importers.impl.MLSNDLibImportTopology;
+import com.graph.topology.importers.impl.SNDLibImportTopology;
 import com.pcee.logger.Logger;
 
 /**
@@ -45,7 +44,7 @@ public class TopologyInformation {
 	private static ImportTopology topology;
 
 	// path to the topology description file
-	private static String topoPath = GlobalCfg.projectSourcePath+GlobalCfg.topology;
+	private static String topoPath = ".//atlanta.txt";
 
 	/**
 	 * @param input
@@ -61,17 +60,17 @@ public class TopologyInformation {
 	 */
 	public static void setImporter(String importer) {
 		if (importer.equals("SNDLib")) {
-			topology = new MLSNDLibImportTopology();
+			topology = new SNDLibImportTopology();
 		} else if (importer.equals("BRITE")) {
 			topology = new BRITEImportTopology();
 		} else {
-			topology = new MLSNDLibImportTopology();
+			topology = new SNDLibImportTopology();
 		}
 	}
 
 	/** default constructor */
 	private TopologyInformation() {
-		topology = new MLSNDLibImportTopology();
+		topology = new SNDLibImportTopology();
 		graph = new GcontrollerImpl();
 
 		// Source file used to instantiate the topology
@@ -80,7 +79,6 @@ public class TopologyInformation {
 		// Function to import the topology stored in the text file into the
 		// graph object
 		topology.importTopology(graph, file.getAbsolutePath());
-		
 		if (graph == null)
 			localDebugger("Error in loading graph from file");
 		else
@@ -147,7 +145,6 @@ public class TopologyInformation {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println(new File(TopologyInformation.topoPath).getAbsolutePath());
-		System.out.println("graph border size: " + TopologyInformation.getInstance().getGraph().getBorderNodeVertexElements().size());
+		System.out.println(new File(topoPath).getAbsolutePath());
 	}
 }

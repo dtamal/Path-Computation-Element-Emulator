@@ -12,7 +12,6 @@ public class GlobalCfg {
 	public static String pcrAddress = "127.0.0.1";
 	public static int pcrPort = 4189;
 
-	public static boolean singlePath = true;
 	/** Reserve and Release Address */
 	// public static String prrAddress = "134.169.174.112";
 	public static String prrAddress = "127.0.0.1";
@@ -20,7 +19,7 @@ public class GlobalCfg {
 
 	
 	/** Define Path Count when doing Path Computation */
-	public static int pathCount = 1; // Need to change after each scenario and
+	public static int pathCount = 2; // Need to change after each scenario and
 	// should be equal to logFileName's
 	// count
 	

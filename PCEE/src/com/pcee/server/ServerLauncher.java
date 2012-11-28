@@ -31,8 +31,8 @@ public class ServerLauncher {
 
 	/** Launch Point of the PCEE Server */
 	public static void main(String[] args) {
-//	    Launcher.init();
-//	    TopoGlobal.init();
+	    Launcher.init();
+	    TopoGlobal.init();
 		if (args.length == 0) {
 			new ModuleManagement(true);
 		} else {
