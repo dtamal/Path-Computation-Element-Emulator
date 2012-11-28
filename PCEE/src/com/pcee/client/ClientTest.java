@@ -78,46 +78,7 @@ public class ClientTest {
 		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "0", "1", "0", "1", "432");
 		PCEPEndPointsObject endPoints = PCEPObjectFrameFactory.generatePCEPEndPointsObject("1", "0", sourceAddress, destinationAddress);
 		PCEPBandwidthObject bandwidth = PCEPObjectFrameFactory.generatePCEPBandwidthObject("1", "0", bw);
-//		PCEPITResourceObject itResource = PCEPObjectFrameFactory.generatePCEPITResourceObject("1", "0", 0, 3, 30, 300);
-
-		PCEPRequestFrame requestFrame = PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
-		requestFrame.insertBandwidthObject(bandwidth);
-//		requestFrame.insertITResourceObject(itResource);
-		PCEPMessage message = PCEPMessageFactory.generateMessage(requestFrame);
-		message.setAddress(address);
-		String mString = message.binaryInformation();
-		log(mString);
-		TopologyUpdateLauncher.requestCount++;
-		TopologyUpdateLauncher.timeStampsSentMilli.add(System.currentTimeMillis());
-		TopologyUpdateLauncher.timeStampsSentNano.add(System.nanoTime());
-
-		lm.getClientModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
-
-		PCEPMessage response;
-		try {
-			response = messageQueue.take();
-			TopologyUpdateLauncher.timeStampsReceivedMilli.add(System.currentTimeMillis());
-			TopologyUpdateLauncher.timeStampsReceivedNano.add(System.nanoTime());
-		} catch (InterruptedException e) {
-			return null;
-		}
-		
-		System.out.println("Repnose RETURNED!!!!!!!!!!!!!!!!!!");
-
-		return PCEPResponseFrameFactory.getPathComputationResponseFrame(response);
-	}
-	
-	public static PCEPResponseFrame getPath(String sourceID, float bw, int cpu, int ram, int storage) {
-
-		// Address of the PCE server
-		PCEPAddress address = new PCEPAddress(GlobalCfg.pcrAddress, GlobalCfg.pcrPort);
-		PCEPAddress sourceAddress = new PCEPAddress(sourceID, false);
-		PCEPAddress destinationAddress = new PCEPAddress(sourceID, false);
-
-		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "0", "1", "0", "1", "432");
-		PCEPEndPointsObject endPoints = PCEPObjectFrameFactory.generatePCEPEndPointsObject("1", "0", sourceAddress, destinationAddress);
-		PCEPBandwidthObject bandwidth = PCEPObjectFrameFactory.generatePCEPBandwidthObject("1", "0", bw);
-		PCEPITResourceObject itResource = PCEPObjectFrameFactory.generatePCEPITResourceObject("1", "0", 0, cpu, ram, storage);
+		PCEPITResourceObject itResource = PCEPObjectFrameFactory.generatePCEPITResourceObject("1", "0", 0, 3, 30, 300);
 
 		PCEPRequestFrame requestFrame = PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
 		requestFrame.insertBandwidthObject(bandwidth);
@@ -130,7 +91,7 @@ public class ClientTest {
 		TopologyUpdateLauncher.timeStampsSentMilli.add(System.currentTimeMillis());
 		TopologyUpdateLauncher.timeStampsSentNano.add(System.nanoTime());
 
-		lm.getClientModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
+		lm.getClientModule().sendMessage(message, ModuleEnum.CLIENT_MODULE);
 
 		PCEPMessage response;
 		try {
