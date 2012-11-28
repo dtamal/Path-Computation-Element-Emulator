@@ -22,6 +22,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.client.ClientTest;
 import com.pcee.logger.Logger;
 
 public class Worker extends Thread {
@@ -65,11 +66,12 @@ public class Worker extends Thread {
 		Request request = null;
 		int flag=0;
 		while(!terminateWorker){
-			WorkerTask task = null;
+			WorkerTaskForMultiPathWithITResourceSupport task = null;
 			try {
 				if (flag==0){
 					request = requestQueue.take();
 					//Record the leaving Queue Time for each request
+					ClientTest.requestLeaveTheQueue.add(System.nanoTime());
 					localLogger("Starting request ID " + request.getRequestID());
 					localLogger("Current Length of Request Queue = " + requestQueue.size());
 				
@@ -87,7 +89,8 @@ public class Worker extends Thread {
 			//Flag to check if thread was interrupted during a wait operation or during a computation 
 			flag=1;
 			if (request!=null){
-				task = new WorkerTask(lm, request, TopologyInformation.getInstance().getGraph().createCopy());
+//				task = new WorkerTaskForMultipath(lm, request, TopologyInformation.getInstance().getGraph().createCopy());
+				task = new WorkerTaskForMultiPathWithITResourceSupport(lm, request, TopologyInformation.getInstance().getGraph().createCopy());
 				task.run();
 				localLogger("Completed processing of request ID " + request.getRequestID());
 			}

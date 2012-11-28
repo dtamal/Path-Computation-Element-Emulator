@@ -1,0 +1,51 @@
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	10018 , 	 Total blocks: 203
+	 Blocking Rate:	0.020263525653823118 
+	 Average signaling delay in Milliseconds :	6
+	 Average singaling delay in Nanosecondes:	6420756
+**************************************************************************
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	10179 , 	 Total blocks: 251
+	 Blocking Rate:	0.024658610865507417 
+	 Average signaling delay in Milliseconds :	6
+	 Average singaling delay in Nanosecondes:	6234370
+**************************************************************************
+35
+
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	9783 , 	 Total blocks: 300
+	 Blocking Rate:	0.030665440049064702 
+	 Average signaling delay in Milliseconds :	6
+	 Average singaling delay in Nanosecondes:	6261410
+**************************************************************************
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	10020 , 	 Total blocks: 401
+	 Blocking Rate:	0.04001996007984032 
+	 Average signaling delay in Milliseconds :	6
+	 Average singaling delay in Nanosecondes:	6212580
+**************************************************************************
+40
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	9967 , 	 Total blocks: 448
+	 Blocking Rate:	0.04494832948730812 
+	 Average signaling delay in Milliseconds :	6
+	 Average singaling delay in Nanosecondes:	6179265
+**************************************************************************
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	9902 , 	 Total blocks: 538
+	 Blocking Rate:	0.05433245808927489 
+	 Average signaling delay in Milliseconds :	6
+	 Average singaling delay in Nanosecondes:	6432797
+**************************************************************************

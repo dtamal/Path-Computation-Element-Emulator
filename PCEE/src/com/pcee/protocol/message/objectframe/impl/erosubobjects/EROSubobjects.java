@@ -22,7 +22,6 @@ public abstract class EROSubobjects {
 	public static final int PCEPIPv4AddressType = 1;
 	public static final int PCEPUnnumberedInterfaceType = 4;
 	public static final int PCEPMLDelimiterType = 40;
-	public static final int PCEPLabelEROSubobjectType = 3;
 	
 	protected String NAME;
 

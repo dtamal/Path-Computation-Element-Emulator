@@ -1,0 +1,24 @@
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	10018 , 	 Total blocks: 39
+	 Blocking Rate:	0.003892992613296067 
+	 Average signaling delay in Milliseconds :	2947
+	 Average singaling delay in Nanosecondes:	2947443665
+**************************************************************************
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	10031 , 	 Total blocks: 39
+	 Blocking Rate:	0.00388794736317416 
+	 Average signaling delay in Milliseconds :	2521
+	 Average singaling delay in Nanosecondes:	2521844252
+**************************************************************************
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	9897 , 	 Total blocks: 37
+	 Blocking Rate:	0.003738506618167121 
+	 Average signaling delay in Milliseconds :	2403
+	 Average singaling delay in Nanosecondes:	2403952333
+**************************************************************************

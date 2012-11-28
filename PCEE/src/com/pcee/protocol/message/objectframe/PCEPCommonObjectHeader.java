@@ -325,5 +325,8 @@ public class PCEPCommonObjectHeader {
 	public String contentInformation() {
 		return "[" + NAME + "]";
 	}
-
+	
+	public void log(String logString){
+		System.out.println("PCEPCommonObjectHeader::: " + logString);
+	}
 }

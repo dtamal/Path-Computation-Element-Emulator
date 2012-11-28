@@ -19,6 +19,7 @@ package com.pcee.architecture.computationmodule.threadpool;
 
 import java.util.ArrayList;
 
+import com.graph.elements.vertex.VertexElement;
 import com.graph.path.PathElement;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
@@ -32,8 +33,28 @@ public class Response {
     private ArrayList<PathElement> elements;
     // Address to identify the PCEP session
     private PCEPAddress address;
+    // Vertex indicating the found vertex
+    private VertexElement vertex;
+    // indicating whether it's a vertex request or path computation request
+    private boolean vertexRequest;
 
-    /**
+    public boolean isVertexRequest() {
+		return vertexRequest;
+	}
+
+	public void setVertexRequest(boolean vertexRequest) {
+		this.vertexRequest = vertexRequest;
+	}
+
+	public VertexElement getVertex() {
+		return vertex;
+	}
+
+	public void setVertex(VertexElement vertex) {
+		this.vertex = vertex;
+	}
+
+	/**
      * @return the requestID
      */
     public String getRequestID() {

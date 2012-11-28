@@ -77,9 +77,8 @@ public class PCEPMessageAnalyser {
 
 	}
 
-	
 	public static int checkSessionCharacteristics(PCEPMessage message) {
-		//TODO
+
 		// 1=acceptable ; 0 = unacceptable&nagotiable ; -1 =
 		// unacceptable&un-nagotiable
 		return 1;

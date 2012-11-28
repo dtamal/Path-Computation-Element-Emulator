@@ -1,0 +1,6 @@
+30
+===============================================================
+				 BLOCKING RATE
+	 Logging count:	1
+	 Total requests:	10099 , 	 Total blocks: 849
+	 Blocking Rate:	0.08406772947816615 

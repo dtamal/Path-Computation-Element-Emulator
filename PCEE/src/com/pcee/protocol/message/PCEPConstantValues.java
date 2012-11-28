@@ -36,8 +36,8 @@ public class PCEPConstantValues {
 	// Testing Values
 	public static final short CONNECT_TIMER = 300;
 	public static final short KEEPALIVE_TIMER = 60;
-	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
-//	public static final short DEAD_TIMER = 12000;
+//	public static final short DEAD_TIMER = KEEPALIVE_TIMER * 4;
+	public static final short DEAD_TIMER = 12000;
 	public static final short OPENWAIT_TIMER = 100;
 	public static final short KEEPWAIT_TIMER = 100;
 
@@ -256,6 +256,7 @@ public class PCEPConstantValues {
 	public static final short REQUEST_PARAMETERS_OBJECT_REQUEST_ID_NUMBER_START_BIT = 32;
 	public static final short REQUEST_PARAMETERS_OBJECT_REQUEST_ID_NUMBER_END_BIT = 63;
 
+	/** NO Path Object*/
 	public static final short NO_PATH_OBJECT_LENGTH = 32;
 
 	public static final short NO_PATH_OBJECT_NATURE_OF_ISSUE_LENGTH = 8;
@@ -273,7 +274,27 @@ public class PCEPConstantValues {
 	public static final short NO_PATH_OBJECT_RESERVED_LENGTH = 8;
 	public static final short NO_PATH_OBJECT_RESERVED_START_BIT = 24;
 	public static final short NO_PATH_OBJECT_RESERVED_END_BIT = 31;
+	
+	/** No Vertex Object*/
+	public static final short NO_VERTEX_OBJECT_LENGTH = 32;
 
+	public static final short NO_VERTEX_OBJECT_NATURE_OF_ISSUE_LENGTH = 8;
+	public static final short NO_VERTEX_OBJECT_NATURE_OF_ISSUE_START_BIT = 0;
+	public static final short NO_VERTEX_OBJECT_NATURE_OF_ISSUE_END_BIT = 7;
+
+	public static final short NO_VERTEX_OBJECT_FLAGS_LENGTH = 16;
+	public static final short NO_VERTEX_OBJECT_FLAGS_START_BIT = 8;
+	public static final short NO_VERTEX_OBJECT_FLAGS_END_BIT = 23;
+
+	public static final short NO_VERTEX_OBJECT_FLAG_FLAG_CONSTRAINTS_LENGTH = 1;
+	public static final short NO_VERTEX_OBJECT_FLAG_FLAG_CONSTRAINTS_START_BIT = 8;
+	public static final short NO_VERTEX_OBJECT_FLAG_FLAG_CONSTRAINTS_END_BIT = 8;
+
+	public static final short NO_VERTEX_OBJECT_RESERVED_LENGTH = 8;
+	public static final short NO_VERTEX_OBJECT_RESERVED_START_BIT = 24;
+	public static final short NO_VERTEX_OBJECT_RESERVED_END_BIT = 31;
+	
+	/** END POINTS OBJECT */
 	public static final short END_POINTS_OBJECT_LENGTH = 64;
 
 	public static final short END_POINTS_OBJECT_SOURCE_ADDRESS_LENGTH = 32;
@@ -502,11 +523,10 @@ public class PCEPConstantValues {
 	public static final short TEMPLATE_OBJECT_FLAG_6_FLAG_C_START_BIT = 23;
 	public static final short TEMPLATE_OBJECT_FLAG_6_FLAG_C_END_BIT = 23;
 
-	
 	public static final short OF_OBJECT_OFCODE_START_BIT=0;
 	public static final short OF_OBJECT_OFCODE_END_BIT=15;
 	public static final short OF_OBJECT_OFCODE_LENGTH=16;
-	
+
 	public static final short OF_OBJECT_RESERVED_START_BIT=16;
 	public static final short OF_OBJECT_RESERVED_END_BIT=31;
 	public static final short OF_OBJECT_RESERVED_LENGTH=16;
