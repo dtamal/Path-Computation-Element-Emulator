@@ -51,7 +51,7 @@ public class ModuleManagement {
 			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
 			sessionModule = new SessionModuleImpl(this);
 			if (isServer == true) {
-				computationModule = new ComputationModuleImpl(this);
+				computationModule = new ComputationModuleMLImpl(this);
 				clientModule = new ClientModuleImpl(this);
 			} else {
 				clientModule = new ClientModuleImpl(this);
