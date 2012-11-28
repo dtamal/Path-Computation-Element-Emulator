@@ -16,7 +16,6 @@
  */
 
 package com.pcee.protocol.message.objectframe.impl;
-
 /**
  * <pre>
  *  0                   1                   2                   3

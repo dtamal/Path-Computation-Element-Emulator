@@ -38,25 +38,27 @@ import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 
 public abstract class PCEPNotificationObject implements PCEPObjectFrame {
 
+
 	private String jsonString;
 
 	private PCEPCommonObjectHeader objectHeader;
-
 	// private LinkedList<PCEPTLVObject> tlvList;
+
+
 
 	protected void updateHeaderLength() {
 		int objectFrameByteLength = this.getObjectFrameByteLength();
 		this.getObjectHeader().setLengthDecimalValue(objectFrameByteLength);
 	}
 
-	public String getJsonString() {
+	public String getJsonString(){
 		return jsonString;
 	}
-
-	public void setJsonString(String input) {
+	
+	public void setJsonString(String input){
 		this.jsonString = input;
 	}
-
+	
 	/**
 	 * Object
 	 */
@@ -74,12 +76,12 @@ public abstract class PCEPNotificationObject implements PCEPObjectFrame {
 	}
 
 	public void setObjectBinaryString(String binaryString) {
-		jsonString = new String(PCEPComputationFactory.rawMessageToByteArray(binaryString));
+		jsonString = new String (PCEPComputationFactory.rawMessageToByteArray(binaryString));
 	}
 
 	public int getObjectFrameByteLength() {
 		int headerLength = PCEPConstantValues.COMMON_OBJECT_HEADER_LENGTH;
-		int objectFrameByteLength = (headerLength + this.getObjectBinaryString().length()) / 8;
+		int objectFrameByteLength = (headerLength + this.getObjectBinaryString().length())/8;
 		return objectFrameByteLength;
 	}
 
@@ -103,5 +105,7 @@ public abstract class PCEPNotificationObject implements PCEPObjectFrame {
 	public String binaryInformation() {
 		return this.getObjectHeader().binaryInformation() + this.getObjectBinaryString();
 	}
+
+
 
 }

@@ -43,6 +43,14 @@ public class PCEPMessage {
 		
 	}
 	
+//	public PCEPMessage(String rawMessageString) {
+//		String messageHeaderString = rawMessageString.substring(0, PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
+//		String objectsRawString = rawMessageString.substring(PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
+//
+//		this.messageHeader = new PCEPCommonMessageHeader(messageHeaderString);
+//		this.objectsList = PCEPObjectFrameFactory.PCEPObjectFabrication(objectsRawString);
+//	}
+
 	public PCEPMessage(PCEPCommonMessageHeader header, LinkedList<PCEPObjectFrame> objectsList) {
 		this.messageHeader = header;
 		this.objectsList = objectsList;

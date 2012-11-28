@@ -69,7 +69,4 @@ public class PCEPMessageFactory {
 		return new PCEPMessage(messageHeader, objectsList);
 	}
 
-	public static void log(String logString){
-		System.out.println("PCEPMessageFactory::: " + logString);
-	}
 }

@@ -24,6 +24,7 @@ import com.pcee.protocol.message.PCEPConstantValues;
 import com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROUnnumberedInterface;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.LabelEROSubobject;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.MLDelimiter;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
@@ -62,7 +63,7 @@ public class PCEPGenericExplicitRouteObjectImpl extends PCEPExplicitRouteObject 
 		this.updateHeaderLength();
 	}
 
-	private void updateHeaderLength() {
+	private void updateHeaderLength(){
 		int objectFrameByteLength = this.getObjectFrameByteLength();
 		this.getObjectHeader().setLengthDecimalValue(objectFrameByteLength);
 	}
@@ -95,23 +96,25 @@ public class PCEPGenericExplicitRouteObjectImpl extends PCEPExplicitRouteObject 
 		ArrayList<EROSubobjects> vertexList = new ArrayList<EROSubobjects>();
 
 		while (binaryString.length() > 0) {
-			String lengthBinaryString = binaryString.substring(8, 16);
+			String lengthBinaryString = binaryString.substring(8, 16); 
 			int length = (int) PCEPComputationFactory.getDecimalValue(lengthBinaryString);
 			length = length * 8;
 			String tempString = binaryString.substring(0, length);
 			int type = (int) PCEPComputationFactory.getDecimalValue(tempString.substring(1, 8));
 			EROSubobjects temp = null;
-			if (type == EROSubobjects.PCEPIPv4AddressType) {
-				temp = new PCEPAddress(tempString, true);
-			} else if (type == EROSubobjects.PCEPUnnumberedInterfaceType) {
+			if (type==EROSubobjects.PCEPIPv4AddressType) {
+					temp=new PCEPAddress(tempString, true);
+			} else if (type==EROSubobjects.PCEPUnnumberedInterfaceType) {
 				temp = new EROUnnumberedInterface(tempString);
-			} else if (type == EROSubobjects.PCEPMLDelimiterType) {
+			} else if (type==EROSubobjects.PCEPMLDelimiterType) {
 				temp = new MLDelimiter(tempString);
+			} else if (type==EROSubobjects.PCEPLabelEROSubobjectType) {
+				temp = LabelEROSubobject.getObjectFromBinaryString(tempString);
 			}
-
-			if (temp == null)
+			
+			if (temp==null)
 				System.out.println("[" + NAME + "] Problem in parsing the ERO Subobject in the setObjectBinaryString Function");
-
+			
 			vertexList.add(temp);
 
 			binaryString = binaryString.substring(length);
@@ -157,16 +160,19 @@ public class PCEPGenericExplicitRouteObjectImpl extends PCEPExplicitRouteObject 
 
 		for (EROSubobjects address : traversedVertexList) {
 			if (address instanceof PCEPAddress)
-				traversedVertexesList = traversedVertexesList + ((PCEPAddress) address).getIPv4Address(false) + "-";
-			else if (address instanceof EROUnnumberedInterface) {
-				traversedVertexesList = traversedVertexesList + "UI-" + ((EROUnnumberedInterface) address).getRouterIDDecimalValue() + ":" + ((EROUnnumberedInterface) address).getInterfaceIDDecimalValue() + "-";
-			} else if (address instanceof MLDelimiter) {
-				traversedVertexesList = traversedVertexesList + "ML-";
+				traversedVertexesList = traversedVertexesList + ((PCEPAddress)address).getIPv4Address(false) + "-";
+			else if (address instanceof EROUnnumberedInterface){
+				traversedVertexesList = traversedVertexesList + "UI-" + ((EROUnnumberedInterface)address).getRouterIDDecimalValue() + ":" + ((EROUnnumberedInterface)address).getInterfaceIDDecimalValue() + "-";
+			}
+			else if (address instanceof MLDelimiter){
+				traversedVertexesList = traversedVertexesList + "ML-";				
 			}
 		}
 
 		return traversedVertexesList;
 	}
+
+
 
 	// public String getTraversedVertexes() {
 	// String traversedVertexesList = new String();
@@ -223,23 +229,25 @@ public class PCEPGenericExplicitRouteObjectImpl extends PCEPExplicitRouteObject 
 		return EROName + subObjectsName + "]";
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		PCEPCommonObjectHeader objectHeader = new PCEPCommonObjectHeader(7, 1, "1", "0");
 
-		ArrayList<EROSubobjects> temp = new ArrayList<EROSubobjects>();
+		ArrayList<EROSubobjects> temp= new ArrayList<EROSubobjects>();
 		temp.add(new PCEPAddress("192.168.1.2", false));
 		temp.add(new PCEPAddress("192.168.1.3", false));
 		temp.add(new MLDelimiter());
-		PCEPGenericExplicitRouteObjectImpl a = new PCEPGenericExplicitRouteObjectImpl(objectHeader, temp);
+		PCEPGenericExplicitRouteObjectImpl a = new PCEPGenericExplicitRouteObjectImpl (objectHeader, temp);
 
 		System.out.println(a.getObjectFrameBinaryString());
 
 		String header = a.getObjectFrameBinaryString().substring(0, 32);
 
+
 		PCEPCommonObjectHeader newHeader = new PCEPCommonObjectHeader(header);
 		System.out.println(a.getObjectFrameBinaryString().substring(32).length());
-		PCEPGenericExplicitRouteObjectImpl b = new PCEPGenericExplicitRouteObjectImpl(newHeader, a.getObjectFrameBinaryString().substring(32));
+		PCEPGenericExplicitRouteObjectImpl b = new PCEPGenericExplicitRouteObjectImpl (newHeader, a.getObjectFrameBinaryString().substring(32));
 		System.out.println(b);
+
 
 	}
 

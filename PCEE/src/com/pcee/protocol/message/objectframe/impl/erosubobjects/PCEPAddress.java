@@ -19,20 +19,22 @@ package com.pcee.protocol.message.objectframe.impl.erosubobjects;
 
 import java.util.StringTokenizer;
 import com.pcee.protocol.message.PCEPComputationFactory;
-/**
- * <pre>
- *  0                   1                   2                   3
- *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * |L|    Type     |     Length    | IPv4 address (4 bytes)        |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * | IPv4 address (continued)      | Prefix Length |      Resvd    |
- * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- * 
- * <pre>
- */
+
 public class PCEPAddress extends EROSubobjects {
-	
+	/**
+	 * <pre>
+	 *  0                   1                   2                   3
+	 *  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 * |L|    Type     |     Length    | IPv4 address (4 bytes)        |
+	 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 * | IPv4 address (continued)      | Prefix Length |      Resvd    |
+	 * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	 * 
+	 * <pre>
+	 */
+
+
 	private String IPv4Address;
 	private String prefixLength;
 	private String reserved;
@@ -52,9 +54,6 @@ public class PCEPAddress extends EROSubobjects {
 	private int port; // Not serialized, kind of an attachment
 
 	// Only used in PCEPEndPointsObject for 32 bit input
-	/**
-	 * @param binaryString
-	 */
 	public PCEPAddress(String binaryString) {
 		NAME="PCEPAddress";
 		if (binaryString.length() == 32) {
@@ -62,6 +61,8 @@ public class PCEPAddress extends EROSubobjects {
 			this.setTypeDecimalValue(EROSubobjects.PCEPIPv4AddressType);
 			this.setLengthDecimalValue(8);
 			this.setIPv4AddressBinaryString(binaryString, true);
+			String tmp = getIPv4Address();
+//			System.out.println("****" + tmp);
 			this.setPrefixLengthDecimalValue(32);
 			this.setReservedDecimalValue(0);
 		} else {
@@ -71,10 +72,6 @@ public class PCEPAddress extends EROSubobjects {
 		this.port = 4189;
 	}
 
-	/**
-	 * @param address
-	 * @param binaryRepresentation
-	 */
 	public PCEPAddress(String address, boolean binaryRepresentation) {
 		NAME="PCEPAddress";
 		if (address.length() == 32) {
@@ -97,10 +94,6 @@ public class PCEPAddress extends EROSubobjects {
 		}
 	}
 
-	/**
-	 * @param address
-	 * @param port
-	 */
 	public PCEPAddress(String address, int port) {
 		NAME="PCEPAddress";
 		this.setLFlagDecimalValue(0);
@@ -123,6 +116,7 @@ public class PCEPAddress extends EROSubobjects {
 		System.out.println(b);
 		System.out.println(b.binaryInformation());
 		System.out.println(b.serialize());
+
 	}
 
 	/**
@@ -133,9 +127,6 @@ public class PCEPAddress extends EROSubobjects {
 		return binaryString;
 	}
 
-	/**
-	 * @param binaryString
-	 */
 	public void deserialize(String binaryString) {
 		String lFlagBinaryString = binaryString.substring(lFlagStartBit, lFlagEndBit + 1);
 		String typeBinaryString = binaryString.substring(typeStartBit, typeEndBit + 1);
@@ -152,15 +143,14 @@ public class PCEPAddress extends EROSubobjects {
 		this.setReservedBinaryString(reservedBinaryString);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects#getByteLength()
-	 */
 	public int getByteLength() {
 		int objectLength = lFlag.length() + prefixLength.length() + type.length() + length.length() + IPv4Address.length() + reserved.length();
 		int objectFrameByteLength = objectLength / 8;
 
 		return objectFrameByteLength;
 	}
+
+
 
 	/**
 	 * IPv4Address
@@ -176,18 +166,12 @@ public class PCEPAddress extends EROSubobjects {
 		return address;
 	}
 
-	/**
-	 * @return String
-	 */
 	public String getIPv4Address() {
 		String address = convertBinaryAddressToAddress(IPv4Address) + ":" + port;
 
 		return address;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getIPv4BinaryAddress() {
 		return IPv4Address;
 	}
@@ -196,6 +180,7 @@ public class PCEPAddress extends EROSubobjects {
 
 		if (binaryRepresentation) {
 			String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, IPv4AddressLength);
+			String tmp = convertBinaryAddressToAddress(binaryString);
 			this.IPv4Address = checkedBinaryString;
 		} else {
 			String address = convertAddressToBinaryAddress(binaryString);
@@ -213,16 +198,10 @@ public class PCEPAddress extends EROSubobjects {
 		return decimalValue;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getPrefixLengthBinaryString() {
 		return this.prefixLength;
 	}
 
-	/**
-	 * @param decimalValue
-	 */
 	public void setPrefixLengthDecimalValue(int decimalValue) {
 		int binaryLength = prefixLengthLength;
 		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength);
@@ -230,10 +209,8 @@ public class PCEPAddress extends EROSubobjects {
 		this.prefixLength = PCEPComputationFactory.setDecimalValue(decimalValue, maxValue, binaryLength);
 	}
 
-	/**
-	 * @param binaryString
-	 */
 	public void setPrefixLengthBinaryString(String binaryString) {
+		//	String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, prefixLengthLength);
 		this.prefixLength = binaryString;
 	}
 
@@ -245,16 +222,10 @@ public class PCEPAddress extends EROSubobjects {
 		return decimalValue;
 	}
 
-	/**
-	 * @return
-	 */
 	public String getReservedBinaryString() {
 		return this.reserved;
 	}
 
-	/**
-	 * @param decimalValue
-	 */
 	public void setReservedDecimalValue(int decimalValue) {
 		int binaryLength = reservedLength;
 		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength);
@@ -262,23 +233,15 @@ public class PCEPAddress extends EROSubobjects {
 		this.reserved = PCEPComputationFactory.setDecimalValue(decimalValue, maxValue, binaryLength);
 	}
 
-	/**
-	 * @param binaryString
-	 */
 	public void setReservedBinaryString(String binaryString) {
+		//	String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, reservedLength);
 		this.reserved = binaryString;
 	}
 
-	/**
-	 * @param port
-	 */
 	public void setPort(int port) {
 		this.port = port;
 	}
 
-	/**
-	 * @return
-	 */
 	public int getPort() {
 		return port;
 	}
@@ -312,10 +275,6 @@ public class PCEPAddress extends EROSubobjects {
 
 	}
 
-	/**
-	 * @param binaryAddress
-	 * @return
-	 */
 	private String convertBinaryAddressToAddress(String binaryAddress) {
 		StringBuffer addressStringBuffer = new StringBuffer();
 
@@ -355,9 +314,6 @@ public class PCEPAddress extends EROSubobjects {
 		return objectInfo;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects#binaryInformation()
-	 */
 	public String binaryInformation() {
 		String lFlagBinaryInfo = getLFlagBinaryString();
 		String typeBinaryInfo = "'" + getTypeBinaryString();
@@ -373,16 +329,10 @@ public class PCEPAddress extends EROSubobjects {
 
 
 
-	/* (non-Javadoc)
-	 * @see com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects#getObjectBinaryString()
-	 */
 	public String getObjectBinaryString() {
 		return this.serialize();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects#setObjectBinaryString(java.lang.String)
-	 */
 	public void setObjectBinaryString(String binaryString) {
 		this.deserialize(binaryString);
 	}

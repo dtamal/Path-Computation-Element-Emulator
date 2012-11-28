@@ -35,23 +35,23 @@ import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 // TODO Change to IEEE Floating point object
 public class PCEPBandwidthObject implements PCEPObjectFrame {
 
-	/*
-	 * public static void main(String[] args) { PCEPBandwidthObject b = new
-	 * PCEPBandwidthObject( new PCEPCommonObjectHeader(6, 1, "1", "0"),
-	 * 101.11f);
-	 * 
-	 * System.out.println(b.getBandwidthFloatValue());
-	 * 
-	 * String headerBinaryString = b.getObjectHeader().getHeaderBinaryString();
-	 * String objectBinaryString = b.getObjectBinaryString();
-	 * System.out.println(objectBinaryString);
-	 * 
-	 * PCEPCommonObjectHeader header = new PCEPCommonObjectHeader(
-	 * headerBinaryString);
-	 * 
-	 * PCEPBandwidthObject b2 = new PCEPBandwidthObject(header,
-	 * objectBinaryString); System.out.println(b2.getBandwidthFloatValue()); }
-	 */
+	/*public static void main(String[] args) {
+		PCEPBandwidthObject b = new PCEPBandwidthObject(
+				new PCEPCommonObjectHeader(6, 1, "1", "0"), 101.11f);
+
+		System.out.println(b.getBandwidthFloatValue());
+
+		String headerBinaryString = b.getObjectHeader().getHeaderBinaryString();
+		String objectBinaryString = b.getObjectBinaryString();
+		System.out.println(objectBinaryString);
+
+		PCEPCommonObjectHeader header = new PCEPCommonObjectHeader(
+				headerBinaryString);
+
+		PCEPBandwidthObject b2 = new PCEPBandwidthObject(header,
+				objectBinaryString);
+		System.out.println(b2.getBandwidthFloatValue());
+	}*/
 
 	private final String NAME = "Bandwidth";
 
@@ -64,13 +64,15 @@ public class PCEPBandwidthObject implements PCEPObjectFrame {
 	private int bandwidthEndBit = PCEPConstantValues.BANDWIDTH_OBJECT_BANDWIDTH_END_BIT;
 	private int bandwidthLength = PCEPConstantValues.BANDWIDTH_OBJECT_BANDWIDTH_LENGTH;
 
-	public PCEPBandwidthObject(PCEPCommonObjectHeader objectHeader, String bandwidthBinaryRepresentation) {
+	public PCEPBandwidthObject(PCEPCommonObjectHeader objectHeader,
+			String bandwidthBinaryRepresentation) {
 		this.setObjectHeader(objectHeader);
 		this.setBandwidthBinaryString(bandwidthBinaryRepresentation);
 		this.updateHeaderLength();
 	}
 
-	public PCEPBandwidthObject(PCEPCommonObjectHeader objectHeader, float bandwidth) {
+	public PCEPBandwidthObject(PCEPCommonObjectHeader objectHeader,
+			float bandwidth) {
 		this.setObjectHeader(objectHeader);
 		this.setBandwidthFloatValue(bandwidth);
 		this.updateHeaderLength();
@@ -97,7 +99,8 @@ public class PCEPBandwidthObject implements PCEPObjectFrame {
 	}
 
 	public void setObjectBinaryString(String binaryString) {
-		String bandwidthBinaryString = binaryString.substring(bandwidthStartBit, bandwidthEndBit + 1);
+		String bandwidthBinaryString = binaryString.substring(
+				bandwidthStartBit, bandwidthEndBit + 1);
 
 		this.setBandwidthBinaryString(bandwidthBinaryString);
 	}
@@ -110,7 +113,8 @@ public class PCEPBandwidthObject implements PCEPObjectFrame {
 	}
 
 	public String getObjectFrameBinaryString() {
-		String headerBinaryString = this.getObjectHeader().getHeaderBinaryString();
+		String headerBinaryString = this.getObjectHeader()
+				.getHeaderBinaryString();
 		String objectBinaryString = this.getObjectBinaryString();
 
 		return headerBinaryString + objectBinaryString;
@@ -119,29 +123,31 @@ public class PCEPBandwidthObject implements PCEPObjectFrame {
 	/**
 	 * bandwidth
 	 */
-	public float getBandwidthFloatValue() {
+	public float getBandwidthFloatValue(){
 		return Float.intBitsToFloat(Integer.parseInt(bandwidth, 2));
 	}
 
-	public String getBandwidthBinaryString() {
+	public String getBandwidthBinaryString(){
 		return this.bandwidth;
 	}
 
-	public void setBandwidthFloatValue(float floatValue) {
+	public void setBandwidthFloatValue(float floatValue){
 
 		int floatBits = Float.floatToIntBits(floatValue);
 
 		String s = Integer.toBinaryString(floatBits);
 
-		if (s.length() > 32) {
-			System.out.println("ERROR in PCEPBandwithObject.setBandwidthFloatValue(...)!!! Bandwith value is bigger than 32 bits, exiting now to let you fix it! :P");
+		if (s.length() > 32){
+			System.out
+					.println("ERROR in PCEPBandwithObject.setBandwidthFloatValue(...)!!! Bandwith value is bigger than 32 bits, exiting now to let you fix it! :P");
 			System.exit(0);
 		}
 		setBandwidthBinaryString(s);
 	}
 
 	public void setBandwidthBinaryString(String binaryString) {
-		String checkedBinaryString = PCEPComputationFactory.setBinaryString(binaryString, bandwidthLength);
+		String checkedBinaryString = PCEPComputationFactory.setBinaryString(
+				binaryString, bandwidthLength);
 		this.bandwidth = checkedBinaryString;
 	}
 

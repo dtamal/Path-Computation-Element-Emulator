@@ -37,8 +37,6 @@ public class VertexElement implements Comparable<VertexElement> {
 
 	/**coordinates for the vertex*/
 	private double xCoord, yCoord;
-	
-	private boolean isBorderNode = false;
 
 	/**Pointer to the Graph Controller associated with the vertex*/
 	protected Gcontroller graph;
@@ -198,21 +196,11 @@ public class VertexElement implements Comparable<VertexElement> {
 			return 0;
 		return 1;
 	}
-	
-	public void setIsBorderNode(boolean isBorderNode){
-	    this.isBorderNode = isBorderNode;
-	}
-	
-	public boolean isBorderNode(){
-	    return this.isBorderNode;
-	}
 
 	public VertexParams getVertexParams(){
 		return params;
 	}
 
-	
-	
 	public void setVertexParams(VertexParams params){
 		this.params = params;
 	}
@@ -220,7 +208,6 @@ public class VertexElement implements Comparable<VertexElement> {
 	/**Function to copt the vertex Element into a new graph*/
 	public VertexElement copyVertexElement (Gcontroller newGraph){
 		VertexElement element = new VertexElement (vertexID, newGraph, xCoord, yCoord);
-		element.setIsBorderNode(isBorderNode);
 		VertexParams params = null;
 		if (this.getVertexParams()!=null)
 			params = this.getVertexParams().copyVertexParams(element);
