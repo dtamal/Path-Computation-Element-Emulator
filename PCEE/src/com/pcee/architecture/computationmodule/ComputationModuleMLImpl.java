@@ -54,7 +54,7 @@ import com.pcee.protocol.response.PCEPResponseFrameFactory;
  */
 public class ComputationModuleMLImpl extends ComputationModule {
 
-    public static boolean singlePath = false;
+    public static boolean singlePath = GlobalCfg.singlePath;
     // Management Object used to forward communications between the different
     // modules
     private ModuleManagement lm;
@@ -230,7 +230,7 @@ public class ComputationModuleMLImpl extends ComputationModule {
 	    // false);
 
 	    /** Single Path Scenario */
-	    singlePath = true;
+	    singlePath = GlobalCfg.singlePath;
 
 	    ClientTest.total++;
 	    if (!singlePath) {
