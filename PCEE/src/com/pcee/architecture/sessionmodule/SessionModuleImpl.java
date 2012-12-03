@@ -178,11 +178,11 @@ public class SessionModuleImpl extends SessionModule {
 			readingQueueThread[x].addMessage(message, sourceLayer);
 			break;
 		case COMPUTATION_MODULE:
-			// x =
-			// Integer.parseInt(message.getAddress().getIPv4Address().split(":")[1])
-			// % sessionThreads;
-			// readingQueueThread[x].addMessage(message);
-			sendMessage(message, ModuleEnum.NETWORK_MODULE);
+			 x =
+			 Integer.parseInt(message.getAddress().getIPv4Address().split(":")[1])
+			 % sessionThreads;
+			 readingQueueThread[x].addMessage(message, sourceLayer);
+			//sendMessage(message, ModuleEnum.NETWORK_MODULE);
 			break;
 		case CLIENT_MODULE:
 			x = Integer.parseInt(message.getAddress().getIPv4Address()
