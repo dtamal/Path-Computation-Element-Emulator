@@ -432,7 +432,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		PCEPEndPointsObject endPoints = PCEPObjectFrameFactory.generatePCEPEndPointsObject(endPointsPFlag, endPointsIFlag, sourceAddress, destinationAddress);
 
 		// Address destAddress = new Address(serverAddressTextField.getText());
-		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), 4189);
+		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), Integer.parseInt(serverPortTextField.getText()));
 
 		PCEPRequestFrame requestMessage = PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
 		PCEPMessage message = PCEPMessageFactory.generateMessage(requestMessage);
