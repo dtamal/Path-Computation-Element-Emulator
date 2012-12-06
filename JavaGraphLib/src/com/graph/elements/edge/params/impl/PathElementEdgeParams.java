@@ -18,116 +18,88 @@
 package com.graph.elements.edge.params.impl;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.edge.params.EdgeParams;
+import com.graph.elements.vertex.VertexElement;
 import com.graph.logger.GraphLogger;
+import com.graph.path.PathElement;
 
-public class BasicEdgeParams extends EdgeParams{
+public class PathElementEdgeParams extends EdgeParams{
 
-	public static final String classIdentifier = "BasicEdgeParams";
-	
-	
-	/**Delay of a link*/
-	private double delay=0;
-	
-	/**Weight of the link*/
-	private double weight=0;
-	
-	/**Maximum capacity of the link*/
-	private double maxCapacity=0;
-	
-	/**Available capacity on the link*/
-	private double availableCapacity=0;
 
-	private boolean isDynamicLink= false;
-	
-	public BasicEdgeParams(EdgeElement edge){
+
+	public static final String classIdentifier = "PathElementEdgeParams";
+
+	/**PathElement based on which Edge params are computed */
+	private PathElement path;
+
+	private boolean isDynamicLink= true;
+
+	public PathElementEdgeParams(EdgeElement edge, PathElement path){
 		this.setEdgeElement(edge);
-	}
-
-	public BasicEdgeParams(EdgeElement edge, double delay, double weight, double maxCapacity){
-		this.setEdgeElement(edge);
-		this.setDelay(delay);
-		this.setWeight(weight);
-		this.setMaxCapacity(maxCapacity);
-		this.setAvailableCapacity(maxCapacity);
-		this.isDynamicLink = false;
+		this.path = path;
 	}
 
 	public boolean isDynamicLink() {
-	    return isDynamicLink;
+		return isDynamicLink;
 	}
 
 	public void setDynamicLink(boolean isDynamicLink) {
-	    this.isDynamicLink = isDynamicLink;
+		this.isDynamicLink = isDynamicLink;
 	}
 
-	public BasicEdgeParams(double delay, double weight, double maxCapacity){
-		//this.setEdgeElement(edge);
-		this.setDelay(delay);
-		this.setWeight(weight);
-		this.setMaxCapacity(maxCapacity);
-		this.setAvailableCapacity(maxCapacity);
-		this.isDynamicLink=false;
-	}
-	
-	
+
 	/**Function to get the delay of the link*/
 	public double getDelay(){
-		return delay;
+		return path.getPathParams().getPathDelay();
 	}
-	
+
 	/**Function to set the delay of the link*/
 	protected void setDelay(double delay){
-		this.delay = delay;
 	}
-	
+
 	/**Function to get the weight of the link*/
 	public double getWeight(){
-		return weight;
+		return path.getPathParams().getPathWeight();
 	}
 
 	/**Function to set the weight of the link*/
 	public void setWeight(double w){
-		weight=w;
-		if (w<0)
-			GraphLogger.logMsg("Notification: Weight of edge " + this.getEdgeElement().getEdgeID() + " < 0, weight = " + Double.toString(w), classIdentifier);
 	}
-	
+
 	/**Function to get the total capacity of the link*/
 	public double getMaxCapacity(){
-		return maxCapacity;
+		return path.getPathParams().getMaxCapacity();
 	}
 
 	/**Function to set the total capacity of the link*/
 	public void setMaxCapacity(double capacity){
-		this.maxCapacity=capacity;
 	}
 
 	/**Function to set the available capacity of the link*/
 	public void setAvailableCapacity(double capacity){
-		this.availableCapacity=capacity;
 	}
 
 	/**Function to get the used capacity of the link*/
 	public double getUsedCapacity(){
-		return maxCapacity-availableCapacity;
+		return this.getMaxCapacity()-this.getAvailableCapacity();
 	}
 
 	/**Function to get the available capacity of the link*/
 	public double getAvailableCapacity(){
-		return availableCapacity;
+		return path.getPathParams().getAvailableCapacity();
 	}
 
-	
+
 	public boolean releaseCapacity(double capacity) {
 		if (this.getUsedCapacity()<capacity){
 			GraphLogger.logError("Capacity release requested is greater than total used capacity", classIdentifier);
 			return false;
 		}
 		else{
-			this.setAvailableCapacity(this.getAvailableCapacity()+ capacity);
+			path.releaseBandwidth(capacity);
 			return true;
 		}
 	}
@@ -138,20 +110,18 @@ public class BasicEdgeParams extends EdgeParams{
 			return false;
 		}
 		else{
-			this.availableCapacity -= capacity;
+			path.resvBandwidth(capacity);
 			return true;
 		}
 	}
 
 	@Override
 	public EdgeParams copyEdgeParams(EdgeElement newElement) {
-		EdgeParams params = new BasicEdgeParams(newElement, delay, weight, maxCapacity);
-		params.setAvailableCapacity(this.availableCapacity);
+		EdgeParams params = new PathElementEdgeParams(newElement, path);
 		params.setDynamicLink(isDynamicLink);
 		return params;
 	}
 
-	@Override
 	public ArrayList<String> getVertexSequence(String sourceID, String destID) {
 		String edgeSourceID = this.getEdgeElement().getSourceVertex().getVertexID();
 		String edgeDestID = this.getEdgeElement().getDestinationVertex().getVertexID();
@@ -159,11 +129,32 @@ public class BasicEdgeParams extends EdgeParams{
 			return null;
 		if ((destID.compareTo(edgeSourceID)!=0) && (destID.compareTo(edgeDestID)!=0))
 			return null;
-		
-		ArrayList<String> temp = new ArrayList<String>();
-		temp.add(sourceID);
-		temp.add(destID);
-		return temp;
+		//Get the sequence of vertices depending on the direction on which the link is being traversed
+		ArrayList<String> pathElementSequence = new ArrayList<String>();
+		Iterator<VertexElement> iter = path.getTraversedVertices().iterator();
+		while(iter.hasNext()) {
+			pathElementSequence.add(iter.next().getVertexID());
+		}
+		if ((pathElementSequence.get(0).compareTo(sourceID)==0) && (pathElementSequence.get(pathElementSequence.size()-1).compareTo(destID)==0)) {
+			return pathElementSequence;
+		} else if ((pathElementSequence.get(0).compareTo(destID)==0) && (pathElementSequence.get(pathElementSequence.size()-1).compareTo(sourceID)==0)) {
+			ArrayList<String> reversed = new ArrayList<String> ();
+			for (int i=pathElementSequence.size()-1; i>=0;i--) {
+				reversed.add(pathElementSequence.get(i));
+			}
+			return reversed;
+		} else {
+			System.out.println("Something wrong with the way path element sequence is defined");
+			return null;
+		}
+	}
+	
+	/**Function to get the path element associated with the Edge Parameter
+	 * 
+	 * @return Path Element
+	 */
+	public PathElement getPath() {
+		return path;
 	}
 
 }

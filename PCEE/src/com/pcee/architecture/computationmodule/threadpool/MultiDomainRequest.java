@@ -1,5 +1,5 @@
 package com.pcee.architecture.computationmodule.threadpool;
 
-public abstract class WorkerTask implements Runnable {
-
+public class MultiDomainRequest extends Request {
+	
 }

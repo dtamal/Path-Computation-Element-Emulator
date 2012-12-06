@@ -23,9 +23,9 @@ import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.edge.params.EdgeParams;
 import com.graph.logger.GraphLogger;
 
-public class BasicEdgeParams extends EdgeParams{
+public class ParentVirtualLinkEdgeParams extends EdgeParams{
 
-	public static final String classIdentifier = "BasicEdgeParams";
+	public static final String classIdentifier = "ParentVirtualLinkEdgeParams";
 	
 	
 	/**Delay of a link*/
@@ -42,17 +42,20 @@ public class BasicEdgeParams extends EdgeParams{
 
 	private boolean isDynamicLink= false;
 	
-	public BasicEdgeParams(EdgeElement edge){
+	private ArrayList<String> vertexSequence; 
+	
+	public ParentVirtualLinkEdgeParams(EdgeElement edge){
 		this.setEdgeElement(edge);
 	}
 
-	public BasicEdgeParams(EdgeElement edge, double delay, double weight, double maxCapacity){
+	public ParentVirtualLinkEdgeParams(EdgeElement edge, double delay, double weight, double maxCapacity, ArrayList<String> vertexSequence){
 		this.setEdgeElement(edge);
 		this.setDelay(delay);
 		this.setWeight(weight);
 		this.setMaxCapacity(maxCapacity);
 		this.setAvailableCapacity(maxCapacity);
 		this.isDynamicLink = false;
+		this.vertexSequence = vertexSequence;
 	}
 
 	public boolean isDynamicLink() {
@@ -63,7 +66,7 @@ public class BasicEdgeParams extends EdgeParams{
 	    this.isDynamicLink = isDynamicLink;
 	}
 
-	public BasicEdgeParams(double delay, double weight, double maxCapacity){
+	public ParentVirtualLinkEdgeParams(double delay, double weight, double maxCapacity){
 		//this.setEdgeElement(edge);
 		this.setDelay(delay);
 		this.setWeight(weight);
@@ -145,7 +148,7 @@ public class BasicEdgeParams extends EdgeParams{
 
 	@Override
 	public EdgeParams copyEdgeParams(EdgeElement newElement) {
-		EdgeParams params = new BasicEdgeParams(newElement, delay, weight, maxCapacity);
+		EdgeParams params = new ParentVirtualLinkEdgeParams(newElement, delay, weight, maxCapacity, vertexSequence);
 		params.setAvailableCapacity(this.availableCapacity);
 		params.setDynamicLink(isDynamicLink);
 		return params;
@@ -160,10 +163,20 @@ public class BasicEdgeParams extends EdgeParams{
 		if ((destID.compareTo(edgeSourceID)!=0) && (destID.compareTo(edgeDestID)!=0))
 			return null;
 		
-		ArrayList<String> temp = new ArrayList<String>();
-		temp.add(sourceID);
-		temp.add(destID);
-		return temp;
+		if ((sourceID.compareTo(vertexSequence.get(0))==0) && (destID.compareTo(vertexSequence.get(vertexSequence.size()-1))==0)) {
+			return vertexSequence;
+		} else if ((destID.compareTo(vertexSequence.get(0))==0) && (sourceID.compareTo(vertexSequence.get(vertexSequence.size()-1))==0)) {
+			//Reverse the vertex Sequence
+			ArrayList<String> out = new ArrayList<String>();
+			for (int i=vertexSequence.size()-1; i>=0;i--) {
+				out.add(vertexSequence.get(i));
+			} 
+			return out;
+		} else {
+			System.out.println("Error in the way vertex Sequence is defined");
+			return null;
+		}
+		
 	}
 
 }

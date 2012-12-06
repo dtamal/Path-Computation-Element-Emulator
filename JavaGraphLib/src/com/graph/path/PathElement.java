@@ -132,4 +132,6 @@ public abstract class PathElement {
 	public abstract boolean releaseBandwidth(double bw);
 
 	public abstract void setEdgeSequence(ArrayList<EdgeElement> edges);
+	
+	public abstract PathElement createCopy();
 }

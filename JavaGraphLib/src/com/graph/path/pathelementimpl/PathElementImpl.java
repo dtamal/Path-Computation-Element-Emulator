@@ -145,4 +145,10 @@ public class PathElementImpl extends PathElement{
 		this.edges = edges;
 		this.updateVertexSequence();
 	}
+
+	@Override
+	public PathElement createCopy() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

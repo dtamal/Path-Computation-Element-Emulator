@@ -1,36 +1,10 @@
-/**
- *  This file is part of Path Computation Element Emulator (PCEE).
- *
- *  PCEE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  PCEE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with PCEE.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.pcee.architecture.computationmodule.threadpool;
 
-import com.graph.path.algorithms.MultiPathComputationAlgorithm;
 import com.graph.path.algorithms.PathComputationAlgorithm;
 import com.graph.path.algorithms.constraints.Constraint;
-import com.graph.path.algorithms.constraints.MultiPathConstraint;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
-/**
- * Class to define a path computation request used by the thread pool
- * 
- * @author Mohit Chamania
- * @author Marek Drogon
- */
 public class Request {
-
     // Variable to store the request ID
     private String requestID;
     
@@ -40,14 +14,41 @@ public class Request {
     // Constraints for the path computation request
     private Constraint constrains;
     
-    //Constraints for multipath computation request
-    private MultiPathConstraint mconstraints;
-
     // Algorithm used for the path computation request
     private PathComputationAlgorithm algo;
+
+	//Source Router IP address
+    private String sourceRouterIP;
     
-    //Algorithm for multipath computation request
-    private MultiPathComputationAlgorithm malgo;
+    //Destination router IP address
+    private String destRouterIP;
+    
+    //Bandwidth requested
+    private double bandwidth;
+    
+    public double getBandwidth() {
+		return bandwidth;
+	}
+
+	public void setBandwidth(double bandwidth) {
+		this.bandwidth = bandwidth;
+	}
+
+	public String getSourceRouterIP() {
+		return sourceRouterIP;
+	}
+
+	public void setSourceRouterIP(String sourceRouterIP) {
+		this.sourceRouterIP = sourceRouterIP;
+	}
+
+	public String getDestRouterIP() {
+		return destRouterIP;
+	}
+
+	public void setDestRouterIP(String destRouterIP) {
+		this.destRouterIP = destRouterIP;
+	}
 
     /**
      * @return the requestID
@@ -109,34 +110,5 @@ public class Request {
 	this.algo = algo;
     }
 
-    /**
- 	 * set contraints for multipath computation
-     * @param mconstraints
-     */
-    public void setMContraints(MultiPathConstraint mconstraints){
-    	this.mconstraints = mconstraints;
-    }
-    
-    /**
-     * return the contraints for multipath computation
-     * @return
-     */
-    public MultiPathConstraint getMConstraints(){
-    	return this.mconstraints;
-    }
-    
-    /**
-     * @param malgo
-     * 				set the multipath computation algorithm
-     */
-    public void setMAlgo(MultiPathComputationAlgorithm malgo){
-    	this.malgo = malgo;
-    }
-    
-    /**
-     * @return Algorithm for multipath computation 
-     */
-    public MultiPathComputationAlgorithm getMAlgo(){
-    	return this.malgo;
-    }
+
 }

@@ -25,8 +25,10 @@ import java.util.Properties;
 import com.pcee.architecture.clientmodule.ClientModule;
 import com.pcee.architecture.clientmodule.ClientModuleImpl;
 import com.pcee.architecture.computationmodule.ComputationModule;
-import com.pcee.architecture.computationmodule.ComputationModuleImpl;
-import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.architecture.computationmodule.ComputationModuleDomainImpl;
+import com.pcee.architecture.computationmodule.ComputationModuleParentImpl;
+import com.pcee.architecture.computationmodule.ted.TopologyInformationDomain;
+import com.pcee.architecture.computationmodule.ted.TopologyInformationParent;
 import com.pcee.architecture.networkmodule.NetworkModule;
 import com.pcee.architecture.networkmodule.NetworkModuleImpl;
 import com.pcee.architecture.sessionmodule.SessionModule;
@@ -50,8 +52,8 @@ public class ModuleManagement {
 			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
 			sessionModule = new SessionModuleImpl(this);
 			if (isServer == true) {
-				computationModule = new ComputationModuleImpl(this);
-				clientModule = new ClientModuleImpl(this);
+				computationModule = new ComputationModuleDomainImpl(this, "127.0.0.1", 4189); //Default location of the parent PCE is 127.0.0.1:4189
+				System.out.println("Using default location of the parent PCE as : 127.0.0.1:4189 to change please use the config file" );
 			} else {
 				clientModule = new ClientModuleImpl(this);
 				Logger.logging = true;
@@ -70,33 +72,27 @@ public class ModuleManagement {
 
 			int port = 0, sessionThreads = 0, computationThreads = 0;
 
-			try {
-				String logger = reader.getProperty("logging");
-				if (logger.equalsIgnoreCase("on")) {
-					Logger.logging = true;
-				} else {
-					Logger.logging = false;
-				}
-
-				String debug = reader.getProperty("debug");
-				if (debug.equalsIgnoreCase("on")) {
-					Logger.debugging = true;
-				} else {
-					Logger.debugging = false;
-				}
-
-				port = Integer.valueOf(reader.getProperty("port"));
-				sessionThreads = Integer.valueOf(reader
-						.getProperty("sessionThreads"));
-				computationThreads = Integer.valueOf(reader
-						.getProperty("computationThreads"));
-				TopologyInformation.setTopoPath(reader.getProperty("topology"));
-				TopologyInformation.setImporter(reader.getProperty("importer"));
-
-			} catch (Exception e) {
-				System.out.println("Wrong Configuration Inputs!");
-				System.exit(0);
+			String logger = reader.getProperty("logging");
+			if (logger.equalsIgnoreCase("on")) {
+				Logger.logging = true;
+			} else {
+				Logger.logging = false;
 			}
+
+			String debug = reader.getProperty("debug");
+			if (debug.equalsIgnoreCase("on")) {
+				Logger.debugging = true;
+			} else {
+				Logger.debugging = false;
+			}
+
+
+			port = Integer.valueOf(reader.getProperty("port"));
+			sessionThreads = Integer.valueOf(reader
+					.getProperty("sessionThreads"));
+			computationThreads = Integer.valueOf(reader
+					.getProperty("computationThreads"));
+
 			if (running == false) {
 
 				this.isServer = isServer;
@@ -106,9 +102,24 @@ public class ModuleManagement {
 				else
 					sessionModule = new SessionModuleImpl(this, sessionThreads);
 				if (isServer == true) {
-					computationModule = new ComputationModuleImpl(this,
-							computationThreads);
-					clientModule = new ClientModuleImpl(this);
+					String role = reader.getProperty("pceRole");
+					if (role.equalsIgnoreCase("domain")) {
+						String pPCEIP = reader.getProperty("parentPCEIP");
+						int pPCEport = Integer.parseInt(reader.getProperty("parentPCEport"));
+						TopologyInformationDomain.setBnListPath(reader.getProperty("borderNodeList"));
+						TopologyInformationDomain.setTopoPath(reader.getProperty("topology"));
+						TopologyInformationDomain.setImporter(reader.getProperty("importer"));
+						TopologyInformationDomain.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
+						TopologyInformationDomain.setTopologyUpdateParentIP(reader.getProperty("parentPCEIP"));
+						TopologyInformationDomain.setTopologyUpdateParentPort(Integer.parseInt(reader.getProperty("topologyUpdateParentPort")));
+						computationModule = new ComputationModuleDomainImpl(this, computationThreads, pPCEIP, pPCEport);
+					} else if (role.equalsIgnoreCase("parent")) {
+						TopologyInformationParent.setTopoPath(reader.getProperty("topology"));
+						TopologyInformationParent.setImporter(reader.getProperty("importer"));
+						TopologyInformationParent.setMultiDomainInfoPath(reader.getProperty("multiDomainInfo"));
+						TopologyInformationParent.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
+						computationModule = new ComputationModuleParentImpl(this, computationThreads);
+					}
 				} else {
 					clientModule = new ClientModuleImpl(this);
 				}
@@ -118,6 +129,9 @@ public class ModuleManagement {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} 			catch (Exception e) {
+			System.out.println("Wrong Configuration Inputs!");
+			System.exit(0);
 		}
 	}
 

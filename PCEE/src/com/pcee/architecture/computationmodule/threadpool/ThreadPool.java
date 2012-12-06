@@ -29,7 +29,7 @@ import com.graph.graphcontroller.Gcontroller;
 import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.architecture.computationmodule.ted.TopologyInformationDomain;
 import com.pcee.logger.Logger;
 
 /**
@@ -50,19 +50,13 @@ public class ThreadPool {
     private boolean isInitialized;
 
     // Map association to store worker threads against their IDs
-    private HashMap<String, Worker> threadHashMap;
+    private HashMap<String, WorkerThread> threadHashMap;
 
     // Blocking queue used by workers to read incoming requests
     private LinkedBlockingQueue<Request> requestQueue;
 
-    // Graph instance used by workers to perform path computations
-    private Gcontroller graph;
-
     // Module management instance to send response to the computation layer
     private ModuleManagement lm;
-
-    // TopologyInformation used to retrieve topology information from file
-    private static TopologyInformation topologyInstance = TopologyInformation.getInstance();
 
     /**
      * default Constructor
@@ -76,11 +70,9 @@ public class ThreadPool {
 	this.threadCount = threadCount;
 	isInitialized = false;
 	this.requestQueue = requestQueue;
-	graph = topologyInstance.getGraph();
 	// initialize the worker threads
 	initThreadPool();
 	// start thread to listen for new topology updates
-	startTopologyUpdateListner();
     }
 
     /**
@@ -91,10 +83,10 @@ public class ThreadPool {
     private boolean initThreadPool() {
 	localLogger("Initializing Thread Pool, size = " + threadCount);
 	if (isInitialized == false) {
-	    threadHashMap = new HashMap<String, Worker>();
+	    threadHashMap = new HashMap<String, WorkerThread>();
 	    for (int i = 0; i < threadCount; i++) {
 		String id = "Thread-" + Integer.toString(i);
-		Worker worker = new Worker(lm, this, id, requestQueue, graph);
+		WorkerThread worker = new WorkerThread(lm, this, id, requestQueue);
 		worker.setName("WorkerThread-" + i);
 		threadHashMap.put(id, worker);
 		worker.start();
@@ -107,79 +99,8 @@ public class ThreadPool {
 	    return false;
     }
 
-    /**
-     * Function to get the new graph instance
-     * 
-     * @return
-     */
-    protected Gcontroller getUpdatedGraph() {
-	return topologyInstance.getGraph();
-    }
 
-    /**
-     * Function to update the graph inside the controller
-     * 
-     * @param graph
-     */
-    private void updateGraph(Gcontroller graph) {
-	topologyInstance.updateGraph(graph);
-	this.graph = topologyInstance.getGraph();
-	Iterator<String> iter = threadHashMap.keySet().iterator();
-	while (iter.hasNext()) {
-	    String id = iter.next();
-	    threadHashMap.get(id).interrupt();
-	}
-    }
 
-    /** Function to initialize a thread to listen for topology updates */
-    private void startTopologyUpdateListner() {
-	Thread thread = new Thread() {
-	    // Override the run() method to implement a simple server socket to listen for topology updates
-	    public void run() {
-		ServerSocket serverSocket;
-		try {
-		    serverSocket = new ServerSocket(port);
-
-		    while (true) {
-			try {
-
-			    Socket clientSocket = serverSocket.accept();
-			    // Remote connection sends topology in the form of a string with a delimiter "@" used for each line
-			    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			    String text = "";
-			    String line = "";
-			    while ((line = bufferedReader.readLine()) != null) {
-				text = text + line;
-			    }
-
-			    // Convert received string into text array and use importers to get graph instance
-			    String[] temp = text.split("@");
-			    ImportTopology importTopology = TopologyInformation.getInstance().getTopologyImporter();
-			    Gcontroller newGraph = new GcontrollerImpl();
-			    importTopology.importTopologyFromString(newGraph, temp);
-
-			    // update the graph instance in the Thread pool
-			    updateGraph(newGraph);
-
-			    // Close the socket
-			    bufferedReader.close();
-			    clientSocket.close();
-			} catch (IOException e) {
-			    localDebugger("IOException during read for new connections. Discarding update");
-			    continue;
-			}
-		    }
-		} catch (IOException e1) {
-		    localDebugger("Could not open server socket to listen for topology updates on port:" + port);
-
-		}
-
-	    }
-
-	};
-	thread.setName("ThreadPoolThread");
-	thread.start();
-    }
 
     /** Function to stop the thread pool */
     public void stop() {

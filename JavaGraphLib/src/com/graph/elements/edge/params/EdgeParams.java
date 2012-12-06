@@ -17,6 +17,8 @@
 
 package com.graph.elements.edge.params;
 
+import java.util.ArrayList;
+
 import com.graph.elements.edge.EdgeElement;
 
 public abstract class EdgeParams {
@@ -84,4 +86,6 @@ public abstract class EdgeParams {
 		return 0;
 	}
 
+	public abstract ArrayList<String> getVertexSequence(String sourceID, String destID);
+	
 }

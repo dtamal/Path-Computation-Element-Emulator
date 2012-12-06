@@ -17,19 +17,30 @@
 
 package com.pcee.architecture.computationmodule;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.path.algorithms.constraints.impl.SimplePathComputationConstraint;
+import com.graph.path.algorithms.impl.BandwidthConstrainedPathComputationAlgorithm;
 import com.graph.path.algorithms.impl.SimplePathComputationAlgorithm;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.architecture.computationmodule.ted.TopologyInformationDomain;
+import com.pcee.architecture.computationmodule.ted.TopologyInformationParent;
+import com.pcee.architecture.computationmodule.threadpool.MultiDomainRequest;
 import com.pcee.architecture.computationmodule.threadpool.Request;
+import com.pcee.architecture.computationmodule.threadpool.SingleDomainRequest;
 import com.pcee.architecture.computationmodule.threadpool.ThreadPool;
 import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.protocol.message.PCEPMessageFactory;
+import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
+import com.pcee.protocol.message.objectframe.impl.PCEPExplicitRouteObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPNoPathObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 import com.pcee.protocol.request.PCEPRequestFrame;
 import com.pcee.protocol.request.PCEPRequestFrameFactory;
@@ -41,7 +52,7 @@ import com.pcee.protocol.response.PCEPResponseFrameFactory;
  * @author Marek Drogon
  * @author Mohit Chamania
  */
-public class ComputationModuleImpl extends ComputationModule {
+public class ComputationModuleParentImpl extends ComputationModule {
 
 	// Management Object used to forward communications between the different
 	// modules
@@ -57,7 +68,7 @@ public class ComputationModuleImpl extends ComputationModule {
 	private LinkedBlockingQueue<Request> requestQueue;
 
 	// Object to retrieve current topology information
-	private TopologyInformation topologyInstance = TopologyInformation
+	private TopologyInformationParent topologyInstance = TopologyInformationParent
 			.getInstance();
 
 	// Graph library used for implementing path computation
@@ -65,20 +76,23 @@ public class ComputationModuleImpl extends ComputationModule {
 
 	//HashMap for keeping track of requests made to remote peers and the associated worker tasks
 	private HashMap <String, LinkedBlockingQueue<PCEPMessage>> remotePeerResponseAssociationHashMap;
-	
-	/**
-	 * Default Constructor
+
+	/** Constructor with default configurations for the threads etc
 	 * 
 	 * @param layerManagement
 	 */
-	public ComputationModuleImpl(ModuleManagement layerManagement) {
+	public ComputationModuleParentImpl(ModuleManagement layerManagement) {
 		lm = layerManagement;
 		computationThreads = 5;
 		start();
 	}
 
-	public ComputationModuleImpl(ModuleManagement layerManagement,
-			int computationThreads) {
+	/** Constructor
+	 * 
+	 * @param layerManagement
+	 * @param computationThreads
+	 */
+	public ComputationModuleParentImpl(ModuleManagement layerManagement, int computationThreads) {
 		lm = layerManagement;
 		this.computationThreads = computationThreads;
 		start();
@@ -136,7 +150,7 @@ public class ComputationModuleImpl extends ComputationModule {
 	private String getKeyForRemotePeerAssociation(PCEPAddress address, String requestID) {
 		return address.getIPv4Address(true) + "-" + requestID;
 	}
-	
+
 	public synchronized boolean  isValidRequestToRemotePeer(PCEPAddress address, String requestID){
 		//If the particular combination of remote PCE peer and request ID already exist do not make a new association
 		String key = getKeyForRemotePeerAssociation(address, requestID);
@@ -144,7 +158,7 @@ public class ComputationModuleImpl extends ComputationModule {
 			return false;
 		return true;
 	}
-	
+
 	public synchronized void registerRequestToRemotePeer(PCEPAddress address, String requestID, LinkedBlockingQueue<PCEPMessage> queue){
 		if (isValidRequestToRemotePeer(address, requestID)) {
 			String key = getKeyForRemotePeerAssociation(address, requestID);
@@ -153,7 +167,7 @@ public class ComputationModuleImpl extends ComputationModule {
 		else
 			localLogger("registerRequestToRemotePeer: Not a valid request");
 	}
-	
+
 	//Function to implement a mechanism where a response from another server (hierarchical or PCE peer) is sent to the correct worker task
 	protected synchronized void processResponseFromRemotePeer(PCEPMessage message) {
 		PCEPAddress address = message.getAddress();
@@ -169,8 +183,8 @@ public class ComputationModuleImpl extends ComputationModule {
 		} else {
 			localLogger("Response for Peer-requestID combnation that is not registered with the computation module");
 		}
-		
-		
+
+
 	}
 
 	public void sendMessage(PCEPMessage message, ModuleEnum targetLayer) {
@@ -216,25 +230,34 @@ public class ComputationModuleImpl extends ComputationModule {
 					false);
 			String destination = requestFrame.getDestinationAddress()
 					.getIPv4Address(false);
-
-			// Creating new request to be assigned to the Thread Pool
-			Request req = new Request();
+			double bandwidth = -1;
+			if (requestFrame.containsBandwidthObject()) {
+				bandwidth = requestFrame.extractBandwidthObject().getBandwidthFloatValue();
+			}
+			Request req = new MultiDomainRequest();
 			req.setRequestID(requestID);
 			req.setAddress(address);
-			localLogger(source);
-			localLogger(destination);
-			localLogger("Size = " + graph.getVertexIDSet().size());
-			req.setConstrains(new SimplePathComputationConstraint(graph
-					.getVertex(source.trim()), graph.getVertex(destination
-							.trim())));
-			req.setAlgo(new SimplePathComputationAlgorithm());
 
-			localLogger("Adding Request ID " + requestID + " to the Queue");
+			//Set the source and destination IP addresses
+			req.setSourceRouterIP(source.trim());
+			req.setDestRouterIP(destination.trim());
+			if (bandwidth < 0) {
+				req.setBandwidth(0);
+				req.setAlgo(new SimplePathComputationAlgorithm());
+			} else {
+				req.setBandwidth(bandwidth);
+				req.setAlgo(new BandwidthConstrainedPathComputationAlgorithm());
+			}
+			localLogger("Adding Request for multi-domain path computation with ID " + requestID + " to the Queue");
 			requestQueue.add(req);
+
+
+
 		} catch (NullPointerException e) {
 			localDebugger("Problem in generating request. Please check request parameters");
 		} 
 	}
+
 
 	/**
 	 * Function to log events in the Computation layer
