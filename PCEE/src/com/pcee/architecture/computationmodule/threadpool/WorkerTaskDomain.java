@@ -208,7 +208,7 @@ public class WorkerTaskDomain extends WorkerTask {
 				//Add bandwidth to the response message if the request contains the bandwidth object
 				if (request.getBandwidth() > 0) {
 					Iterator<PCEPBandwidthObject> bwIter = bwList.iterator();
-					while(eroIter.hasNext()) 
+					while(bwIter.hasNext()) 
 						responseFrame.insertBandwidthObject(bwIter.next());
 				}
 				PCEPMessage message = PCEPMessageFactory.generateMessage(responseFrame);
@@ -283,17 +283,18 @@ public class WorkerTaskDomain extends WorkerTask {
 
 		lm.getComputationModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
 
+		localLogger("Request Sent to Parent PCE");
 
 		//Wait for response from remote peer (parent PCE)
 		try {
 			PCEPMessage in = inQueue.take();
-
 			//Response received from Server
 			PCEPResponseFrame responseFrame = PCEPResponseFrameFactory.getPathComputationResponseFrame(in);
 
 			//Check if a single path exists
 			if (responseFrame.containsNoPathObject()) {
 				//No path received from Parent PCE return No Path to Domain PCE
+				localLogger("Received No path From Parent PCE");				
 				returnNoPathMessage();
 			} else {
 				//if source is one of the border nodes, use the EROs sent by the parent PCE and send it back to the client
@@ -315,6 +316,8 @@ public class WorkerTaskDomain extends WorkerTask {
 				}
 				else {
 					//compute paths from the source of the request to the source of all EROs, append EROs to make destintaion 
+					
+					localLogger("response Received from Parent PCE computing path in local PCE");
 					Iterator <PCEPExplicitRouteObject> iter = responseFrame.extractExplicitRouteObjectList().iterator();
 					LinkedList<PCEPBandwidthObject> bwList = null;
 					if (responseFrame.containsBandwidthObjectList())
@@ -326,6 +329,7 @@ public class WorkerTaskDomain extends WorkerTask {
 					
 					int count =0;
 					while(iter.hasNext()) {
+						localLogger("Inserting Edges in local topology");
 						double bw =0;
 						if (bwList!=null)
 							bw = bwList.get(count).getBandwidthFloatValue();
