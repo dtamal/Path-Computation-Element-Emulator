@@ -51,7 +51,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 	JFrame windowFrame;
 	JPanel windowPanel, introPanel, inputPanel, openMessagePanel, keepAliveMessagePanel, requestMessagePanel, textAreaPanel;
 
-	JTextField serverAddressTextField, keepAliveTextField, deadTimerTextField, priTextField, sourceTextField, destinationTextField;
+	JTextField serverAddressTextField, serverPortTextField, keepAliveTextField, deadTimerTextField, priTextField, sourceTextField, destinationTextField;
 	JButton connectButton, openMessageButton, keepAliveMessageButton, requestMessageButton;
 	JCheckBox openMessagePFlagCheckBox, openMessageIFlagCheckBox, requestMessagePFlagCheckBox, requestMessageIFlagCheckBox, oFlagCheckBox, bFlagCheckBox, rFlagCheckBox, endPointsPFlag, endPointsIFlag;
 	static JTextArea messageTextArea;
@@ -125,15 +125,27 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		serverLabel.setVerticalAlignment(SwingConstants.CENTER);
 		serverLabel.setPreferredSize(labelDimension);
 
+		JLabel serverPort = new JLabel("Port:", SwingConstants.LEFT);
+		serverPort.setVerticalAlignment(SwingConstants.CENTER);
+		serverPort.setPreferredSize(labelDimension);
+
 		serverAddressTextField = new JTextField(address.getIPv4Address(false));
 		serverAddressTextField.setPreferredSize(textFieldDimension);
 
+		if (address.getPort()!=0)
+			serverPortTextField = new JTextField(Integer.toString(address.getPort()));
+		else
+			serverPortTextField = new JTextField("4189");
+			
+		serverPortTextField.setPreferredSize(textFieldDimension);
+		
+		
 		connectButton = new JButton("Connect");
 		connectButton.setPreferredSize(buttonDimension);
 
 		GridBagConstraints c = new GridBagConstraints();
 
-		c.insets = new Insets(3, 5, 3, 5);
+		c.insets = new Insets(5, 5, 3, 5);
 		c.anchor = GridBagConstraints.FIRST_LINE_START;
 
 		c.gridx = 0;
@@ -147,6 +159,18 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		this.inputPanel.add(this.serverAddressTextField);
 
 		c.gridx = 2;
+		c.gridy = 0;
+		gridbag.setConstraints(serverPort, c);
+		this.inputPanel.add(serverPort);
+
+		
+		c.gridx = 3;
+		c.gridy = 0;
+		gridbag.setConstraints(this.serverPortTextField, c);
+		this.inputPanel.add(this.serverPortTextField);
+
+		
+		c.gridx = 4;
 		c.gridy = 0;
 		gridbag.setConstraints(this.connectButton, c);
 		this.inputPanel.add(this.connectButton);
@@ -381,7 +405,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 	}
 
 	public void openConnection() throws Exception {
-		PCEPAddress address = new PCEPAddress(serverAddressTextField.getText(), port);
+		PCEPAddress address = new PCEPAddress(serverAddressTextField.getText(), Integer.parseInt(serverPortTextField.getText()));
 		killIDALogo();
 		guiLogger("Trying to connect to " + address.getIPv4Address(true));
 		lm.getClientModule().registerConnection(address, false, true, true);
@@ -408,7 +432,7 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 		PCEPEndPointsObject endPoints = PCEPObjectFrameFactory.generatePCEPEndPointsObject(endPointsPFlag, endPointsIFlag, sourceAddress, destinationAddress);
 
 		// Address destAddress = new Address(serverAddressTextField.getText());
-		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), 4189);
+		PCEPAddress destAddress = new PCEPAddress(serverAddressTextField.getText(), Integer.parseInt(serverPortTextField.getText()));
 
 		PCEPRequestFrame requestMessage = PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
 		PCEPMessage message = PCEPMessageFactory.generateMessage(requestMessage);
