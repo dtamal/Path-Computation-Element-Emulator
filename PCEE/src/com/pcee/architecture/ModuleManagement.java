@@ -92,7 +92,7 @@ public class ModuleManagement {
 						.getProperty("computationThreads"));
 				TopologyInformation.setTopoPath(reader.getProperty("topology"));
 				TopologyInformation.setImporter(reader.getProperty("importer"));
-
+				TopologyInformation.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
 			} catch (Exception e) {
 				System.out.println("Wrong Configuration Inputs!");
 				System.exit(0);
