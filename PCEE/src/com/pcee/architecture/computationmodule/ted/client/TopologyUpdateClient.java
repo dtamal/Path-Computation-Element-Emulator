@@ -123,12 +123,12 @@ public class TopologyUpdateClient {
 		String destID = "192.169.2.7";
 
 		String ip = "127.0.0.1";
-		int port = 5190;
+		int port = 5189;
 		reomputeVirtuaTopology(ip, port);
 
 		ImportTopology importer = new SNDLibImportTopology();
 		Gcontroller graph = new GcontrollerImpl();
-		importer.importTopology(graph, "atlantaDomain1.txt");
+		importer.importTopology(graph, "atlanta.txt");
 
 
 

@@ -36,6 +36,7 @@ import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.graph.topology.importers.impl.BRITEImportTopology;
 import com.graph.topology.importers.impl.SNDLibImportTopology;
+import com.pcee.logger.Logger;
 
 /**
  * Class to provide Topology Instances to the computation layer
@@ -161,7 +162,7 @@ public class TopologyInformation {
 	 * @param event
 	 */
 	private void localLogger(String event) {
-		// Logger.logSystemEvents("[TopologyInformation]     " + event);
+		Logger.logSystemEvents("[TopologyInformation]     " + event);
 	}
 
 	/**
@@ -170,7 +171,7 @@ public class TopologyInformation {
 	 * @param event
 	 */
 	private void localDebugger(String event) {
-		// Logger.debugger("[TopologyInformation]     " + event);
+		Logger.debugger("[TopologyInformation]     " + event);
 	}
 
 	/**
@@ -204,8 +205,7 @@ public class TopologyInformation {
 									String sourceID = (String)vertexSequence.get(i);
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
-										if (graph.getConnectingEdge(sourceID, destID).getEdgeParams().reserveCapacity(capacity)) {
-											localLogger("Cannot reserve requested capacity between " + sourceID +" and " + destID);
+										if (!graph.getConnectingEdge(sourceID, destID).getEdgeParams().reserveCapacity(capacity)) {
 											for (int j=0;j<i;j++) {
 												//Releasing capacity that was reserved till before i
 												String srcID = (String)vertexSequence.get(j);
@@ -227,7 +227,7 @@ public class TopologyInformation {
 									}
 								}
 								if (i==vertexSequence.size()-1) {
-									localLogger("Successfully released capacity on provided sequence");
+									localLogger("Successfully reserved capacity on provided sequence");
 								}
 
 							}
