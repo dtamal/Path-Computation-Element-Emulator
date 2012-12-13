@@ -33,7 +33,7 @@ import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 
 public class PCEPResponseFrameFactory {
 
-	public static PCEPResponseFrame generatePathComputationRequestFrame(
+	public static PCEPResponseFrame generatePathComputationResponseFrame(
 			PCEPRequestParametersObject RP) {
 
 		PCEPResponseFrame responseFrame = new PCEPResponseFrame(RP);
