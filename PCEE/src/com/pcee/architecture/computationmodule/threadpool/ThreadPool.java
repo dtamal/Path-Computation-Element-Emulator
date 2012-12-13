@@ -97,7 +97,7 @@ public class ThreadPool {
 				worker.setName("WorkerThread-" + i);
 				threadHashMap.put(id, worker);
 				worker.start();
-				System.out.println("Worker Thread " + i + " initialized");
+				localLogger("Worker Thread " + i + " initialized");
 			}
 			isInitialized = true;
 			localDebugger("Thread Pool Initialized");
