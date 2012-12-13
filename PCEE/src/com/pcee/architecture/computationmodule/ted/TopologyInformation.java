@@ -36,7 +36,6 @@ import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.graph.topology.importers.impl.BRITEImportTopology;
 import com.graph.topology.importers.impl.SNDLibImportTopology;
-import com.pcee.logger.Logger;
 
 /**
  * Class to provide Topology Instances to the computation layer
@@ -51,7 +50,7 @@ public class TopologyInformation {
 	private static Gson json = new Gson();
 
 	//Port on which to listen for topology Information Updates
-	private static int topologyUpdatePort = 5555;
+	private static int topologyUpdatePort = 5189;
 
 	//Thread for topology Update Listener
 	private static Thread topologyUpdateThread;
@@ -200,7 +199,8 @@ public class TopologyInformation {
 							double capacity = Double.parseDouble(input.get("capacity").toString());
 							ArrayList vertexSequence = ((ArrayList)input.get("vertexSequence"));
 							synchronized(graph) {
-								for (int i=0;i<vertexSequence.size()-1;i++){
+								int i=0;
+								for (i=0;i<vertexSequence.size()-1;i++){
 									String sourceID = (String)vertexSequence.get(i);
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
@@ -226,6 +226,10 @@ public class TopologyInformation {
 										break;
 									}
 								}
+								if (i==vertexSequence.size()-1) {
+									localLogger("Successfully released capacity on provided sequence");
+								}
+
 							}
 
 						} else if (input.get("operation").toString().equalsIgnoreCase("release")) {
@@ -233,7 +237,8 @@ public class TopologyInformation {
 							double capacity = Double.parseDouble(input.get("capacity").toString());
 							ArrayList vertexSequence = ((ArrayList)input.get("vertexSequence"));
 							synchronized(graph) {
-								for (int i=0;i<vertexSequence.size()-1;i++){
+								int i=0;
+								for (i=0;i<vertexSequence.size()-1;i++){
 									String sourceID = (String)vertexSequence.get(i);
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
@@ -259,6 +264,9 @@ public class TopologyInformation {
 										break;
 									}
 								}
+								if (i==vertexSequence.size()-1) {
+									localLogger("Successfully released capacity on provided sequence");
+								}
 							}
 
 						} else 	if (input.get("operation").toString().equalsIgnoreCase("updateEdgeDefinition")) {
@@ -280,10 +288,10 @@ public class TopologyInformation {
 									EdgeParams params = new BasicEdgeParams(edge, delay, weight, capacity);
 									params.setAvailableCapacity(avcapacity);
 									edge.setEdgeParams(params);
-									localLogger("Updated Edge from " + sourceID + " to " + destID);
+									localLogger("Updated Edge definition from " + sourceID + " to " + destID);
+								} else {
+									localLogger("No existing edge from " + sourceID + " to " + destID + " foud in topology");
 								}
-
-
 							}
 
 						}
