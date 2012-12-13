@@ -17,17 +17,11 @@
 
 package com.pcee.architecture.computationmodule.threadpool;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ServerSocket;
-import java.net.Socket;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 import com.graph.graphcontroller.Gcontroller;
-import com.graph.graphcontroller.impl.GcontrollerImpl;
-import com.graph.topology.importers.ImportTopology;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.logger.Logger;
@@ -41,8 +35,6 @@ import com.pcee.protocol.message.PCEPMessage;
  */
 public class ThreadPool {
 
-	// port used to receive topology updates
-	private int port = 1337;
 
 	// Integer to define the number of threads used
 	private int threadCount;
