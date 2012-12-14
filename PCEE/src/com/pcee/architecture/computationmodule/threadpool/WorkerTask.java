@@ -24,16 +24,25 @@ import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.path.PathElement;
+import com.graph.path.algorithms.PathComputationAlgorithm;
+import com.graph.path.algorithms.constraints.Constraint;
+import com.graph.path.algorithms.constraints.impl.SimplePathComputationConstraint;
+import com.graph.path.algorithms.impl.MaxBandwidthShortestPathComputationAlgorithm;
+import com.graph.path.algorithms.impl.SimplePathComputationAlgorithm;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.PCEPMessageFactory;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
+import com.pcee.protocol.message.objectframe.impl.PCEPBandwidthObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPExplicitRouteObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPNoPathObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import com.pcee.protocol.request.PCEPRequestFrame;
+import com.pcee.protocol.request.PCEPRequestFrameFactory;
 import com.pcee.protocol.response.PCEPResponseFrame;
 import com.pcee.protocol.response.PCEPResponseFrameFactory;
 
@@ -45,50 +54,17 @@ import com.pcee.protocol.response.PCEPResponseFrameFactory;
  */
 public class WorkerTask implements Runnable {
 	// Request to be processed
-	private Request request;
+	private PCEPMessage request;
 	// Graph used for computation of the request
 	private Gcontroller graph;
 	// Module management object to send the response to the session layer
 	private ModuleManagement lm;
 
 	/** Default Constructor */
-	public WorkerTask(ModuleManagement layerManagement, Request request, Gcontroller graph) {
+	public WorkerTask(ModuleManagement layerManagement, PCEPMessage request, Gcontroller graph) {
 		lm = layerManagement;
 		this.request = request;
 		this.graph = graph;
-	}
-
-	/**
-	 * Function to process the path computation request and create a response object from the same
-	 * 
-	 * @return Response Object
-	 */
-	public Response processRequest() {
-		// Initialize response object and set parameters
-		Response response = new Response();
-		response.setRequestID(request.getRequestID());
-		response.setAddress(request.getAddress());
-		// Compute path
-		PathElement element = request.getAlgo().computePath(graph, request.getConstrains());
-		if (element != null) {
-			response.setElement(element);
-			localLogger("Computed path is " + element.getVertexSequence());
-			Iterator<EdgeElement> iter = element.getTraversedEdges().iterator();
-			while(iter.hasNext()){
-				EdgeElement temp = iter.next();
-				localLogger (temp.getEdgeID() + "\t" + temp.getSourceVertex().getVertexID() + "\t" + temp.getDestinationVertex().getVertexID());
-			}
-			Iterator<VertexElement> iter1 = element.getTraversedVertices().iterator();
-			while(iter1.hasNext()){
-				localLogger(iter1.next().getVertexID());
-			}
-
-		}
-		else
-			localDebugger("Error in Computing Path from " + request.getConstrains().getSource().getVertexID() + " to " + request.getConstrains().getDestination().getVertexID());
-
-		// return response
-		return response;
 	}
 
 	/** Function to update the graph instance used for computation */
@@ -98,55 +74,103 @@ public class WorkerTask implements Runnable {
 
 	/** Function to implement the path computation operations */
 	public void run() {
-		localDebugger("Start processing of Request for path from " + request.getConstrains().getSource().getVertexID() + " to " + request.getConstrains().getDestination().getVertexID());
-		localLogger("Processing of Request: " + request.getRequestID());
-		Response response = processRequest();
-		processResponseMessage(response);
+		PCEPRequestFrame requestFrame = PCEPRequestFrameFactory.getPathComputationRequestFrame(request);
+		localLogger("Starting Processing of Request: " + requestFrame.getRequestID());
+		processSingleDomainRequest(requestFrame);
+		localLogger("Completed Processing of Request: " + requestFrame.getRequestID());		
 	}
 
-	/** Function to create a PCEPResponse message from the response object */
-	private void processResponseMessage(Response resp) {
 
-		String requestID = resp.getRequestID();
-		ArrayList<PCEPAddress> vertexList = getTraversedVertexes(resp);
+	private void processSingleDomainRequest(PCEPRequestFrame requestFrame) {
+		//Check if source and destination domain are available in the graph, if not send a no path object 
+		String sourceID = requestFrame.getSourceAddress().getIPv4Address(false).trim();
+		String destID = requestFrame.getDestinationAddress().getIPv4Address(false).trim();
+		if (graph.vertexExists(sourceID) && graph.vertexExists(destID)) {
+			//begin path computation
+			//Check if bandwidth objecy exists in the request frame
+			Constraint constr = null;
+			PathComputationAlgorithm algo = null;
+			if (requestFrame.containsBandwidthObject()) {
+				localLogger("Request Contains bandwidth Object");
+				constr = new SimplePathComputationConstraint (graph.getVertex(sourceID), graph.getVertex(destID), requestFrame.extractBandwidthObject().getBandwidthFloatValue());
+				algo = new MaxBandwidthShortestPathComputationAlgorithm();
+			} else {
+				constr = new SimplePathComputationConstraint (graph.getVertex(sourceID), graph.getVertex(destID));
+				algo = new SimplePathComputationAlgorithm();
+			}
+			//Start Path Computation
+			PathElement element = algo.computePath(graph, constr);
+			if (element !=null) {
+				localLogger("Computed path is " + element.getVertexSequence());
+				// return response
+				ArrayList<EROSubobjects> vertexList = getTraversedVertexes(element.getTraversedVertices());
 
-		ArrayList<EROSubobjects> newVertexList = new ArrayList<EROSubobjects>();
+				//Generate ERO Object
+				PCEPExplicitRouteObject ERO = PCEPObjectFrameFactory.generatePCEPExplicitRouteObject("1", "0", vertexList);
+				//atleast one path was computed
+				PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "0", "0", "0", "1", Integer.toString(requestFrame.getRequestID()));
 
-		for (int i = 0; i < vertexList.size(); i++) {
-			newVertexList.add(vertexList.get(i));
+				PCEPResponseFrame respFrame = PCEPResponseFrameFactory.generatePathComputationResponseFrame(RP);
+
+				respFrame.insertExplicitRouteObject(ERO);
+
+				if (requestFrame.containsBandwidthObject()) {
+					PCEPBandwidthObject bw = PCEPObjectFrameFactory.generatePCEPBandwidthObject("1", "0", (float) element.getPathParams().getAvailableCapacity());
+					respFrame.insertBandwidthObject(bw);
+				}
+
+				PCEPMessage mesg = PCEPMessageFactory.generateMessage(respFrame);
+				mesg.setAddress(request.getAddress());
+
+				localLogger("Path found in the domain. Sending back to client");
+				// Send response message from the computation layer to the session layer
+				lm.getComputationModule().sendMessage(mesg, ModuleEnum.SESSION_MODULE);
+
+
+			} else {
+				//No path Found in the source domain return no path Object
+				returnNoPathMessage(requestFrame.getRequestID());
+			}
+
+		} else {
+			//Source and/or destination not present in the PCE
+			if (graph.vertexExists(sourceID))
+				localLogger("Destination IP address " + destID + " not in the topology. Returning a no path object");
+			else if (graph.vertexExists(destID)) 
+				localLogger("Source IP address " + sourceID + " not in the topology. Returning a no path object");
+			else {
+				localLogger("Both source IP address " + sourceID + " and destination IP address " + destID + " not in the topology. Returning a no path object");
+			}
+			returnNoPathMessage(requestFrame.getRequestID());
 		}
+	}
 
-		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "0", "0", "0", "1", requestID);
-		PCEPExplicitRouteObject ERO = PCEPObjectFrameFactory.generatePCEPExplicitRouteObject("1", "0", newVertexList);
 
-		PCEPResponseFrame responseFrame = PCEPResponseFrameFactory.generatePathComputationRequestFrame(RP);
-		responseFrame.insertExplicitRouteObject(ERO);
-
-		PCEPMessage message = PCEPMessageFactory.generateMessage(responseFrame);
-		message.setAddress(resp.getAddress());
-
-		// Send response message from the computation layer to the session layer
-		lm.getComputationModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
+	/**Function to return the no Path message to the Client*/
+	protected void returnNoPathMessage(int requestID) {
+		//Generate a No path object
+		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "0", "0", "0", "1", Integer.toString(requestID));
+		PCEPNoPathObject noPath = PCEPObjectFrameFactory.generatePCEPNoPathObject("1", "0", 1, "0");
+		PCEPResponseFrame responseFrame = PCEPResponseFrameFactory.generatePathComputationResponseFrame(RP);
+		responseFrame.insertNoPathObject(noPath);
+		PCEPMessage mesg = PCEPMessageFactory.generateMessage(responseFrame);
+		mesg.setAddress(request.getAddress());
+		lm.getComputationModule().sendMessage(mesg, ModuleEnum.SESSION_MODULE);
 	}
 
 	/**
-	 * Function to get the list of traversed vertices from the response object. Used to create ERO
-	 * 
+	 * Function to get the list of traversed vertices as PCEP addresses from the List of vertices in the graph. Used to create ERO
+	 *
 	 * @param resp
 	 * @return
 	 */
-	private ArrayList<PCEPAddress> getTraversedVertexes(Response resp) {
+	protected ArrayList<EROSubobjects> getTraversedVertexes(ArrayList<VertexElement> vertexArrayList) {
 
-		ArrayList<VertexElement> vertexArrayList = resp.getElement().getTraversedVertices();
-		ArrayList<PCEPAddress> traversedVertexesList = new ArrayList<PCEPAddress>();
+		ArrayList<EROSubobjects> traversedVertexesList = new ArrayList<EROSubobjects>();
 
-		for (int i = 0; i < vertexArrayList.size(); i++) {
-			VertexElement vertex = vertexArrayList.get(i);
-
-			PCEPAddress address = new PCEPAddress(vertex.getVertexID(), false); // FIXME
-			traversedVertexesList.add(address);
+		for (int i=0;i<vertexArrayList.size();i++) {
+			traversedVertexesList.add(new PCEPAddress(vertexArrayList.get(i).getVertexID(), false));			
 		}
-
 		return traversedVertexesList;
 	}
 

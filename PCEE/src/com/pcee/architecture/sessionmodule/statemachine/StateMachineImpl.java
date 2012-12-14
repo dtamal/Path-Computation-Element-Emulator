@@ -83,71 +83,69 @@ import com.pcee.protocol.open.PCEPOpenFrameFactory;
  * 
  * @author Marek Drogon
  */
-public class StateMachineImpl extends StateMachine {
-
-	LinkedBlockingQueue<PCEPMessage> sendingQueue;
+public abstract class StateMachineImpl extends StateMachine {
 
 	// Module Management Variable to facilitate communication between the
 	// different modules
 	ModuleManagement lm;
 
 	// Random Session ID instance used in this implementation
-	private int sessionID = SessionID.getInstance().getID(); // TODO read from
+	protected int sessionID = SessionID.getInstance().getID(); // TODO read from
 	// message
 	// Remote address of the PCEP connection
-	private PCEPAddress address;
+	protected PCEPAddress address;
 
 	// Boolean to indicate if the peer initialized the connection
-	private boolean connectionInitialized;
+	protected boolean connectionInitialized;
 
 	// Boolean to indicate if the TCP connection was established
-	private boolean connectionEstablished;
+	protected boolean connectionEstablished;
 
 	// Reference variable to the session layer global timer
-	private Timer stateTimer;
+	protected Timer stateTimer;
 
 	// /Timer tasks defined to implement operations for different timeout
 	// operations
-	private TimerTask connectTimerTask;
-	private TimerTask openWaitTimerTask;
-	private TimerTask keepWaitTimerTask;
-	private TimerTask keepAliveTimerTask;
-	private TimerTask deadTimerTask;
+	protected TimerTask connectTimerTask;
+	protected TimerTask openWaitTimerTask;
+	protected TimerTask keepWaitTimerTask;
+	protected TimerTask keepAliveTimerTask;
+	protected TimerTask deadTimerTask;
 
 	// Boolean variables to check if timers are running
-	private boolean connectTimerRunning;
-	private boolean keepAliveTimerRunning;
-	private boolean deadTimerRunning;
+	protected boolean connectTimerRunning;
+	protected boolean keepAliveTimerRunning;
+	protected boolean deadTimerRunning;
 
-	private boolean firstTimeSessionUP = true;
+	// Indicator to see if the Session UP state is achieved for the first time, for logging in GUI
+	protected boolean firstTimeSessionUP = true;
 
 	// Variable to store the current state of the state machine
-	private int state;
+	protected int state;
 
 	// Int to store the connection retry count
-	private int connectRetry;
+	protected int connectRetry;
 
 	// final int to store the maximum connection retries
-	private final int connectMaxRetry = 5;
+	protected final int connectMaxRetry = 5;
 
 	// FIXME change to non-debugging values back
-	private final int connect = PCEPConstantValues.CONNECT_TIMER;
-	private int openWait = PCEPConstantValues.OPENWAIT_TIMER;
-	private int keepWait = PCEPConstantValues.KEEPWAIT_TIMER;
-	private int keepAlive = PCEPConstantValues.KEEPALIVE_TIMER;
-	private int deadTimer = PCEPConstantValues.DEAD_TIMER;
+	protected final int connect = PCEPConstantValues.CONNECT_TIMER;
+	protected int openWait = PCEPConstantValues.OPENWAIT_TIMER;
+	protected int keepWait = PCEPConstantValues.KEEPWAIT_TIMER;
+	protected int keepAlive = PCEPConstantValues.KEEPALIVE_TIMER;
+	protected int deadTimer = PCEPConstantValues.DEAD_TIMER;
 
-	private int openRetry;
+	protected int openRetry;
 
-	private boolean remoteOk;
-	private boolean localOk;
+	protected boolean remoteOk;
+	protected boolean localOk;
 
 	public StateMachineImpl(ModuleManagement layerManagement,
 			PCEPAddress Address, Timer stateTimer, boolean connectionInitialized) {
 		// localDebugger("Entering: StateMachineImpl(ModuleManagement layerManagement, PCEPAddress Address, Timer stateTimer, boolean connectionInitialized)");
 
 		lm = layerManagement;
-		sendingQueue = new LinkedBlockingQueue<PCEPMessage>();
 
 		address = Address;
 		this.stateTimer = stateTimer;
@@ -167,9 +165,8 @@ public class StateMachineImpl extends StateMachine {
 			this.updateState(true);
 	}
 
-	private void setState(int state) {
+	protected void setState(int state) {
 		localDebugger("Entering: setState(int state)");
-
 		switch (state) {
 		case 0: {
 			localLogger("Entering Idle State");
@@ -215,6 +212,7 @@ public class StateMachineImpl extends StateMachine {
 		}
 		}
 
+
 	}
 
 	public synchronized void updateState(boolean connectionEstablished) {
@@ -230,92 +228,16 @@ public class StateMachineImpl extends StateMachine {
 		enterTCPPendingState();
 	}
 
-	public synchronized void updateState(PCEPMessage message) {
-		localDebugger("Entering: updateState(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
 
-		chooseState(message);
 
-	}
+	public abstract void updateState(PCEPMessage message, ModuleEnum sourceModule);
+	
 
-	public synchronized void updateState(PCEPMessage message,
-			ModuleEnum sourceModule) {
-		localDebugger("Entering: updateState(PCEPMessage message, ModuleEnum targetLayer)");
-		localDebugger("| message: " + message.contentInformation());
-
-		// Message Types
-		// 1 Open, 2 Keepalive, 3 Request, 4 Reply, 5 Notification, 6 Error, 7
-		// Close
-
-		int currentState = this.state;
-
-		// sendingQueue.add(message);
-
-		boolean check1 = currentState != 4;
-		boolean check2 = sourceModule == ModuleEnum.CLIENT_MODULE;
-
-		// Check if Request is send before connection is set up
-		if (check1 && check2) {
-			sendingQueue.add(message);
-		} else {
-			chooseState(message);
-		}
-
-	}
-
-	public void chooseState(PCEPMessage message) {
-		switch (state) {
-		case 0: {
-			enterIdleState();
-			break;
-		}
-		case 1: {
-			// enterTCPPendingState();
-			localLogger("You should not see me!");
-			System.out.println("Message Arrived Before State Was Updated");
-			break;
-		}
-		case 2: {
-			enterOpenWaitState(message);
-			break;
-		}
-		case 3: {
-			enterKeepWaitState(message);
-			break;
-		}
-		case 4: {
-			enterSessionUPState(message);
-			break;
-		}
-		default: {
-			localLogger("Lost in a completely not reachable state. wtf?");
-		}
-		}
-	}
-
-	public synchronized void flushBuffer() {
-
-		int size = sendingQueue.size();
-
-		if (size > 0) {
-			localLogger("Found " + size
-					+ " Messages waiting  in Buffer for Connection "
-					+ address.getIPv4Address());
-			while (sendingQueue.size() > 0) {
-				try {
-					PCEPMessage message = sendingQueue.take();
-					sendMessageToPeer(message, ModuleEnum.NETWORK_MODULE);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
 
 	/**
 	 * enterIdleState
 	 */
-	private void enterIdleState() {
+	protected void enterIdleState() {
 		localDebugger("Entering: enterIdleState()");
 
 		// this.connectRetry = 0;
@@ -343,7 +265,7 @@ public class StateMachineImpl extends StateMachine {
 	/**
 	 * enterTCPPendingState
 	 */
-	private void enterTCPPendingState() {
+	protected void enterTCPPendingState() {
 		localDebugger("Entering: enterTCPPendingState()");
 
 		if (connectionEstablished == true) { // (a)
@@ -367,7 +289,7 @@ public class StateMachineImpl extends StateMachine {
 	 * 
 	 * @param message
 	 */
-	private void enterOpenWaitState(PCEPMessage message) {
+	protected void enterOpenWaitState(PCEPMessage message) {
 		localDebugger("Entering: enterOpenWaitState(PCEPMessage message)");
 		localDebugger("| message: " + message.contentInformation());
 
@@ -465,7 +387,7 @@ public class StateMachineImpl extends StateMachine {
 	 * 
 	 * @param message
 	 */
-	private void enterKeepWaitState(PCEPMessage message) {
+	protected void enterKeepWaitState(PCEPMessage message) {
 		localDebugger("Entering: enterKeepWaitState(PCEPMessage message)");
 		localDebugger("| message: " + message.contentInformation());
 
@@ -496,18 +418,6 @@ public class StateMachineImpl extends StateMachine {
 
 				this.cancelKeepWaitTimer();
 				this.setState(4);
-
-				flushBuffer();
-				// Forward the received keepalive message to the client layer to
-				// start sending of Path Computation requests
-				if ((lm.isServer()) && (message.getAddress().getPort() == 4189)) {
-					lm.getSessionModule().sendMessage(message,
-							ModuleEnum.CLIENT_MODULE);
-				}
-				if ((!lm.isServer())) {
-					lm.getSessionModule().sendMessage(message,
-							ModuleEnum.CLIENT_MODULE);
-				}
 			}
 			if (remoteOk == false) {
 				localLogger("remoteOk is false");
@@ -564,7 +474,7 @@ public class StateMachineImpl extends StateMachine {
 	 * 
 	 * @param message
 	 */
-	private void enterSessionUPState(PCEPMessage message) {
+	protected void enterSessionUPState(PCEPMessage message) {
 		localDebugger("Entering: enterSessionUPState(PCEPMessage message)");
 		localDebugger("| message: " + message.contentInformation());
 
@@ -654,7 +564,8 @@ public class StateMachineImpl extends StateMachine {
 		}
 		case 6: {
 			localLogger("Received Error Message");
-			// MessageHandler.processRequestMessage(message);
+			if (lm.isServer()==false)
+				lm.getClientModule().receiveMessage(message, ModuleEnum.SESSION_MODULE);
 
 			break;
 		}
@@ -678,21 +589,21 @@ public class StateMachineImpl extends StateMachine {
 	 * Set/Get
 	 */
 
-	private void setLocalOk(boolean value) {
+	protected void setLocalOk(boolean value) {
 		localDebugger("Entering: setLocalOk(boolean value)");
 
 		localLogger("Setting LocalOk to: " + value);
 		this.localOk = value;
 	}
 
-	private void setRemoteOk(boolean value) {
+	protected void setRemoteOk(boolean value) {
 		localDebugger("Entering: setRemoteOk(boolean value)");
 
 		localLogger("Setting RemoteOk to: " + value);
 		this.remoteOk = value;
 	}
 
-	private void incrementOpenRetry() {
+	protected void incrementOpenRetry() {
 		localDebugger("Entering: incrementOpenRetry()");
 
 		openRetry++;
@@ -703,7 +614,7 @@ public class StateMachineImpl extends StateMachine {
 	 * Various
 	 */
 
-	private void sendMessageToPeer(PCEPMessage message, ModuleEnum targetLayer) {
+	protected void sendMessageToPeer(PCEPMessage message, ModuleEnum targetLayer) {
 		localDebugger("Entering: sendMessageToPeer(PCEPMessage message)");
 		localDebugger("| message: " + message.contentInformation());
 
@@ -712,25 +623,25 @@ public class StateMachineImpl extends StateMachine {
 
 	}
 
-	private void checkMultipleConnections() {
+	protected void checkMultipleConnections() {
 		localDebugger("Entering: checkMultipleConnections()");
 		// localLogger("Waiting to be implemented! checkMultipleConnections()");
 		// // TODO
 	}
 
-	private void adjustSessionCharacteristics() {
+	protected void adjustSessionCharacteristics() {
 		localDebugger("Entering: adjustSessionCharacteristics()");
 
 		localLogger("Waiting to be implemented! adjustSessionCharacteristics()"); // TODO
 	}
 
-	private void retryTCPConnection() {
+	protected void retryTCPConnection() {
 		localDebugger("Entering: retryTCPConnection()");
 
 		localLogger("Waiting to be implemented! retryTCPConnection()"); // TODO
 	}
 
-	private void checkPendingStatus() {
+	protected void checkPendingStatus() {
 		localDebugger("Entering: checkPendingStatus()");
 
 		if (connectRetry == connectMaxRetry) {
@@ -744,7 +655,7 @@ public class StateMachineImpl extends StateMachine {
 		}
 	}
 
-	private void terminateTimerTasks() {
+	protected void terminateTimerTasks() {
 		localDebugger("Entering: terminateTimerTasks()");
 
 		localLogger("TERMINATING TIMERS");
@@ -770,7 +681,7 @@ public class StateMachineImpl extends StateMachine {
 	}
 
 	// TODO UPDATE
-	private void closeTCPConnection() {
+	protected void closeTCPConnection() {
 		localDebugger("Entering: closeTCPConnection()");
 
 		localLogger("CLOSING CONNECTION");
@@ -782,7 +693,7 @@ public class StateMachineImpl extends StateMachine {
 	/**************************************************************************************************
 	 * Messages
 	 */
-	private void sendOpenMessage(int keepalive, int deadTimer) {
+	protected void sendOpenMessage(int keepalive, int deadTimer) {
 		localDebugger("Entering: sendOpenMessage(int keepalive, int deadTimer)");
 
 		localLogger("Sending Open Message to" + address.getIPv4Address());
@@ -794,7 +705,7 @@ public class StateMachineImpl extends StateMachine {
 		sendMessageToPeer(openMessage, ModuleEnum.NETWORK_MODULE);
 	}
 
-	private void sendKeepAliveMessage() {
+	protected void sendKeepAliveMessage() {
 		localDebugger("Entering: sendKeepAliveMessage()");
 
 		localLogger("Sending KeepAlive Message to" + address.getIPv4Address());
@@ -811,7 +722,7 @@ public class StateMachineImpl extends StateMachine {
 		}
 	}
 
-	private void sendCloseMessage() {
+	protected void sendCloseMessage() {
 		localDebugger("Entering: sendCloseMessage()");
 
 		localLogger("Sending Close Message to" + address.getIPv4Address());
@@ -824,7 +735,7 @@ public class StateMachineImpl extends StateMachine {
 		sendMessageToPeer(closeMessage, ModuleEnum.NETWORK_MODULE);
 	}
 
-	private void sendErrorMessage(int type, int value) {
+	protected void sendErrorMessage(int type, int value) {
 		localDebugger("Entering: sendErrorMessage(int type, int value)");
 
 		localLogger("Sending Error Message to" + address.getIPv4Address());
@@ -837,7 +748,7 @@ public class StateMachineImpl extends StateMachine {
 	/**************************************************************************************************
 	 * Connect
 	 */
-	private void startConnectTimer() {
+	protected void startConnectTimer() {
 		localDebugger("Entering: startConnectTimer()");
 
 		localLogger("Starting Connect Timer");
@@ -853,7 +764,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(connectTimerTask, connect * 1000);
 	}
 
-	private void restartConnectTimer() {
+	protected void restartConnectTimer() {
 		localDebugger("Entering: restartConnectTimer()");
 
 		localLogger("Restarting Connect Timer");
@@ -868,7 +779,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(connectTimerTask, connect * 1000);
 	}
 
-	private void cancelConnectTimer() {
+	protected void cancelConnectTimer() {
 		localDebugger("Entering: cancelConnectTimer()");
 
 		if (connectTimerRunning == true) {
@@ -883,7 +794,7 @@ public class StateMachineImpl extends StateMachine {
 	/**************************************************************************************************
 	 * OpenWait
 	 */
-	private void startOpenWaitTimer() {
+	protected void startOpenWaitTimer() {
 		localDebugger("Entering: startOpenWaitTimer()");
 
 		localLogger("Starting OpenWait Timer");
@@ -900,7 +811,7 @@ public class StateMachineImpl extends StateMachine {
 
 	}
 
-	private void restartOpenWaitTimer() {
+	protected void restartOpenWaitTimer() {
 		localDebugger("Entering: restartOpenWaitTimer()");
 
 		localLogger("Restarting OpenWait Timer");
@@ -917,7 +828,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(openWaitTimerTask, openWait * 1000);
 	}
 
-	private void cancelOpenWaitTimer() {
+	protected void cancelOpenWaitTimer() {
 		localDebugger("Entering: cancelOpenWaitTimer()");
 
 		localLogger("Cancelling OpenWait Timer");
@@ -928,7 +839,7 @@ public class StateMachineImpl extends StateMachine {
 	/**************************************************************************************************
 	 * KeepWait
 	 */
-	private void startKeepWaitTimer() {
+	protected void startKeepWaitTimer() {
 		localDebugger("Entering: startKeepWaitTimer()");
 
 		localLogger("Starting KeepWait Timer");
@@ -944,7 +855,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(keepWaitTimerTask, keepWait * 1000);
 	}
 
-	private void restartKeepWaitTimer() {
+	protected void restartKeepWaitTimer() {
 		localDebugger("Entering: restartKeepWaitTimer()");
 
 		localLogger("Restarting KeepWait Timer");
@@ -961,7 +872,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(keepWaitTimerTask, keepWait * 1000);
 	}
 
-	private void cancelKeepWaitTimer() {
+	protected void cancelKeepWaitTimer() {
 		localDebugger("Entering: cancelKeepWaitTimer()");
 
 		localLogger("Cancelling KeepWait Timer");
@@ -972,7 +883,7 @@ public class StateMachineImpl extends StateMachine {
 	/**************************************************************************************************
 	 * KeepAlive
 	 */
-	private void startKeepAliveTimer() {
+	protected void startKeepAliveTimer() {
 		localDebugger("Entering: startKeepAliveTimer()");
 
 		localLogger("Starting KeepAlive Timer");
@@ -987,7 +898,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(keepAliveTimerTask, keepAlive * 1000);
 	}
 
-	public void restartKeepAliveTimer() {
+	protected void restartKeepAliveTimer() {
 		localDebugger("Entering: restartKeepAliveTimer()");
 
 		localLogger("Restarting KeepAlive Timer");
@@ -1001,7 +912,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(keepAliveTimerTask, keepAlive * 1000);
 	}
 
-	private void cancelKeepAliveTimer() {
+	protected void cancelKeepAliveTimer() {
 		localDebugger("Entering: cancelKeepAliveTimer()");
 
 		localLogger("Cancelling KeepAlive Timer");
@@ -1012,7 +923,7 @@ public class StateMachineImpl extends StateMachine {
 	/**************************************************************************************************
 	 * DeadTimer
 	 */
-	private void startDeadTimer() {
+	protected void startDeadTimer() {
 		localDebugger("Entering: startDeadTimer()");
 
 		localLogger("Starting Dead Timer");
@@ -1033,7 +944,7 @@ public class StateMachineImpl extends StateMachine {
 
 	}
 
-	private void restartDeadTimer() {
+	protected void restartDeadTimer() {
 		localDebugger("Entering: restartDeadTimer()");
 
 		localLogger("Restarting Dead Timer");
@@ -1055,7 +966,7 @@ public class StateMachineImpl extends StateMachine {
 		stateTimer.schedule(deadTimerTask, deadTimer * 1000);
 	}
 
-	private void cancelDeadTimer() {
+	protected void cancelDeadTimer() {
 		localDebugger("Entering: cancelDeadTimer()");
 
 		localLogger("Cancelling Dead Timer");
@@ -1075,24 +986,24 @@ public class StateMachineImpl extends StateMachine {
 				+ connectionInitialized;
 	}
 
-	private static void guiLogger(String event) {
+	protected static void guiLogger(String event) {
 		// Logger.logGUINotifications(event);
 	}
 
-	private void localLogger(String event) {
+	protected void localLogger(String event) {
 
-		 String prefix = prefixGenerator();
-		 Logger.logSystemEvents("[StateMachine: " + address.getIPv4Address() +
-		 "]" + prefix + " " + event);
+		String prefix = prefixGenerator();
+		Logger.logSystemEvents("[StateMachine: " + address.getIPv4Address() +
+				"]" + prefix + " " + event);
 	}
 
-	private void localDebugger(String event) {
+	protected void localDebugger(String event) {
 		// String prefix = prefixGenerator();
 		// Logger.debugger("[StateMachine: " + address.getIPv4Address() + "]" +
 		// prefix + " " + event);
 	}
 
-	private String prefixGenerator() {
+	protected String prefixGenerator() {
 		String prefix;
 
 		switch (state) {

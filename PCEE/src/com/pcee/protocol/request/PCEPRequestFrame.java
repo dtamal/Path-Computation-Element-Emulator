@@ -26,6 +26,7 @@ import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLoadBalancingObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPObjectiveFunctionObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPReportedRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPSynchronizationVectorObject;
@@ -67,6 +68,7 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 	PCEPReportedRouteObject RRO;
 	PCEPIncludeRouteObject IRO;
 	PCEPLoadBalancingObject loadBalancing;
+	PCEPObjectiveFunctionObject of;
 
 	public PCEPRequestFrame(PCEPRequestParametersObject RP,
 			PCEPEndPointsObject endPoints) {
@@ -137,6 +139,10 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		this.bandwidth = bandwidth;
 	}
 
+	public void insertObjectiveFunctionObject(PCEPObjectiveFunctionObject of){
+		this.of = of;
+	}
+	
 	public void insertMetricObject(PCEPMetricObject metricObject) {
 		if (containsMetricObjectList()) {
 			extractMetricObjectList().add(metricObject);
@@ -171,6 +177,13 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return null;
 	}
 
+	public PCEPObjectiveFunctionObject extractObjectiveFunctionObject() {
+		if (containsObjectiveFunctionObject())
+			return of;
+		return null;
+	}
+
+	
 	public PCEPEndPointsObject extractEndPointsObject() {
 		if (containsEndPointsObject())
 			return endPoints;
@@ -222,7 +235,13 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 
 	// CONTAINS METHODS
 
+	public boolean containsObjectiveFunctionObject() {
+		if (of == null)
+			return false;
+		return true;
+	}
 
+	
 	public boolean containsEndPointsObject() {
 		if (endPoints == null)
 			return false;
@@ -314,7 +333,11 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		if (containsLoadBalancingObject()) {
 			length += loadBalancing.getObjectFrameByteLength();
 		}
-
+		
+		if (containsObjectiveFunctionObject()){
+			length += of.getObjectFrameByteLength();
+		}
+		
 		return length;
 	}
 
@@ -354,6 +377,10 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 			objectsString.append(loadBalancing.getObjectFrameBinaryString());
 		}
 
+		if (containsObjectiveFunctionObject()){
+			objectsString.append(of.getObjectFrameBinaryString());
+		}
+		
 		return objectsString.toString();
 	}
 
@@ -393,6 +420,10 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 			requestObjects.add(loadBalancing);
 		}
 
+		if (containsObjectiveFunctionObject()) {
+			requestObjects.add(of);
+		}
+		
 		return requestObjects;
 	}
 
