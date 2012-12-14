@@ -147,7 +147,7 @@ public class WorkerTask implements Runnable {
 
 
 	/**Function to return the no Path message to the Client*/
-	private void returnNoPathMessage(int requestID) {
+	protected void returnNoPathMessage(int requestID) {
 		//Generate a No path object
 		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "0", "0", "0", "1", Integer.toString(requestID));
 		PCEPNoPathObject noPath = PCEPObjectFrameFactory.generatePCEPNoPathObject("1", "0", 1, "0");
@@ -164,7 +164,7 @@ public class WorkerTask implements Runnable {
 	 * @param resp
 	 * @return
 	 */
-	private ArrayList<EROSubobjects> getTraversedVertexes(ArrayList<VertexElement> vertexArrayList) {
+	protected ArrayList<EROSubobjects> getTraversedVertexes(ArrayList<VertexElement> vertexArrayList) {
 
 		ArrayList<EROSubobjects> traversedVertexesList = new ArrayList<EROSubobjects>();
 

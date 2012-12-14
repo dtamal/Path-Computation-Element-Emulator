@@ -17,6 +17,7 @@
 
 package com.pcee.architecture.computationmodule.ted;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -190,8 +192,8 @@ public class TopologyInformation {
 		topologyUpdateThread = new Thread() {
 
 			//Function to parse and implement incoming topology Updates
-			@SuppressWarnings("rawtypes")
-			public void parseInput(String text) {
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			public String parseInput(String text) {
 				try {
 					Map input = json.fromJson(text, Map.class);
 					if (input.containsKey("operation")) {
@@ -202,18 +204,24 @@ public class TopologyInformation {
 							synchronized(graph) {
 								int i=0;
 								for (i=0;i<vertexSequence.size()-1;i++){
+									
+									
 									String sourceID = (String)vertexSequence.get(i);
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
 										if (!graph.getConnectingEdge(sourceID, destID).getEdgeParams().reserveCapacity(capacity)) {
+											localLogger("Cannot reserve capacity between " + sourceID +" and " + destID);
 											for (int j=0;j<i;j++) {
 												//Releasing capacity that was reserved till before i
 												String srcID = (String)vertexSequence.get(j);
 												String dstID = (String)vertexSequence.get(j+1);
 												graph.getConnectingEdge(srcID, dstID).getEdgeParams().releaseCapacity(capacity);
 											}
-											break;
-
+											//break;
+											Map map = new HashMap();
+											map.put("response", new Boolean(false));
+											map.put("reason", "could not reserve capacity on edge from " + sourceID + " to " + destID);
+											return json.toJson(map);
 										}
 									} else {
 										localLogger("Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
@@ -223,11 +231,17 @@ public class TopologyInformation {
 											String dstID = (String)vertexSequence.get(j+1);
 											graph.getConnectingEdge(srcID, dstID).getEdgeParams().releaseCapacity(capacity);
 										}
-										break;
+										Map map = new HashMap();
+										map.put("response", new Boolean(false));
+										map.put("reason", "Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
+										return json.toJson(map);
 									}
 								}
 								if (i==vertexSequence.size()-1) {
 									localLogger("Successfully reserved capacity on provided sequence");
+									Map map = new HashMap();
+									map.put("response", new Boolean(true));
+									return json.toJson(map);
 								}
 
 							}
@@ -250,7 +264,10 @@ public class TopologyInformation {
 												String dstID = (String)vertexSequence.get(j+1);
 												graph.getConnectingEdge(srcID, dstID).getEdgeParams().reserveCapacity(capacity);
 											}
-											break;
+											Map map = new HashMap();
+											map.put("response", new Boolean(false));
+											map.put("reason", "could not release capacity on edge from " + sourceID + " to " + destID);
+											return json.toJson(map);
 
 										}
 									} else {
@@ -261,11 +278,17 @@ public class TopologyInformation {
 											String dstID = (String)vertexSequence.get(j+1);
 											graph.getConnectingEdge(srcID, dstID).getEdgeParams().reserveCapacity(capacity);
 										}
-										break;
+										Map map = new HashMap();
+										map.put("response", new Boolean(false));
+										map.put("reason", "Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
+										return json.toJson(map);
 									}
 								}
 								if (i==vertexSequence.size()-1) {
 									localLogger("Successfully released capacity on provided sequence");
+									Map map = new HashMap();
+									map.put("response", new Boolean(true));
+									return json.toJson(map);
 								}
 							}
 
@@ -289,8 +312,15 @@ public class TopologyInformation {
 									params.setAvailableCapacity(avcapacity);
 									edge.setEdgeParams(params);
 									localLogger("Updated Edge definition from " + sourceID + " to " + destID);
+									Map map = new HashMap();
+									map.put("response", new Boolean(true));
+									return json.toJson(map);
 								} else {
 									localLogger("No existing edge from " + sourceID + " to " + destID + " foud in topology");
+									Map map = new HashMap();
+									map.put("response", new Boolean(false));
+									map.put("reason", "No existing edge from " + sourceID + " to " + destID + " foud in topology");
+									return json.toJson(map);
 								}
 							}
 
@@ -298,10 +328,20 @@ public class TopologyInformation {
 					}
 				} catch (JsonSyntaxException e) {
 					localLogger("Malformed Json sent from Client" + e.getMessage());
+					Map map = new HashMap();
+					map.put("response", new Boolean(false));
+					map.put("reason", "Malformed Json sent from Client" + e.getMessage());
+					return json.toJson(map);
 				} catch (Exception e) {
-					localLogger("Invalid parameters sent in the JSON from Client : " + e.getMessage());
-
+					Map map = new HashMap();
+					map.put("response", new Boolean(false));
+					map.put("reason", "Exception " + e.getMessage());
+					return json.toJson(map);
 				}
+				Map map = new HashMap();
+				map.put("response", new Boolean(false));
+				map.put("reason", "Invalid or unknown operaiton");
+				return json.toJson(map);
 
 			}
 
@@ -315,17 +355,23 @@ public class TopologyInformation {
 					while (true) {
 						try {
 							Socket clientSocket = serverSocket.accept();
-							// Remote connection sends topology in the form of a string with a delimiter "@" used for each line
 							BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 							String text = "";
 							String line = "";
 							while ((line = bufferedReader.readLine()) != null) {
+								if (line.trim().compareTo("@") ==0)
+									break;
 								text = text + line;
 							}
-							parseInput(text);
-							// Close the socket
+							String outText = parseInput(text);
+							BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream());
+							out.write(outText.getBytes());
+							out.flush();
+							//Close Input and output streams
+							out.close();
 							bufferedReader.close();
-							clientSocket.close();
+							// Ignore close of the socket // should be closed by client
+							//clientSocket.close();
 						} catch (IOException e) {
 							localDebugger("IOException during read for new connections. Discarding update");
 							continue;

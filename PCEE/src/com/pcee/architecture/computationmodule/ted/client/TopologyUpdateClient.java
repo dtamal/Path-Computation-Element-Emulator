@@ -1,7 +1,9 @@
 package com.pcee.architecture.computationmodule.ted.client;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -25,9 +27,10 @@ public class TopologyUpdateClient {
 	private static Gson gson = new Gson();
 
 
-	public static void sendMessage(String ip, int port, String text){
+	public static String sendMessage(String ip, int port, String text){
 		System.out.println("Attempting a connection to " + ip + ":" + port + " String = " + text);
 
+		String inText = "";
 		Socket socket = null;
 		BufferedOutputStream out = null;
 		try{
@@ -38,6 +41,15 @@ public class TopologyUpdateClient {
 			System.out.println(new String(text.getBytes()));
 			out.write(text.getBytes());
 			out.flush();
+			out.write(new String("\n@\n").getBytes());
+			out.flush();
+		//	out.close();
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String line = "";
+			while ((line = bufferedReader.readLine()) != null) {
+				inText = inText + line;
+			}
+			System.out.println(inText);
 		}
 		catch(UnknownHostException e){
 			System.err.println("You are trying to connect to an unknown host!");
@@ -57,6 +69,7 @@ public class TopologyUpdateClient {
 				e.printStackTrace();
 			}
 		}
+		return inText;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -99,24 +112,7 @@ public class TopologyUpdateClient {
 	}
 
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void updateVirtualTopologyWithParent(String ip, int port) {
-		Map map = new HashMap();
-		map.put("operation", "updateVirtualTopologyBandwidth");
-		String json = gson.toJson(map);
-		//Send message to the server
-		sendMessage(ip, port, json);
-	}
 
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void reomputeVirtuaTopology(String ip, int port) {
-		Map map = new HashMap();
-		map.put("operation", "recomputeVirtualTopology");
-		String json = gson.toJson(map);
-		//Send message to the server
-		sendMessage(ip, port, json);
-	}
 
 	public static void main (String[] args) {
 		String sourceID = "192.169.2.1";
@@ -124,13 +120,10 @@ public class TopologyUpdateClient {
 
 		String ip = "127.0.0.1";
 		int port = 5189;
-		reomputeVirtuaTopology(ip, port);
 
 		ImportTopology importer = new SNDLibImportTopology();
 		Gcontroller graph = new GcontrollerImpl();
 		importer.importTopology(graph, "atlanta.txt");
-
-
 
 		PathComputationAlgorithm algo = new MaxBandwidthShortestPathComputationAlgorithm();
 		Constraint constr = new SimplePathComputationConstraint(graph.getVertex(sourceID), graph.getVertex(destID), 10);
@@ -144,11 +137,10 @@ public class TopologyUpdateClient {
 			for (int i=0;i<vertices.size();i++)
 				vertexSequence.add(vertices.get(i).getVertexID());
 			
+	//		vertexSequence.add("192.169.2.13");
 			reserveCapacity(ip, port, 10, vertexSequence);
-			releaseCapacity(ip, port, 10, vertexSequence);
+		//	releaseCapacity(ip, port, 10, vertexSequence);
 		}
-
-		updateVirtualTopologyWithParent(ip, port);
 
 
 	}
