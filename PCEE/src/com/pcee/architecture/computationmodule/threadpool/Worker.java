@@ -23,12 +23,12 @@ import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.logger.Logger;
+import com.pcee.protocol.message.PCEPMessage;
 
 public class Worker extends Thread {
 
 	private String ID;
-	private LinkedBlockingQueue<Request> requestQueue;
-	private Gcontroller graph;
+	private LinkedBlockingQueue<PCEPMessage> requestQueue;
 	private ThreadPool pool;
 	private ModuleManagement lm;
 	private boolean terminateWorker = false;
@@ -49,12 +49,11 @@ public class Worker extends Thread {
 	 * @param requestQueue
 	 * @param graph
 	 */
-	public Worker(ModuleManagement layerManagement, ThreadPool pool, String ID, LinkedBlockingQueue<Request> requestQueue, Gcontroller graph){
+	public Worker(ModuleManagement layerManagement, ThreadPool pool, String ID, LinkedBlockingQueue<PCEPMessage> requestQueue, Gcontroller graph){
 		lm = layerManagement;
 		this.pool = pool;
 		this.ID = ID;
 		this.requestQueue = requestQueue;
-		this.graph = graph;
 	}
 
 
@@ -62,7 +61,7 @@ public class Worker extends Thread {
 	public void run(){
 
 		localLogger("Initializing Worker Thread ID = " + ID);
-		Request request = null;
+		PCEPMessage request = null;
 		int flag=0;
 		while(!terminateWorker){
 			WorkerTask task = null;
@@ -70,7 +69,7 @@ public class Worker extends Thread {
 				if (flag==0){
 					request = requestQueue.take();
 					//Record the leaving Queue Time for each request
-					localLogger("Starting request ID " + request.getRequestID());
+//					localLogger("Starting request ID " + request.getRequestID());
 					localLogger("Current Length of Request Queue = " + requestQueue.size());
 				
 				}
@@ -79,9 +78,6 @@ public class Worker extends Thread {
 					localDebugger("Stopping Worker Thread : " + ID);
 					break;
 				}
-				//Thread Interupted to update the topology, get updated topology from ThreadPool 
-				localDebugger("Updating topology for Thread ID = " + ID);
-				this.graph = pool.getUpdatedGraph();
 				continue;
 			}
 			//Flag to check if thread was interrupted during a wait operation or during a computation 
@@ -89,17 +85,13 @@ public class Worker extends Thread {
 			if (request!=null){
 				task = new WorkerTask(lm, request, TopologyInformation.getInstance().getGraph().createCopy());
 				task.run();
-				localLogger("Completed processing of request ID " + request.getRequestID());
+//				localLogger("Completed processing of request ID " + request.getRequestID());
 			}
 			if (Thread.currentThread().isInterrupted()) {
 				if (terminateWorker){
 					localDebugger("Stopping Worker Thread : " + ID);
 					break;
 				}
-				//Thread Interupted to update the topology, get updated topology from ThreadPool 
-				localDebugger("Updating topology for Thread ID = " + ID);
-				this.graph = pool.getUpdatedGraph();
-				//at this point flag=1 so the request will be computed again 
 				continue;
 			}
 			//The request was computed successfully, and the flag variable is set to indicate 

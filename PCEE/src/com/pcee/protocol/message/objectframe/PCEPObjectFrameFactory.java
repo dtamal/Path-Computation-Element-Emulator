@@ -194,6 +194,13 @@ public class PCEPObjectFrameFactory {
 
 		return object;
 	}
+	
+	public static PCEPObjectiveFunctionObject generatePCEPObjectiveFunctionObject(String pFlag, String iFlag, int ofCode) {
+		PCEPCommonObjectHeader objectHeader = new PCEPCommonObjectHeader(21, 1,
+				pFlag, iFlag);
+		PCEPObjectiveFunctionObject object = new PCEPObjectiveFunctionObject(objectHeader, ofCode);
+		return object;
+	}
 
 
 	public static LinkedList<PCEPObjectFrame> PCEPObjectFabrication(
@@ -260,6 +267,8 @@ public class PCEPObjectFrameFactory {
 			return new PCEPLoadBalancingObject(objectHeader, objectString);
 		case 15:
 			return new PCEPCloseObject(objectHeader, objectString);
+		case 21:
+			return new PCEPObjectiveFunctionObject(objectHeader, objectString);
 		default:
 			Logger.logWarning("Error at switch(objectHeader.getClassDecimalValue()). Value = "
 					+ objectHeader.getClassDecimalValue());

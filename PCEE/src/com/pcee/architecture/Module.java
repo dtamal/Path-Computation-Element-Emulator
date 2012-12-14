@@ -30,6 +30,6 @@ public interface Module {
 
 	
 	public abstract void closeConnection(PCEPAddress address);
-	public abstract void registerConnection(PCEPAddress address, boolean connected, boolean connectionInitialized);
+	public abstract void registerConnection(PCEPAddress address, boolean connected, boolean connectionInitialized, boolean forceClient);
 
 }
