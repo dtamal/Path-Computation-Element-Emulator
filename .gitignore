@@ -1,0 +1,4 @@
+*.class
+PCEE/bin/
+JavaGraphLib/bin/
+.DS_Store
