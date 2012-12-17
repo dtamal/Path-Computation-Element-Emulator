@@ -465,7 +465,7 @@ public class TopologyInformationParent {
 									String sourceID = (String)vertexSequence.get(i);
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
-										if (graph.getConnectingEdge(sourceID, destID).getEdgeParams().reserveCapacity(capacity)) {
+										if (!graph.getConnectingEdge(sourceID, destID).getEdgeParams().reserveCapacity(capacity)) {
 											localLogger("Cannot reserve requested capacity between " + sourceID +" and " + destID);
 											for (int j=0;j<i;j++) {
 												//Releasing capacity that was reserved till before i
