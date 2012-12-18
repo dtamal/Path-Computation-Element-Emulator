@@ -1,0 +1,1831 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<network>
+	<domain>
+  		<layer type="mpls"></layer>
+    		<domain_id>0.0.0.101</domain_id>
+		
+		<reachability_entry>
+			<ipv4_address>192.168.101.0</ipv4_address>
+			<prefix>24</prefix>
+		</reachability_entry>
+   		<node>
+   			<router_id>192.168.101.1</router_id>
+   		</node>
+    		<node>
+      			<router_id>192.168.101.2</router_id>
+   		</node>
+		<node>
+		 	<router_id>192.168.101.3</router_id>
+		</node>
+		<node>
+		 	<router_id>192.168.101.4</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.5</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.6</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.7</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.8</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.9</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.10</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.11</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.12</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.13</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.14</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.15</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.16</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.17</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.18</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.19</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.20</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.21</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.22</router_id>
+		</node>
+		<node>
+		        <router_id>192.168.101.23</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.24</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.25</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.26</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.27</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.28</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.29</router_id>
+		</node>
+		<node>
+			<router_id>192.168.101.30</router_id>
+		</node>
+	</domain>
+	<domain>
+		<layer type="interlayer"></layer>
+		<domain_id>0.0.0.0</domain_id>
+		
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.1</router_id>  
+			</source>			
+			<destination>
+				<router_id>192.168.201.1</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.1</router_id>  
+			</source>			
+			<destination>
+				<router_id>192.168.101.1</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.2</router_id>  
+			</source>			
+			<destination>
+				<router_id>192.168.201.2</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.2</router_id>
+			</source>	
+					
+			<destination>
+				<router_id>192.168.101.2</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.3</router_id>  <!--Amsterdam - Amsterdam-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.3</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.3</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.3</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.4</router_id>  <!--Copenhagen - Copenhagen-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.4</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.4</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.4</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.5</router_id>  <!--Warsaw - Warsaw-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.5</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.5</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.5</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.6</router_id>  <!--Budapest - Budapest-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.6</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.6</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.6</router_id>
+			</destination>					
+		</edge>
+				
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.7</router_id>  <!--Athens - Athens-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.7</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.7</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.7</router_id>
+			</destination>					
+		</edge>
+			
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.8</router_id>  <!--Rome - Rome-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.8</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.8</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.8</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.9</router_id>  <!--Zurich - Zurich-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.9</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.9</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.9</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.10</router_id>  <!--Barcelona - Barcelona-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.10</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.10</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.10</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.11</router_id>  <!--Barcelona - Barcelona-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.11</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.11</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.11</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.12</router_id>  <!--Barcelona - Barcelona-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.12</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.12</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.12</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.13</router_id>  <!--Barcelona - Barcelona-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.13</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.13</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.13</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.14</router_id>  <!--Barcelona - Barcelona-->
+			</source>			
+			<destination>
+				<router_id>192.168.201.14</router_id>
+			</destination>					
+		</edge>
+		
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.14</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.14</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.15</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.15</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.15</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.15</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.16</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.16</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.16</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.16</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.17</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.17</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.17</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.17</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.18</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.18</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.18</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.18</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.19</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.19</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.19</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.19</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.20</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.20</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.20</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.20</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.21</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.21</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.21</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.21</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.22</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.22</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.22</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.22</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.23</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.23</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.23</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.23</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.24</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.24</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.24</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.24</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.25</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.25</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.25</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.25</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.26</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.26</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.26</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.26</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.27</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.27</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.27</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.27</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.28</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.28</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.28</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.28</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.29</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.29</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.29</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.29</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.101.30</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.201.30</router_id>
+			</destination>					
+		</edge>
+		<edge type="interlayer">
+			<source>
+				<router_id>192.168.201.30</router_id>
+			</source>			
+			<destination>
+				<router_id>192.168.101.30</router_id>
+			</destination>					
+		</edge>
+		
+	</domain>
+		    
+	<domain>
+		<layer type="wson"></layer>
+		<domain_id>0.0.0.201</domain_id>
+		<num_wavelengths>80</num_wavelengths>
+		
+		<reachability_entry>
+			<ipv4_address>192.168.201.0</ipv4_address>
+			<prefix>24</prefix>
+		</reachability_entry>
+		<edgeCommon>
+			<AvailableLabels>
+				<LabelSetField type="4">
+				<numLabels>80</numLabels>
+				<!--<baseLabel grid="1" cs="2" min_frequency="1561.4" ></baseLabel>-->
+				<baseLabel grid="1" cs="2" n="0"></baseLabel>
+				</LabelSetField>
+			</AvailableLabels>
+		</edgeCommon>
+		<node>
+			<router_id>192.168.201.1</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.2</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.3</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.4</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.5</router_id>
+		</node>
+		<node>
+		     	<router_id>192.168.201.6</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.7</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.8</router_id>
+		</node>
+		<node>
+		     	<router_id>192.168.201.9</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.10</router_id>
+		</node>    
+		<node>
+		      	<router_id>192.168.201.11</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.12</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.13</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.14</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.15</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.16</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.17</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.18</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.19</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.20</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.21</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.22</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.23</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.24</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.25</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.26</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.27</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.28</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.29</router_id>
+		</node>
+		<node>
+		      	<router_id>192.168.201.30</router_id>
+		</node>
+
+
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.3</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.1</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.1</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.3</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.2</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.1</router_id>
+				<if_id>2</if_id>
+	     		 </destination>
+	   	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.1</router_id>
+				<if_id>2</if_id>
+	     		 </source>
+	      		<destination>
+				<router_id>192.168.201.2</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	     		 <source>
+				<router_id>192.168.201.4</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.3</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.3</router_id>
+				<if_id>2</if_id>
+	     		 </source>
+	      		<destination>
+				<router_id>192.168.201.4</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	   	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.6</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.4</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.4</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.6</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.1</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.4</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.4</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.1</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.5</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.2</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.2</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.5</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.6</router_id>
+				<if_id>2</if_id>
+	     		 </source>
+	      		<destination>
+				<router_id>192.168.201.2</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.2</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.6</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.5</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.26</router_id>
+		<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.26</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.5</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.26</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.29</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.29</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.26</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	   	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.29</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.30</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.30</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.29</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.30</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.24</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.24</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.30</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.24</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.22</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.22</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.24</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.22</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.21</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.21</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.22</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	     		<source>
+				<router_id>192.168.201.21</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.20</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.20</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.21</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.20</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.18</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.18</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.20</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.18</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.13</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.13</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.18</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.13</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.15</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.15</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.13</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	   	<edge type="intradomain">
+	     		<source>
+				<router_id>192.168.201.15</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.11</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.11</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.15</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.11</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.12</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.12</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.11</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.12</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.3</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.3</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.12</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.15</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.14</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.14</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.15</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	   	 <edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.14</router_id>
+				<if_id>2</if_id>
+	     		</source>
+	      		<destination>
+				<router_id>192.168.201.13</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.13</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.14</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.14</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.18</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.18</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.14</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.15</router_id>
+				<if_id>4</if_id>
+	     		</source>
+	      		<destination>
+				<router_id>192.168.201.16</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.16</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.15</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.16</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.18</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.18</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.16</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.16</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.11</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.11</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.16</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.11</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.10</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.10</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.11</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.16</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.10</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.10</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.16</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.18</router_id>
+				<if_id>5</if_id>
+	     		</source>
+	      		<destination>
+				<router_id>192.168.201.17</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.17</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.18</router_id>
+				<if_id>5</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.17</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.9</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.9</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.17</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.9</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.10</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.10</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.9</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	     		<source>
+				<router_id>192.168.201.10</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.6</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.6</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.10</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.6</router_id>
+				<if_id>5</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.9</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.9</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.6</router_id>
+				<if_id>5</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.6</router_id>
+				<if_id>6</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.12</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.12</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.6</router_id>
+				<if_id>6</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.19</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.21</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	   	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.21</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.19</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.19</router_id>
+				<if_id>2</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.20</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.20</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.19</router_id>
+				<if_id>2</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.19</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.17</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.17</router_id>
+				<if_id>3</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.19</router_id>
+				<if_id>3</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.7</router_id>
+				<if_id>1</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.19</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.19</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.7</router_id>
+				<if_id>1</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.7</router_id>
+		<if_id>2</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.8</router_id>
+		<if_id>1</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.8</router_id>
+		<if_id>1</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.7</router_id>
+		<if_id>2</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.8</router_id>
+		<if_id>2</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.9</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.9</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.8</router_id>
+		<if_id>2</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.8</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.5</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.5</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.8</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.5</router_id>
+		<if_id>5</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.25</router_id>
+		<if_id>1</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.25</router_id>
+		<if_id>1</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.5</router_id>
+		<if_id>5</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.25</router_id>
+		<if_id>2</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.7</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.7</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.25</router_id>
+		<if_id>2</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.25</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.27</router_id>
+		<if_id>1</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.27</router_id>
+		<if_id>1</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.25</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.25</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.26</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.26</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.25</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.25</router_id>
+		<if_id>5</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.28</router_id>
+		<if_id>1</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.28</router_id>
+		<if_id>1</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.25</router_id>
+		<if_id>5</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.28</router_id>
+		<if_id>2</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.29</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.29</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.28</router_id>
+		<if_id>2</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.28</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.30</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.30</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.28</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.28</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.23</router_id>
+		<if_id>1</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.23</router_id>
+		<if_id>1</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.28</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.27</router_id>
+		<if_id>2</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.23</router_id>
+		<if_id>2</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.23</router_id>
+		<if_id>2</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.27</router_id>
+		<if_id>2</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.23</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.24</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.24</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.23</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.23</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.22</router_id>
+		<if_id>3</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.22</router_id>
+		<if_id>3</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.23</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.17</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.20</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	    <edge type="intradomain">
+	      <source>
+		<router_id>192.168.201.20</router_id>
+		<if_id>4</if_id>
+	      </source>
+	      <destination>
+		<router_id>192.168.201.17</router_id>
+		<if_id>4</if_id>
+	      </destination>
+	    </edge>
+	  
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.27</router_id>
+				<if_id>4</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.19</router_id>
+				<if_id>6</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.19</router_id>
+				<if_id>6</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.27</router_id>
+				<if_id>4</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.26</router_id>
+				<if_id>5</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.28</router_id>
+				<if_id>6</if_id>
+	      		</destination>
+	    	</edge>
+	    	<edge type="intradomain">
+	      		<source>
+				<router_id>192.168.201.28</router_id>
+				<if_id>6</if_id>
+	      		</source>
+	      		<destination>
+				<router_id>192.168.201.26</router_id>
+				<if_id>5</if_id>
+	     		</destination>
+	    	</edge>
+	</domain>
+</network>

@@ -37,8 +37,8 @@ public class ClientLauncher {
 		String pceServerAddress = "127.0.0.1";
 		//Default source and destination values for path computation requests
 
-		String defaultSourceAddress = "192.169.2.1";
-		String defaultDestinationAddress = "192.169.2.14";
+		String defaultSourceAddress = "192.168.101.1";
+		String defaultDestinationAddress = "192.168.101.30";
 		
 		//Set Logger to log to the GUI
 		Logger.setLogObject(new GUILogObject());

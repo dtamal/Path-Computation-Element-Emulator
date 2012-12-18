@@ -35,121 +35,118 @@ import com.pcee.logger.Logger;
 
 public class ModuleManagement {
 
-	private NetworkModule networkModule;
-	private SessionModule sessionModule;
-	private ComputationModule computationModule;
-	private ClientModule clientModule;
+    private NetworkModule networkModule;
+    private SessionModule sessionModule;
+    private ComputationModule computationModule;
+    private ClientModule clientModule;
 
-	boolean running = false;
-	boolean isServer = false;
+    boolean running = false;
+    boolean isServer = false;
 
-	public ModuleManagement(boolean isServer) {
-		if (running == false) {
+    public ModuleManagement(boolean isServer) {
+	if (running == false) {
 
-			this.isServer = isServer;
-			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
-			sessionModule = new SessionModuleImpl(this);
-			if (isServer == true) {
-				computationModule = new ComputationModuleImpl(this);
-				clientModule = new ClientModuleImpl(this);
-			} else {
-				clientModule = new ClientModuleImpl(this);
-				Logger.logging = true;
-				Logger.debugging = true;
-			}
+	    this.isServer = isServer;
+	    networkModule = new NetworkModuleImpl(isServer, this); // FIXME
+	    sessionModule = new SessionModuleImpl(this);
+	    if (isServer == true) {
+		computationModule = new ComputationModuleImpl(this);
+		clientModule = new ClientModuleImpl(this);
+	    } else {
+		clientModule = new ClientModuleImpl(this);
+		Logger.logging = true;
+		Logger.debugging = true;
+	    }
 
-			running = true;
-		}
+	    running = true;
 	}
+    }
 
-	public ModuleManagement(boolean isServer, String configFile) {
+    public ModuleManagement(boolean isServer, String configFile) {
 
-		try {
-			Properties reader = new Properties();
-			reader.load(new FileInputStream(configFile));
+	try {
+	    Properties reader = new Properties();
+	    reader.load(new FileInputStream(configFile));
 
-			int port = 0, sessionThreads = 0, computationThreads = 0;
+	    int port = 0, sessionThreads = 0, computationThreads = 0;
 
-			try {
-				String logger = reader.getProperty("logging");
-				if (logger.equalsIgnoreCase("on")) {
-					Logger.logging = true;
-				} else {
-					Logger.logging = false;
-				}
-
-				String debug = reader.getProperty("debug");
-				if (debug.equalsIgnoreCase("on")) {
-					Logger.debugging = true;
-				} else {
-					Logger.debugging = false;
-				}
-
-				port = Integer.valueOf(reader.getProperty("port"));
-				sessionThreads = Integer.valueOf(reader
-						.getProperty("sessionThreads"));
-				computationThreads = Integer.valueOf(reader
-						.getProperty("computationThreads"));
-				TopologyInformation.setTopoPath(reader.getProperty("topology"));
-				TopologyInformation.setImporter(reader.getProperty("importer"));
-				TopologyInformation.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
-			} catch (Exception e) {
-				System.out.println("Wrong Configuration Inputs!");
-				System.exit(0);
-			}
-			if (running == false) {
-
-				this.isServer = isServer;
-				networkModule = new NetworkModuleImpl(isServer, this, port);
-				if (isServer == false)
-					sessionModule = new SessionModuleImpl(this, sessionThreads);
-				else
-					sessionModule = new SessionModuleImpl(this, sessionThreads);
-				if (isServer == true) {
-					computationModule = new ComputationModuleImpl(this,
-							computationThreads);
-					clientModule = new ClientModuleImpl(this);
-				} else {
-					clientModule = new ClientModuleImpl(this);
-				}
-				running = true;
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void stop() {
-		running = false;
-		sessionModule.stop();
-		networkModule.stop();
-		if (isServer == true) {
-			computationModule.stop();
+	    try {
+		String logger = reader.getProperty("logging");
+		if (logger.equalsIgnoreCase("on")) {
+		    Logger.logging = true;
 		} else {
-			clientModule.stop();
+		    Logger.logging = false;
 		}
-	}
 
-	public NetworkModule getNetworkModule() {
-		return networkModule;
-	}
+		String debug = reader.getProperty("debug");
+		if (debug.equalsIgnoreCase("on")) {
+		    Logger.debugging = true;
+		} else {
+		    Logger.debugging = false;
+		}
 
-	public SessionModule getSessionModule() {
-		return sessionModule;
-	}
+		port = Integer.valueOf(reader.getProperty("port"));
+		sessionThreads = Integer.valueOf(reader.getProperty("sessionThreads"));
+		computationThreads = Integer.valueOf(reader.getProperty("computationThreads"));
+		TopologyInformation.setTopoPath(reader.getProperty("topology"));
+		TopologyInformation.setImporter(reader.getProperty("importer"));
+		TopologyInformation.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
+	    } catch (Exception e) {
+		System.out.println("Wrong Configuration Inputs!");
+		System.exit(0);
+	    }
+	    if (running == false) {
 
-	public ComputationModule getComputationModule() {
-		return computationModule;
+		this.isServer = isServer;
+		networkModule = new NetworkModuleImpl(isServer, this, port);
+		if (isServer == false)
+		    sessionModule = new SessionModuleImpl(this, sessionThreads);
+		else
+		    sessionModule = new SessionModuleImpl(this, sessionThreads);
+		if (isServer == true) {
+		    computationModule = new ComputationModuleImpl(this, computationThreads);
+		    clientModule = new ClientModuleImpl(this);
+		} else {
+		    clientModule = new ClientModuleImpl(this);
+		}
+		running = true;
+	    }
+	} catch (FileNotFoundException e) {
+	    e.printStackTrace();
+	} catch (IOException e) {
+	    e.printStackTrace();
 	}
+    }
 
-	public ClientModule getClientModule() {
-		return clientModule;
+    public void stop() {
+	running = false;
+	sessionModule.stop();
+	networkModule.stop();
+	if (isServer == true) {
+	    computationModule.stop();
+	} else {
+	    clientModule.stop();
 	}
+    }
 
-	public boolean isServer() {
-		return isServer;
-	}
+    public NetworkModule getNetworkModule() {
+	return networkModule;
+    }
+
+    public SessionModule getSessionModule() {
+	return sessionModule;
+    }
+
+    public ComputationModule getComputationModule() {
+	return computationModule;
+    }
+
+    public ClientModule getClientModule() {
+	return clientModule;
+    }
+
+    public boolean isServer() {
+	return isServer;
+    }
 
 }
