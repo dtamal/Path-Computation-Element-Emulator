@@ -11,7 +11,6 @@ import com.graph.elements.edge.params.EdgeParams;
 import com.graph.elements.edge.params.impl.BasicEdgeParams;
 import com.graph.elements.vertex.params.ITResourceVertexParams;
 import com.graph.graphcontroller.Gcontroller;
-import com.pcee.client.TEDecommissionClientLauncher;
 import com.pcee.logger.Logger;
 
 /**
@@ -244,23 +243,7 @@ public class SocketProcessing extends Thread {
 		return arr;
 	}
 
-	/**
-	 * 
-	 */
-	public static void checkPolicy() {
-		Gcontroller graph = TopologyInformation.getInstance().getGraph();
-		Iterator<EdgeElement> iter = graph.getEdgeSet().iterator();
-		while (iter.hasNext()) {
-			EdgeElement temp = iter.next();
-			if (temp.getEdgeParams().getMaxCapacity() > 10) {
-				if (temp.getEdgeParams().getAvailableCapacity() >= 10) {
-					new TEDecommissionClientLauncher(temp.getSourceVertex().getVertexID(), temp.getDestinationVertex().getVertexID());
-
-				}
-			}
-		}
-	}
-
+	
 	/**
 	 * @param event
 	 */

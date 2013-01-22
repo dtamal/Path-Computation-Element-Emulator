@@ -238,7 +238,7 @@ public class ComputationModuleMLImpl extends ComputationModule {
 			req.setMContraints(new SimpleMultiPathComputationConstraint(graph.getVertex(source.trim()), graph.getVertex((destination==null)?source.trim():destination.trim()), path, requestFrame.extractBandwidthObject().getBandwidthFloatValue()));
 			req.setMAlgo(new SimpleMultiPathComputationAlgorithm());
 			cout("Source : " + req.getMConstraints().getSource().getVertexID());
-			cout("Destination : " + req.getConstrains().getDestination().getVertexID());
+			cout("Destination : " + req.getMConstraints().getDestination().getVertexID());
 		} else {
 			ClientTest.singlePath++;
 			req.setConstrains(new SimplePathComputationConstraint(graph.getVertex(source.trim()), graph.getVertex((destination==null)?source.trim():destination.trim()), requestFrame.extractBandwidthObject().getBandwidthFloatValue()));
