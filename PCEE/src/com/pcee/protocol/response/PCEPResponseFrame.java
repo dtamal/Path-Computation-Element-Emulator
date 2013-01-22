@@ -27,6 +27,7 @@ import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPNoPathObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPNoVertexObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 
 public class PCEPResponseFrame implements PCEPMessageFrame {
@@ -37,13 +38,12 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 
 	PCEPNoPathObject noPath;
 	PCEPLabelSwitchedPathAttributesObject LSPA;
+	// PCEPBandwidthObject bandwidth;
 	LinkedList<PCEPMetricObject> metricList;
 	PCEPIncludeRouteObject IRO;
-
-	// responseFrame.getattributelist().insertlasp();
-
 	LinkedList<PCEPBandwidthObject> bwList;
 	LinkedList<PCEPExplicitRouteObject> EROList;
+	PCEPNoVertexObject noVertex;
 
 	public PCEPResponseFrame(PCEPRequestParametersObject RP) {
 		this.RP = RP;
@@ -76,8 +76,11 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		this.noPath = noPath;
 	}
 
-	public void insertLabelSwitchedPathAttributesObject(
-			PCEPLabelSwitchedPathAttributesObject LSPA) {
+	public void insertNoVertexObject(PCEPNoVertexObject noVertex) {
+		this.noVertex = noVertex;
+	}
+
+	public void insertLabelSwitchedPathAttributesObject(PCEPLabelSwitchedPathAttributesObject LSPA) {
 		this.LSPA = LSPA;
 	}
 
@@ -90,8 +93,8 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		}
 
 	}
-	
-	public void insertBandwidthObjectList(LinkedList<PCEPBandwidthObject> bwList){
+
+	public void insertBandwidthObjectList(LinkedList<PCEPBandwidthObject> bwList) {
 		this.bwList = bwList;
 	}
 
@@ -122,8 +125,7 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 
 	}
 
-	public void insertExplicitRouteObjectList(
-			LinkedList<PCEPExplicitRouteObject> EROList) {
+	public void insertExplicitRouteObjectList(LinkedList<PCEPExplicitRouteObject> EROList) {
 		this.EROList = EROList;
 	}
 
@@ -133,6 +135,12 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		if (containsNoPathObject()) {
 			return noPath;
 		}
+		return null;
+	}
+
+	public PCEPNoVertexObject extractNoVertexObject() {
+		if (containsNoVertexObject())
+			return noVertex;
 		return null;
 	}
 
@@ -172,11 +180,17 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 	}
 
 	// CONTAINS METHODS
-	
+
 	public boolean containsNoPathObject() {
 		if (noPath == null) {
 			return false;
 		}
+		return true;
+	}
+
+	public boolean containsNoVertexObject() {
+		if (noVertex == null)
+			return false;
 		return true;
 	}
 
@@ -246,6 +260,9 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 				length += EROList.get(i).getObjectFrameByteLength();
 			}
 		}
+		if (containsNoVertexObject()){
+		    length += noVertex.getObjectFrameByteLength();
+		}
 		return length;
 	}
 
@@ -263,14 +280,12 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		}
 		if (containsBandwidthObjectList()) {
 			for (int i = 0; i < bwList.size(); i++) {
-				objectsString
-						.append(bwList.get(i).getObjectFrameBinaryString());
+				objectsString.append(bwList.get(i).getObjectFrameBinaryString());
 			}
 		}
 		if (containsMetricObjectList()) {
 			for (int i = 0; i < metricList.size(); i++) {
-				objectsString.append(metricList.get(i)
-						.getObjectFrameBinaryString());
+				objectsString.append(metricList.get(i).getObjectFrameBinaryString());
 			}
 		}
 		if (containsIncludeRouteObject()) {
@@ -278,8 +293,7 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 		}
 		if (containsExplicitRouteObjectList()) {
 			for (int i = 0; i < EROList.size(); i++) {
-				objectsString.append(EROList.get(i)
-						.getObjectFrameBinaryString());
+				objectsString.append(EROList.get(i).getObjectFrameBinaryString());
 			}
 		}
 
@@ -288,6 +302,7 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 
 	public LinkedList<PCEPObjectFrame> getObjectFrameLinkedList() {
 
+		log("entering getObjectFrameLinkedList()...");
 		LinkedList<PCEPObjectFrame> respondObjects = new LinkedList<PCEPObjectFrame>();
 
 		respondObjects.add(RP);
@@ -317,11 +332,19 @@ public class PCEPResponseFrame implements PCEPMessageFrame {
 				respondObjects.add(EROList.get(i));
 			}
 		}
+
+		if (containsNoVertexObject()) {
+			respondObjects.add(noVertex);
+		}
 		return respondObjects;
 	}
 
 	public int getMessageType() {
 		return MESSAGE_TYPE;
+	}
+
+	public void log(String logString) {
+		System.out.println("PCEPResponseFrame::: " + logString);
 	}
 
 }

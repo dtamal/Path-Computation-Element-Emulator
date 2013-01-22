@@ -35,6 +35,7 @@ import com.graph.path.algorithms.constraints.multipath.impl.SimpleMultiPathCompu
 import com.graph.path.algorithms.impl.SimplePathComputationAlgorithm;
 import com.graph.path.pathelementimpl.PathElementImpl;
 import com.graph.topology.importers.ImportTopology;
+import com.graph.topology.importers.impl.MLSNDLibImportTopology;
 import com.graph.topology.importers.impl.TxtImportTopology;
 
 public class ShortestKDisjointMultiPathComputationAlgorithm implements MultiPathComputationAlgorithm{
@@ -193,12 +194,12 @@ public class ShortestKDisjointMultiPathComputationAlgorithm implements MultiPath
 	}
 	
 	public static void main(String[] args){
-		ImportTopology importT = new TxtImportTopology();
+		MLSNDLibImportTopology importer = new MLSNDLibImportTopology();
 		Gcontroller graph = new GcontrollerImpl();
-		importT.importTopology(graph, "c:\\trap.txt");
+		importer.importTopology(graph, "germany50.txt");
 		
 		ShortestKDisjointMultiPathComputationAlgorithm algo = new ShortestKDisjointMultiPathComputationAlgorithm();
-		MultiPathConstraint constr = new SimpleMultiPathComputationConstraint(graph.getVertex("1"), graph.getVertex("8"), 2, 10);
+		MultiPathConstraint constr = new SimpleMultiPathComputationConstraint(graph.getVertex("192.169.2.3"), graph.getVertex("192.169.2.9"), 1, 10);
 		
 		ArrayList<PathElement> paths = algo.computePath(graph, constr);
 		for (int i=0;i<paths.size();i++){

@@ -72,4 +72,6 @@ public interface Gcontroller {
     /** Function to create a copy of the Graph Controller */
     public Gcontroller createCopy();
 
+    public ArrayList<VertexElement> getBorderNodeVertexElements();
+
 }

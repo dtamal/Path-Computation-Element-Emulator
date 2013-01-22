@@ -85,5 +85,15 @@ public class SimpleMultiPathComputationConstraint extends MultiPathConstraint{
 		this.bw = bw;
 	}
 
+	@Override
+	public void setSource(VertexElement source) {
+		this.source = source;
+	}
+
+	@Override
+	public void setDestination(VertexElement destination) {
+		this.destination = destination;
+	}
+
 	
 }

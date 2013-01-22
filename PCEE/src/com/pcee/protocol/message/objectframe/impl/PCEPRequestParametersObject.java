@@ -90,11 +90,11 @@ public class PCEPRequestParametersObject implements PCEPObjectFrame {
 		this.updateHeaderLength();
 	}
 
-	public static void main (String [] args){
-	    PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "1", "0", "0", "1", "32");
-	    System.out.println(RP.getRequestIDNumberDecimalValue());
+	public static void main(String[] args) {
+		PCEPRequestParametersObject RP = PCEPObjectFrameFactory.generatePCEPRequestParametersObject("1", "0", "1", "0", "0", "1", "32");
+		System.out.println(RP.getRequestIDNumberDecimalValue());
 	}
-	
+
 	private void updateHeaderLength() {
 		int objectFrameByteLength = this.getObjectFrameByteLength();
 		this.getObjectHeader().setLengthDecimalValue(objectFrameByteLength);
@@ -160,7 +160,7 @@ public class PCEPRequestParametersObject implements PCEPObjectFrame {
 
 	public void setRequestIDNumberDecimalValue(int decimalValue) {
 		int binaryLength = requestIDNumberLength;
-		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength-1);
+		int maxValue = (int) PCEPComputationFactory.MaxValueFabrication(binaryLength - 1);
 
 		this.requestIDNumber = PCEPComputationFactory.setDecimalValue(decimalValue, maxValue, binaryLength);
 	}

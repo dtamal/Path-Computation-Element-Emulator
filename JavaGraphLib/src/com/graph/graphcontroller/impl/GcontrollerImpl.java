@@ -33,9 +33,12 @@ public class GcontrollerImpl implements Gcontroller{
 
 	/**JDSL Graph Implementation*/
 	protected JDSLGraphImpl graph;
+	
+	private ArrayList<VertexElement> borderNodes;
 
 	public GcontrollerImpl(){
 		graph= new JDSLGraphImpl();
+		this.borderNodes = new ArrayList<VertexElement>();
 	}
 	
 	private static final String classIdentifier = "Gcontroller";
@@ -107,6 +110,8 @@ public class GcontrollerImpl implements Gcontroller{
 	public void addVertex(VertexElement vertex) {
 		if (this.vertexExists(vertex)==false){
 			this.graph.addVertex(vertex);
+			if(vertex.isBorderNode())
+			    this.borderNodes.add(vertex);
 		}
 		else
 			GraphLogger.logMsg("Vertex already exists", classIdentifier);
@@ -115,7 +120,6 @@ public class GcontrollerImpl implements Gcontroller{
 	
 	/**Function to add an edge in the graph. Also responsible for inserting the edges in the VertexElements*/
 	public void addEdge(EdgeElement edge) {
-//		if (this.aConnectingEdge(edge.getSourceVertex(), edge.getDestinationVertex())==false){
 			if (this.graph.addEdge(edge))
 			{
 				edge.getSourceVertex().insertConnectedEdge(edge);
@@ -123,9 +127,6 @@ public class GcontrollerImpl implements Gcontroller{
 			}
 			else
 				GraphLogger.logMsg("Error inserting edge in the graph", classIdentifier);			
-//		}
-//		else
-//			Logger.logMsg("Edge already exists", classIdentifier);
 	}
 
 	
@@ -167,4 +168,7 @@ public class GcontrollerImpl implements Gcontroller{
 		return graph.allConnectingEdges(vertexID1.getVertexID(), vertexID2.getVertexID());
 	}
 
+	public ArrayList<VertexElement> getBorderNodeVertexElements(){
+	    return this.borderNodes;
+	}
 }

@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.global.GlobalCfg;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.logger.Logger;
@@ -95,7 +96,7 @@ public class NetworkModuleImpl extends NetworkModule {
 		localDebugger("Entering: NetworkModuleImpl(boolean isServer, ModuleManagement layerManagement)");
 
 		lm = layerManagement;
-		port = 4189;
+		port = GlobalCfg.pcrPort;
 		this.isServer = isServer;
 		this.start();
 	}
@@ -574,11 +575,8 @@ public class NetworkModuleImpl extends NetworkModule {
 							outputSocketChannel.write(messageBuffer);
 						}
 					} catch (ClosedByInterruptException e) {
-						// System.out.println("Problem is synchronous operation");
 						break;
 					} catch (IOException e) {
-						// System.out.println("Connection Closed Illegally");
-						// lm.getSessionLayer().closeConnection(message.getAddress());
 						break;
 					}
 				}

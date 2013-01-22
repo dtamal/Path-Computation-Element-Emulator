@@ -111,6 +111,7 @@ public class EROUnnumberedInterface extends EROSubobjects {
 	public int getByteLength() {
 		int objectLength = lFlag.length() + type.length() + length.length() + reserved.length() + routerID.length() + interfaceID.length();
 		int objectFrameByteLength = objectLength / 8;
+
 		return objectFrameByteLength;
 	}
 

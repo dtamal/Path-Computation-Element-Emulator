@@ -22,13 +22,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.client.ClientTest;
+import com.pcee.client.GuiLauncher;
 import com.pcee.logger.Logger;
-import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.architecture.computationmodule.threadpool.WorkerTaskForMultipath;
 
 public class Worker extends Thread {
 
 	private String ID;
-	private LinkedBlockingQueue<PCEPMessage> requestQueue;
+	private LinkedBlockingQueue<Request> requestQueue;
+	private Gcontroller graph;
 	private ThreadPool pool;
 	private ModuleManagement lm;
 	private boolean terminateWorker = false;
@@ -49,11 +52,12 @@ public class Worker extends Thread {
 	 * @param requestQueue
 	 * @param graph
 	 */
-	public Worker(ModuleManagement layerManagement, ThreadPool pool, String ID, LinkedBlockingQueue<PCEPMessage> requestQueue, Gcontroller graph){
+	public Worker(ModuleManagement layerManagement, ThreadPool pool, String ID, LinkedBlockingQueue<Request> requestQueue, Gcontroller graph){
 		lm = layerManagement;
 		this.pool = pool;
 		this.ID = ID;
 		this.requestQueue = requestQueue;
+		this.graph = graph;
 	}
 
 
@@ -61,15 +65,16 @@ public class Worker extends Thread {
 	public void run(){
 
 		localLogger("Initializing Worker Thread ID = " + ID);
-		PCEPMessage request = null;
+		Request request = null;
 		int flag=0;
 		while(!terminateWorker){
-			WorkerTask task = null;
+			WorkerTaskForMultipath task = null;
 			try {
 				if (flag==0){
 					request = requestQueue.take();
 					//Record the leaving Queue Time for each request
-//					localLogger("Starting request ID " + request.getRequestID());
+					ClientTest.requestLeaveTheQueue.add(System.nanoTime());
+					localLogger("Starting request ID " + request.getRequestID());
 					localLogger("Current Length of Request Queue = " + requestQueue.size());
 				
 				}
@@ -78,20 +83,27 @@ public class Worker extends Thread {
 					localDebugger("Stopping Worker Thread : " + ID);
 					break;
 				}
+				//Thread Interupted to update the topology, get updated topology from ThreadPool 
+				localDebugger("Updating topology for Thread ID = " + ID);
+				this.graph = pool.getUpdatedGraph();
 				continue;
 			}
 			//Flag to check if thread was interrupted during a wait operation or during a computation 
 			flag=1;
 			if (request!=null){
-				task = new WorkerTask(lm, request, TopologyInformation.getInstance().getGraph().createCopy());
+				task = new WorkerTaskForMultipath(lm, request, TopologyInformation.getInstance().getGraph());
 				task.run();
-//				localLogger("Completed processing of request ID " + request.getRequestID());
+				localLogger("Completed processing of request ID " + request.getRequestID());
 			}
 			if (Thread.currentThread().isInterrupted()) {
 				if (terminateWorker){
 					localDebugger("Stopping Worker Thread : " + ID);
 					break;
 				}
+				//Thread Interupted to update the topology, get updated topology from ThreadPool 
+				localDebugger("Updating topology for Thread ID = " + ID);
+				this.graph = pool.getUpdatedGraph();
+				//at this point flag=1 so the request will be computed again 
 				continue;
 			}
 			//The request was computed successfully, and the flag variable is set to indicate 
@@ -114,5 +126,9 @@ public class Worker extends Thread {
 	 */
 	private void localDebugger(String event) {
 		Logger.debugger("[Worker "+ ID +"]     " + event);
+	}
+	
+	private void cout(String coutString){
+		GuiLauncher.debug("Worker.java : " + coutString);
 	}
 }

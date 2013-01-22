@@ -19,7 +19,6 @@ package com.pcee.protocol.request;
 
 import java.util.LinkedList;
 
-
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.PCEPCommonObjectHeader;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
@@ -32,11 +31,10 @@ import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPReportedRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPSynchronizationVectorObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPGeneralizedEndPointsTNAObject;
 
 public class PCEPRequestFrameFactory {
 
-	
-	
 	public static PCEPRequestFrame generatePathComputationRequestFrame(PCEPRequestParametersObject RP, PCEPEndPointsObject endPoints) {
 
 		PCEPRequestFrame requestFrame = new PCEPRequestFrame(RP, endPoints);
@@ -44,11 +42,17 @@ public class PCEPRequestFrameFactory {
 		return requestFrame;
 	}
 
-	public static PCEPRequestFrame generatePathComputationRequestFrame(PCEPRequestParametersObject RP, PCEPEndPointsObject endPoints, PCEPBandwidthObject bandwidth){
+	public static PCEPRequestFrame generatePathComputationRequestFrame(PCEPRequestParametersObject RP, PCEPEndPointsObject endPoints, PCEPBandwidthObject bandwidth) {
 		PCEPRequestFrame requestFrame = new PCEPRequestFrame(RP, endPoints, bandwidth);
 		return requestFrame;
 	}
-	
+
+	public static PCEPRequestFrame generateGeneralizedEndPointsTNARequestFrame(PCEPRequestParametersObject RP, PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNAObject) {
+		PCEPRequestFrame requestFrame = new PCEPRequestFrame(RP, generalizedEndPointsTNAObject);
+
+		return requestFrame;
+	}
+
 	public static PCEPRequestFrame getPathComputationRequestFrame(PCEPMessage message) {
 
 		LinkedList<PCEPSynchronizationVectorObject> SVECList = null;
@@ -60,7 +64,6 @@ public class PCEPRequestFrameFactory {
 		PCEPReportedRouteObject RRO = null;
 		PCEPIncludeRouteObject IRO = null;
 		PCEPLoadBalancingObject loadBalancing = null;
-//		PCEPGeneralizedEndPointsTNAObject generalizedEndPointTNA = null;
 		LinkedList<PCEPObjectFrame> objectList = message.getObjectsList();
 
 		for (int i = 0; i < objectList.size(); i++) {
@@ -88,7 +91,8 @@ public class PCEPRequestFrameFactory {
 				break;
 			}
 			case 4: {
-				//generalizedEndPointTNA = (PCEPGeneralizedEndPointsTNAObject) objectFrame;
+				// generalizedEndPointTNA = (PCEPGeneralizedEndPointsTNAObject)
+				// objectFrame;
 				endPoints = (PCEPEndPointsObject) objectFrame;
 				break;
 			}
@@ -130,7 +134,6 @@ public class PCEPRequestFrameFactory {
 				break;
 			}
 
-			
 			default: {
 				break;
 			}
@@ -141,11 +144,7 @@ public class PCEPRequestFrameFactory {
 
 		PCEPRequestFrame requestFrame = new PCEPRequestFrame(RP, endPoints);
 
-		if(endPoints !=null){
-			requestFrame = new PCEPRequestFrame(RP,endPoints);
-		}
-		
-		
+		/* added for PCEPITResourceObject */
 		if (SVECList != null) {
 			requestFrame.insertSynchronizationVectorObjectList(SVECList);
 		}
@@ -168,17 +167,11 @@ public class PCEPRequestFrameFactory {
 			requestFrame.insertLoadBalancingObject(loadBalancing);
 		}
 
-		//if(generalizedEndPointTNA!=null){
-			//requestFrame = new PCEPRequestFrame(RP,generalizedEndPointTNA);
-	//	}
-		
 		return requestFrame;
 	}
 
-	public static PCEPRequestFrame generatePathComputationRequestFrame(
-			PCEPRequestParametersObject RP, PCEPEndPointsObject endPoints,
-			PCEPBandwidthObject bandwidth, PCEPMetricObject metric) {
-		PCEPRequestFrame requestFrame = new PCEPRequestFrame(RP,endPoints,bandwidth,metric);
+	public static PCEPRequestFrame generatePathComputationRequestFrame(PCEPRequestParametersObject RP, PCEPEndPointsObject endPoints, PCEPBandwidthObject bandwidth, PCEPMetricObject metric) {
+		PCEPRequestFrame requestFrame = new PCEPRequestFrame(RP, endPoints, bandwidth, metric);
 		return requestFrame;
 	}
 

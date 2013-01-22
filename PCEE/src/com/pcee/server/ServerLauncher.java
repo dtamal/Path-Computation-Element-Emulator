@@ -17,20 +17,29 @@
 
 package com.pcee.server;
 
+import com.globalGraph.TopoGlobal;
+import com.graph.elements.vertex.VertexElement;
+import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
+import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.client.GuiLauncher;
+import com.pcee.client.launcher.Launcher;
 
-/**Example class to demonstrate the launch of the PCE Server
+/**
+ * Example class to demonstrate the launch of the PCE Server
  * 
  * @author Mohit Chamania
- *
+ * 
  */
 public class ServerLauncher {
 
-	/**Launch Point of the PCEE Server*/
+	/** Launch Point of the PCEE Server */
 	public static void main(String[] args) {
-		if(args.length == 0){
+//	    Launcher.init();
+//	    TopoGlobal.init();
+		if (args.length == 0) {
 			new ModuleManagement(true);
-		}else{
+		} else {
 			new ModuleManagement(true, args[0]);
 		}
 	}

@@ -25,4 +25,7 @@ public abstract class Constraint {
 	public abstract VertexElement getDestination();
 	
 	public abstract double getBw();
+	
+	public abstract void setSource(VertexElement source);
+	public abstract void setDestination(VertexElement destination);
 }

@@ -26,6 +26,7 @@ import com.pcee.architecture.clientmodule.ClientModule;
 import com.pcee.architecture.clientmodule.ClientModuleImpl;
 import com.pcee.architecture.computationmodule.ComputationModule;
 import com.pcee.architecture.computationmodule.ComputationModuleImpl;
+import com.pcee.architecture.computationmodule.ComputationModuleMLImpl;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.architecture.networkmodule.NetworkModule;
 import com.pcee.architecture.networkmodule.NetworkModuleImpl;
@@ -50,7 +51,7 @@ public class ModuleManagement {
 			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
 			sessionModule = new SessionModuleImpl(this);
 			if (isServer == true) {
-				computationModule = new ComputationModuleImpl(this);
+				computationModule = new ComputationModuleMLImpl(this);
 				clientModule = new ClientModuleImpl(this);
 			} else {
 				clientModule = new ClientModuleImpl(this);
@@ -92,7 +93,7 @@ public class ModuleManagement {
 						.getProperty("computationThreads"));
 				TopologyInformation.setTopoPath(reader.getProperty("topology"));
 				TopologyInformation.setImporter(reader.getProperty("importer"));
-				TopologyInformation.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
+
 			} catch (Exception e) {
 				System.out.println("Wrong Configuration Inputs!");
 				System.exit(0);

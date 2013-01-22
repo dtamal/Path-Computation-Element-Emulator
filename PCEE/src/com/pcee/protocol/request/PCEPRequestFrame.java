@@ -22,11 +22,11 @@ import com.pcee.protocol.message.PCEPMessageFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.impl.PCEPBandwidthObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPEndPointsObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPGeneralizedEndPointsTNAObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLoadBalancingObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPObjectiveFunctionObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPReportedRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPSynchronizationVectorObject;
@@ -36,23 +36,23 @@ import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
  * <pre>
  *   The format of a PCReq message is as follows:
  * 
- *   <PCReq Message>::= <Common Header>
- *                      [<svec-list>]
- *                      <request-list>
+ *   &lt;PCReq Message&gt;::= &lt;Common Header&gt;
+ *                      [&lt;svec-list&gt;]
+ *                      &lt;request-list&gt;
  * 
  *   where:
- *      <svec-list>::=<SVEC>[<svec-list>]
- *      <request-list>::=<request>[<request-list>]
- *      <request>::= <RP>
- *                   <END-POINTS>
- *                   [<LSPA>]
- *                   [<BANDWIDTH>]
- *                   [<metric-list>]
- *                   [<RRO>[<BANDWIDTH>]]
- *                   [<IRO>]
- *                   [<LOAD-BALANCING>]
+ *      &lt;svec-list&gt;::=&lt;SVEC&gt;[&lt;svec-list&gt;]
+ *      &lt;request-list&gt;::=&lt;request&gt;[&lt;request-list&gt;]
+ *      &lt;request&gt;::= &lt;RP&gt;
+ *                   &lt;END-POINTS&gt;
+ *                   [&lt;LSPA&gt;]
+ *                   [&lt;BANDWIDTH&gt;]
+ *                   [&lt;metric-list&gt;]
+ *                   [&lt;RRO&gt;[&lt;BANDWIDTH&gt;]]
+ *                   [&lt;IRO&gt;]
+ *                   [&lt;LOAD-BALANCING&gt;]
  * 
- *   <metric-list>::=<METRIC>[<metric-list>]
+ *   &lt;metric-list&gt;::=&lt;METRIC&gt;[&lt;metric-list&gt;]
  * </pre>
  */
 public class PCEPRequestFrame implements PCEPMessageFrame {
@@ -68,7 +68,7 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 	PCEPReportedRouteObject RRO;
 	PCEPIncludeRouteObject IRO;
 	PCEPLoadBalancingObject loadBalancing;
-	PCEPObjectiveFunctionObject of;
+	PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNA;
 
 	public PCEPRequestFrame(PCEPRequestParametersObject RP,
 			PCEPEndPointsObject endPoints) {
@@ -76,6 +76,11 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		this.endPoints = endPoints;
 	}
 
+	public PCEPRequestFrame(PCEPRequestParametersObject RP,
+			PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNA) {
+		this.RP = RP;
+		this.generalizedEndPointsTNA = generalizedEndPointsTNA;
+	}
 
 	public PCEPRequestFrame(PCEPRequestParametersObject RP,
 			PCEPEndPointsObject endPoints, PCEPBandwidthObject bandwidth) {
@@ -101,13 +106,26 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 	}
 
 	public PCEPAddress getSourceAddress() {
-		return new PCEPAddress(endPoints.getSourceAddressBinaryString());
+		// return new PCEPAddress(endPoints.getSourceAddressBinaryString());
+		if (endPoints != null)
+			return new PCEPAddress(endPoints.getSourceAddressBinaryString());
+		return new PCEPAddress(generalizedEndPointsTNA
+				.getSourcePointBinaryString());
 	}
 
 	public PCEPAddress getDestinationAddress() {
-		return new PCEPAddress(endPoints.getDestinationAddressBinaryString());
+		// return new
+		// PCEPAddress(endPoints.getDestinationAddressBinaryString());
+		if (endPoints != null)
+			return new PCEPAddress(endPoints
+					.getDestinationAddressBinaryString());
+		return new PCEPAddress(generalizedEndPointsTNA
+				.getDestinationPointBinaryString());
 	}
 
+	public PCEPGeneralizedEndPointsTNAObject getGeneralizedEndPointsTNAObject() {
+		return this.generalizedEndPointsTNA;
+	}
 
 	// INSERT METHODS
 
@@ -139,10 +157,6 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		this.bandwidth = bandwidth;
 	}
 
-	public void insertObjectiveFunctionObject(PCEPObjectiveFunctionObject of){
-		this.of = of;
-	}
-	
 	public void insertMetricObject(PCEPMetricObject metricObject) {
 		if (containsMetricObjectList()) {
 			extractMetricObjectList().add(metricObject);
@@ -168,6 +182,11 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		this.loadBalancing = loadBalancing;
 	}
 
+	public void insertGeneralizedEndPointsTNAObject(
+			PCEPGeneralizedEndPointsTNAObject generalizedEndPointsTNA) {
+		this.generalizedEndPointsTNA = generalizedEndPointsTNA;
+	}
+
 	// EXTRACT METHODS
 
 	public LinkedList<PCEPSynchronizationVectorObject> extractSynchronizationVectorObjectList() {
@@ -177,13 +196,6 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return null;
 	}
 
-	public PCEPObjectiveFunctionObject extractObjectiveFunctionObject() {
-		if (containsObjectiveFunctionObject())
-			return of;
-		return null;
-	}
-
-	
 	public PCEPEndPointsObject extractEndPointsObject() {
 		if (containsEndPointsObject())
 			return endPoints;
@@ -232,16 +244,14 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return null;
 	}
 
+	public PCEPGeneralizedEndPointsTNAObject extractGeneralizedEndPointsTNAObject() {
+		if (containsGeneralizedEndPointsTNAObject())
+			return generalizedEndPointsTNA;
+		return null;
+	}
 
 	// CONTAINS METHODS
 
-	public boolean containsObjectiveFunctionObject() {
-		if (of == null)
-			return false;
-		return true;
-	}
-
-	
 	public boolean containsEndPointsObject() {
 		if (endPoints == null)
 			return false;
@@ -297,6 +307,11 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return true;
 	}
 
+	public boolean containsGeneralizedEndPointsTNAObject() {
+		if (generalizedEndPointsTNA == null)
+			return false;
+		return true;
+	}
 
 	// INTERFACE METHODS
 
@@ -312,6 +327,9 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		length += RP.getObjectFrameByteLength();
 		if (containsEndPointsObject())
 			length += endPoints.getObjectFrameByteLength();
+
+		if (containsGeneralizedEndPointsTNAObject())
+			length += generalizedEndPointsTNA.getObjectFrameByteLength();
 
 		if (containsLabelSwitchedPathAttributesObject()) {
 			length += LSPA.getObjectFrameByteLength();
@@ -333,11 +351,6 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		if (containsLoadBalancingObject()) {
 			length += loadBalancing.getObjectFrameByteLength();
 		}
-		
-		if (containsObjectiveFunctionObject()){
-			length += of.getObjectFrameByteLength();
-		}
-		
 		return length;
 	}
 
@@ -377,10 +390,6 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 			objectsString.append(loadBalancing.getObjectFrameBinaryString());
 		}
 
-		if (containsObjectiveFunctionObject()){
-			objectsString.append(of.getObjectFrameBinaryString());
-		}
-		
 		return objectsString.toString();
 	}
 
@@ -398,6 +407,9 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 
 		if (containsEndPointsObject())
 			requestObjects.add(endPoints);
+
+		if (containsGeneralizedEndPointsTNAObject())
+			requestObjects.add(generalizedEndPointsTNA);
 
 		if (containsLabelSwitchedPathAttributesObject()) {
 			requestObjects.add(LSPA);
@@ -420,10 +432,6 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 			requestObjects.add(loadBalancing);
 		}
 
-		if (containsObjectiveFunctionObject()) {
-			requestObjects.add(of);
-		}
-		
 		return requestObjects;
 	}
 
@@ -431,4 +439,7 @@ public class PCEPRequestFrame implements PCEPMessageFrame {
 		return MESSAGE_TYPE;
 	}
 
+	public void log(String logString) {
+		System.out.println("PCEPRequestFrame::: " + logString);
+	}
 }

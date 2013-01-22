@@ -29,20 +29,63 @@ import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPNoPathObject;
+import com.pcee.protocol.message.objectframe.impl.PCEPNoVertexObject;
 import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
 
 public class PCEPResponseFrameFactory {
 
-	public static PCEPResponseFrame generatePathComputationResponseFrame(
-			PCEPRequestParametersObject RP) {
+	public static PCEPResponseFrame generatePathComputationRequestFrame(PCEPRequestParametersObject RP) {
 
 		PCEPResponseFrame responseFrame = new PCEPResponseFrame(RP);
 
 		return responseFrame;
 	}
 
-	public static PCEPResponseFrame getPathComputationResponseFrame(
-			PCEPMessage message) {
+	public static PCEPResponseFrame getITResourceResponseFrame(PCEPMessage message) {
+		PCEPRequestParametersObject RP = null;
+		LinkedList<PCEPExplicitRouteObject> EROList = null;
+		PCEPNoVertexObject noVertexObject = null;
+		LinkedList<PCEPObjectFrame> objectList = message.getObjectsList();
+
+		for (int i = 0; i < objectList.size(); i++) {
+			PCEPObjectFrame objectFrame = objectList.get(i);
+			PCEPCommonObjectHeader objectFrameHeader = objectFrame.getObjectHeader();
+
+			switch (objectFrameHeader.getClassDecimalValue()) {
+			case 2:
+				RP = (PCEPRequestParametersObject) objectFrame;
+				break;
+			case 7:
+				PCEPExplicitRouteObject ERO = (PCEPGenericExplicitRouteObjectImpl) objectFrame;
+				if (EROList != null)
+					EROList.add(ERO);
+				else {
+					EROList = new LinkedList<PCEPExplicitRouteObject>();
+					EROList.add(ERO);
+				}
+				break;
+			case 12:
+				noVertexObject = (PCEPNoVertexObject) objectFrame;
+				break;
+			}
+		}
+
+		PCEPResponseFrame responseFrame = new PCEPResponseFrame(RP);
+
+		if (EROList != null) {
+		    System.out.println("EROList != null in PCEPResponseFrameFactory");
+			responseFrame.insertExplicitRouteObjectList(EROList);
+		}
+
+		if (noVertexObject != null) {
+		    System.out.println("noVertexObject != null in PCEPResponseFrameFactory");
+			responseFrame.insertNoVertexObject(noVertexObject);
+		}
+
+		return responseFrame;
+	}
+
+	public static PCEPResponseFrame getPathComputationResponseFrame(PCEPMessage message) {
 
 		PCEPRequestParametersObject RP = null;
 		PCEPNoPathObject noPath = null;
@@ -57,8 +100,7 @@ public class PCEPResponseFrameFactory {
 		for (int i = 0; i < objectList.size(); i++) {
 
 			PCEPObjectFrame objectFrame = objectList.get(i);
-			PCEPCommonObjectHeader objectFrameHeader = objectFrame
-					.getObjectHeader();
+			PCEPCommonObjectHeader objectFrameHeader = objectFrame.getObjectHeader();
 
 			switch (objectFrameHeader.getClassDecimalValue()) {
 
@@ -127,28 +169,31 @@ public class PCEPResponseFrameFactory {
 		if (noPath != null) {
 			responseFrame.insertNoPathObject(noPath);
 		}
-		
+
 		if (LSPA != null) {
 			responseFrame.insertLabelSwitchedPathAttributesObject(LSPA);
 		}
-		
+
 		if (bwList != null) {
 			responseFrame.insertBandwidthObjectList(bwList);
 		}
-		
+
 		if (metricList != null) {
 			responseFrame.insertMetricObjectList(metricList);
 		}
-		
+
 		if (IRO != null) {
 			responseFrame.insertIncludeRouteObject(IRO);
 		}
-		
+
 		if (EROList != null) {
 			responseFrame.insertExplicitRouteObjectList(EROList);
 		}
-		
+
 		return responseFrame;
 	}
 
+	public static void log(String logString) {
+		System.out.println("PCEPResponseFrameFactory:::" + logString);
+	}
 }

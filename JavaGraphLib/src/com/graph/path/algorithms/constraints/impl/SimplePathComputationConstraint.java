@@ -65,5 +65,16 @@ public class SimplePathComputationConstraint extends Constraint{
 	public double getBw() {
 		return this.bw;
 	}
+
+	@Override
+	public void setSource(VertexElement source) {
+		this.source = source;
+	}
+
+	@Override
+	public void setDestination(VertexElement destination) {
+		// TODO Auto-generated method stub
+		this.destination = destination;
+	}
 	
 }
