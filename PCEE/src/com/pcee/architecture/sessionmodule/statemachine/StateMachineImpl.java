@@ -21,10 +21,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.common.SessionID;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.close.PCEPCloseFrame;
 import com.pcee.protocol.close.PCEPCloseFrameFactory;
 import com.pcee.protocol.keepalive.PCEPKeepaliveFrame;
@@ -85,6 +87,8 @@ import com.pcee.protocol.open.PCEPOpenFrameFactory;
  */
 public abstract class StateMachineImpl extends StateMachine {
 
+	protected static Logger logger = LoggerFactory.getLogger(StateMachineImpl.class);
+
 	// Module Management Variable to facilitate communication between the
 	// different modules
 	ModuleManagement lm;
@@ -143,7 +147,7 @@ public abstract class StateMachineImpl extends StateMachine {
 
 	public StateMachineImpl(ModuleManagement layerManagement,
 			PCEPAddress Address, Timer stateTimer, boolean connectionInitialized) {
-		// localDebugger("Entering: StateMachineImpl(ModuleManagement layerManagement, PCEPAddress Address, Timer stateTimer, boolean connectionInitialized)");
+		// logger.debug("Entering: StateMachineImpl(ModuleManagement layerManagement, PCEPAddress Address, Timer stateTimer, boolean connectionInitialized)");
 
 		lm = layerManagement;
 
@@ -166,33 +170,33 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void setState(int state) {
-		localDebugger("Entering: setState(int state)");
+		logger.debug("Entering: setState(int state)");
 		switch (state) {
 		case 0: {
-			localLogger("Entering Idle State");
+			logger.info("Entering Idle State");
 			this.state = state;
 			break;
 		}
 		case 1: {
-			localLogger("Entering TCPPending State");
+			logger.info("Entering TCPPending State");
 			this.state = state;
 			break;
 		}
 		case 2: {
-			localLogger("Entering OpenWait State");
+			logger.info("Entering OpenWait State");
 			this.state = state;
 			break;
 		}
 		case 3: {
-			localLogger("Entering KeepWait State");
+			logger.info("Entering KeepWait State");
 			this.state = state;
 			break;
 		}
 		case 4: {
-			localLogger("Entering SessionUP State");
+			logger.info("Entering SessionUP State");
 			if (firstTimeSessionUP) {
-				localLogger("Entering SessionUp State");
-				guiLogger("Connection established");
+				logger.info("Entering SessionUp State");
+				logger.info("Connection established");
 				firstTimeSessionUP = false;
 			}
 			this.state = state;
@@ -206,7 +210,7 @@ public abstract class StateMachineImpl extends StateMachine {
 			break;
 		}
 		default: {
-			localLogger("ERROR: Unkown State");
+			logger.info("ERROR: Unkown State");
 			this.setState(0);
 			break;
 		}
@@ -216,11 +220,11 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	public synchronized void updateState(boolean connectionEstablished) {
-		localDebugger("Entering: updateState(boolean connectionEstablished)");
-		localDebugger("| connectionEstablished: " + connectionEstablished);
+		logger.debug("Entering: updateState(boolean connectionEstablished)");
+		logger.debug("| connectionEstablished: " + connectionEstablished);
 
 		if (state != 1) {
-			localLogger("Received connectionEstablished Update in the wrong state! Should have been state 1, received it in state"
+			logger.info("Received connectionEstablished Update in the wrong state! Should have been state 1, received it in state"
 					+ state);
 		}
 
@@ -238,7 +242,7 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * enterIdleState
 	 */
 	protected void enterIdleState() {
-		localDebugger("Entering: enterIdleState()");
+		logger.debug("Entering: enterIdleState()");
 
 		// this.connectRetry = 0;
 		// this.localOk = false;
@@ -246,13 +250,13 @@ public abstract class StateMachineImpl extends StateMachine {
 		// this.openRetry = 0;
 
 		if (connectionInitialized == true) {
-			localLogger("System initiated the Connection");
+			logger.info("System initiated the Connection");
 			startConnectTimer();
 			setState(1);
 		}
 
 		if (connectionInitialized == false) {
-			localLogger("System received the Connection");
+			logger.info("System received the Connection");
 
 			this.sendOpenMessage(keepAlive, deadTimer);
 			this.startOpenWaitTimer();
@@ -266,10 +270,10 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * enterTCPPendingState
 	 */
 	protected void enterTCPPendingState() {
-		localDebugger("Entering: enterTCPPendingState()");
+		logger.debug("Entering: enterTCPPendingState()");
 
 		if (connectionEstablished == true) { // (a)
-			localLogger("Connection established with Peer");
+			logger.info("Connection established with Peer");
 
 			sendOpenMessage(keepAlive, deadTimer);
 			cancelConnectTimer();
@@ -277,7 +281,7 @@ public abstract class StateMachineImpl extends StateMachine {
 			setState(2);
 		}
 		if (connectionEstablished == false) { // (b)
-			localLogger("Connection establishment failed with Peer");
+			logger.info("Connection establishment failed with Peer");
 
 			checkPendingStatus();
 		}
@@ -290,15 +294,15 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * @param message
 	 */
 	protected void enterOpenWaitState(PCEPMessage message) {
-		localDebugger("Entering: enterOpenWaitState(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
+		logger.debug("Entering: enterOpenWaitState(PCEPMessage message)");
+		logger.debug("| message: " + message.contentInformation());
 
 		// PCEPMessageFrame frame =
 		// PCEPMessageFactory.getPCEPMessageFrame(message);
 		int messageType = message.getMessageHeader().getTypeDecimalValue();
 
 		if (messageType != 1) { // (h)
-			localLogger("Received wrong Message Type. Should have been type 1. Got: "
+			logger.info("Received wrong Message Type. Should have been type 1. Got: "
 					+ messageType);
 
 			this.releaseResources();
@@ -310,7 +314,7 @@ public abstract class StateMachineImpl extends StateMachine {
 				.checkMessageFormat(message);
 
 		if (!noErrorsDetected) {// (b)
-			localLogger("Message Format Error detected");
+			logger.info("Message Format Error detected");
 
 			this.sendErrorMessage(1, 1);
 			// this.releaseResources();
@@ -321,7 +325,7 @@ public abstract class StateMachineImpl extends StateMachine {
 				.checkSessionCharacteristics(message);
 
 		if (noErrorsDetected && sessionCharacteristics == 0) { // (c)
-			localLogger("No Error detected, but Session Characteristics are not acceptable, but negotiable");
+			logger.info("No Error detected, but Session Characteristics are not acceptable, but negotiable");
 
 			this.openRetry = 1;
 			this.sendErrorMessage(1, 5);
@@ -329,20 +333,20 @@ public abstract class StateMachineImpl extends StateMachine {
 		}
 
 		if (noErrorsDetected && sessionCharacteristics == 1) { // (d)
-			localLogger("No Error detected and Session Characteristics are acceptable");
+			logger.info("No Error detected and Session Characteristics are acceptable");
 
 			this.sendKeepAliveMessage();
 			this.setRemoteOk(true);
 
 			if (localOk == true) {
-				localLogger("localOk is true");
+				logger.info("localOk is true");
 
 				this.cancelOpenWaitTimer();
 				this.setState(4);
 			}
 
 			if (localOk == false) {
-				localLogger("localOk is false");
+				logger.info("localOk is false");
 
 				this.cancelOpenWaitTimer();
 				this.startKeepWaitTimer();
@@ -351,27 +355,27 @@ public abstract class StateMachineImpl extends StateMachine {
 		}
 
 		if (noErrorsDetected && sessionCharacteristics == -1) { // (e)
-			localLogger("No Error detected, but Session Characteristics are not acceptable, and not negotiable");
+			logger.info("No Error detected, but Session Characteristics are not acceptable, and not negotiable");
 
 			this.sendErrorMessage(1, 3);
 			this.releaseResources();
 		}
 
 		if (noErrorsDetected && openRetry == 0 && sessionCharacteristics == 0) { // (f)
-			localLogger("No Error detected, openRetry==0, and Session Characteristics are not acceptable, but negotiable");
+			logger.info("No Error detected, openRetry==0, and Session Characteristics are not acceptable, but negotiable");
 
 			this.incrementOpenRetry();
 			this.sendErrorMessage(1, 4); // TODO No Proposed Objects, yet!
 
 			if (localOk == true) {
-				localLogger("localOk is true");
+				logger.info("localOk is true");
 
 				this.restartOpenWaitTimer();
 				this.setState(2);
 			}
 
 			if (localOk == false) {
-				localLogger("localOk is false");
+				logger.info("localOk is false");
 
 				this.cancelOpenWaitTimer();
 				this.startKeepWaitTimer();
@@ -388,13 +392,13 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * @param message
 	 */
 	protected void enterKeepWaitState(PCEPMessage message) {
-		localDebugger("Entering: enterKeepWaitState(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
+		logger.debug("Entering: enterKeepWaitState(PCEPMessage message)");
+		logger.debug("| message: " + message.contentInformation());
 
 		int messageType = message.getMessageHeader().getTypeDecimalValue();
 
 		if (messageType != 2 && messageType != 6) { // (e)
-			localLogger("Received wrong Message Type. Should have been type 2,6. Got: "
+			logger.info("Received wrong Message Type. Should have been type 2,6. Got: "
 					+ messageType);
 			this.releaseResources();
 		}
@@ -403,24 +407,24 @@ public abstract class StateMachineImpl extends StateMachine {
 				.checkMessageFormat(message);
 
 		if (!noErrorsDetected) {// (b)
-			localLogger("Message Format Error detected");
+			logger.info("Message Format Error detected");
 
 			this.sendErrorMessage(1, 1);
 			this.closeTCPConnection();
 		}
 
 		if (messageType == 2) {
-			localLogger("Processing KeepAlive Message");
+			logger.info("Processing KeepAlive Message");
 			setLocalOk(true);
 
 			if (remoteOk == true) {
-				localLogger("remoteOk is true");
+				logger.info("remoteOk is true");
 
 				this.cancelKeepWaitTimer();
 				this.setState(4);
 			}
 			if (remoteOk == false) {
-				localLogger("remoteOk is false");
+				logger.info("remoteOk is false");
 
 				this.cancelKeepWaitTimer();
 				this.startOpenWaitTimer();
@@ -429,14 +433,14 @@ public abstract class StateMachineImpl extends StateMachine {
 		}
 
 		if (messageType == 6) {
-			localLogger("Processing Error Message");
+			logger.info("Processing Error Message");
 
 			// TODO New Proposal through error msg
 			int sessionCharacteristics = PCEPMessageAnalyser
 					.checkSessionCharacteristics(message);
 
 			if (sessionCharacteristics == -1) {
-				localLogger("Session Characteristics are not acceptable, and not negotiable");
+				logger.info("Session Characteristics are not acceptable, and not negotiable");
 
 				this.sendErrorMessage(1, 6);
 				// this.releaseResources();
@@ -444,7 +448,7 @@ public abstract class StateMachineImpl extends StateMachine {
 			}
 
 			if (sessionCharacteristics == 1) {
-				localLogger("Session Characteristics are acceptable");
+				logger.info("Session Characteristics are acceptable");
 
 				this.adjustSessionCharacteristics();
 				this.restartKeepWaitTimer();
@@ -452,13 +456,13 @@ public abstract class StateMachineImpl extends StateMachine {
 			}
 
 			if (remoteOk == true) {
-				localLogger("remoteOk is true");
+				logger.info("remoteOk is true");
 
 				this.restartKeepWaitTimer();
 				this.setState(3);
 			}
 			if (remoteOk == false) {
-				localLogger("remoteOk is false");
+				logger.info("remoteOk is false");
 
 				this.cancelKeepWaitTimer();
 				this.startOpenWaitTimer();
@@ -475,8 +479,8 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * @param message
 	 */
 	protected void enterSessionUPState(PCEPMessage message) {
-		localDebugger("Entering: enterSessionUPState(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
+		logger.debug("Entering: enterSessionUPState(PCEPMessage message)");
+		logger.debug("| message: " + message.contentInformation());
 
 		// System.out.println("[StateMachine: " + address.getAddress() +
 		// "] entering Session up State" );
@@ -487,7 +491,7 @@ public abstract class StateMachineImpl extends StateMachine {
 				.checkMessageFormat(message);
 
 		if (noErrorsDetected == false) {
-			localLogger("Message Format Error detected");
+			logger.info("Message Format Error detected");
 			sendCloseMessage();
 			// releaseResources();
 			closeTCPConnection();
@@ -500,29 +504,29 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	private void analyzeMessage(PCEPMessage message) {
-		localDebugger("Entering: analyzeMessage(PCEPMessage message)");
+		logger.debug("Entering: analyzeMessage(PCEPMessage message)");
 
 		int messageType = message.getMessageHeader().getTypeDecimalValue();
 
 		switch (messageType) {
 
 		case 1: {
-			localLogger("Received Open Message");
-			localLogger("Waiting to be implemented. Do something with this Message!");
+			logger.info("Received Open Message");
+			logger.info("Waiting to be implemented. Do something with this Message!");
 
 			break;
 		}
 		case 2: {
-			localLogger("Received KeepAlive Message");
+			logger.info("Received KeepAlive Message");
 
 			restartDeadTimer();
-			localLogger("Processing Information: "
+			logger.info("Processing Information: "
 					+ message.contentInformation());
 
 			break;
 		}
 		case 3: {
-			localLogger("Received Path Computation Request Message");
+			logger.info("Received Path Computation Request Message");
 			// System.out.println("Received Path Computation Request Message");
 
 			restartDeadTimer();
@@ -537,7 +541,7 @@ public abstract class StateMachineImpl extends StateMachine {
 			break;
 		}
 		case 4: {
-			localLogger("Received Path Computation Response Message");
+			logger.info("Received Path Computation Response Message");
 			restartDeadTimer();
 			// MessageHandler.readResponseMessage(message);
 			if (message.getAddress().getPort() == 4189) {
@@ -556,28 +560,28 @@ public abstract class StateMachineImpl extends StateMachine {
 			break;
 		}
 		case 5: {
-			localLogger("Received Notification Message");
+			logger.info("Received Notification Message");
 
 			// MessageHandler.processRequestMessage(message);
 
 			break;
 		}
 		case 6: {
-			localLogger("Received Error Message");
+			logger.info("Received Error Message");
 			if (lm.isServer()==false)
 				lm.getClientModule().receiveMessage(message, ModuleEnum.SESSION_MODULE);
 
 			break;
 		}
 		case 7: {
-			localLogger("Received Close Message");
+			logger.info("Received Close Message");
 
 			this.closeTCPConnection();
 
 			break;
 		}
 		default: {
-			localLogger("ERROR: Unkown Message");
+			logger.info("ERROR: Unkown Message");
 
 			break;
 		}
@@ -590,24 +594,24 @@ public abstract class StateMachineImpl extends StateMachine {
 	 */
 
 	protected void setLocalOk(boolean value) {
-		localDebugger("Entering: setLocalOk(boolean value)");
+		logger.debug("Entering: setLocalOk(boolean value)");
 
-		localLogger("Setting LocalOk to: " + value);
+		logger.info("Setting LocalOk to: " + value);
 		this.localOk = value;
 	}
 
 	protected void setRemoteOk(boolean value) {
-		localDebugger("Entering: setRemoteOk(boolean value)");
+		logger.debug("Entering: setRemoteOk(boolean value)");
 
-		localLogger("Setting RemoteOk to: " + value);
+		logger.info("Setting RemoteOk to: " + value);
 		this.remoteOk = value;
 	}
 
 	protected void incrementOpenRetry() {
-		localDebugger("Entering: incrementOpenRetry()");
+		logger.debug("Entering: incrementOpenRetry()");
 
 		openRetry++;
-		localLogger("Incrementing openRetry. Value is now: " + openRetry);
+		logger.info("Incrementing openRetry. Value is now: " + openRetry);
 	}
 
 	/**************************************************************************************************
@@ -615,8 +619,8 @@ public abstract class StateMachineImpl extends StateMachine {
 	 */
 
 	protected void sendMessageToPeer(PCEPMessage message, ModuleEnum targetLayer) {
-		localDebugger("Entering: sendMessageToPeer(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
+		logger.debug("Entering: sendMessageToPeer(PCEPMessage message)");
+		logger.debug("| message: " + message.contentInformation());
 
 		message.setAddress(address);
 		lm.getSessionModule().sendMessage(message, targetLayer);
@@ -624,28 +628,28 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void checkMultipleConnections() {
-		localDebugger("Entering: checkMultipleConnections()");
-		// localLogger("Waiting to be implemented! checkMultipleConnections()");
+		logger.debug("Entering: checkMultipleConnections()");
+		// logger.info("Waiting to be implemented! checkMultipleConnections()");
 		// // TODO
 	}
 
 	protected void adjustSessionCharacteristics() {
-		localDebugger("Entering: adjustSessionCharacteristics()");
+		logger.debug("Entering: adjustSessionCharacteristics()");
 
-		localLogger("Waiting to be implemented! adjustSessionCharacteristics()"); // TODO
+		logger.info("Waiting to be implemented! adjustSessionCharacteristics()"); // TODO
 	}
 
 	protected void retryTCPConnection() {
-		localDebugger("Entering: retryTCPConnection()");
+		logger.debug("Entering: retryTCPConnection()");
 
-		localLogger("Waiting to be implemented! retryTCPConnection()"); // TODO
+		logger.info("Waiting to be implemented! retryTCPConnection()"); // TODO
 	}
 
 	protected void checkPendingStatus() {
-		localDebugger("Entering: checkPendingStatus()");
+		logger.debug("Entering: checkPendingStatus()");
 
 		if (connectRetry == connectMaxRetry) {
-			localLogger("Maximum number of connection retries reached");
+			logger.info("Maximum number of connection retries reached");
 			releaseResources();
 		}
 		if (connectRetry < connectMaxRetry) {
@@ -656,9 +660,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void terminateTimerTasks() {
-		localDebugger("Entering: terminateTimerTasks()");
+		logger.debug("Entering: terminateTimerTasks()");
 
-		localLogger("TERMINATING TIMERS");
+		logger.info("TERMINATING TIMERS");
 
 		if (connectTimerTask != null)
 			cancelConnectTimer();
@@ -673,8 +677,8 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	public void releaseResources() {
-		localDebugger("Entering: releaseResources()");
-		localLogger("RELEASING RESSOURCES");
+		logger.debug("Entering: releaseResources()");
+		logger.info("RELEASING RESSOURCES");
 
 		terminateTimerTasks();
 		this.setState(0);
@@ -682,10 +686,9 @@ public abstract class StateMachineImpl extends StateMachine {
 
 	// TODO UPDATE
 	protected void closeTCPConnection() {
-		localDebugger("Entering: closeTCPConnection()");
+		logger.debug("Entering: closeTCPConnection()");
 
-		localLogger("CLOSING CONNECTION");
-		guiLogger("Closing Connection");
+		logger.info("Closing Connection");
 
 		lm.getSessionModule().closeConnection(address);
 	}
@@ -694,9 +697,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * Messages
 	 */
 	protected void sendOpenMessage(int keepalive, int deadTimer) {
-		localDebugger("Entering: sendOpenMessage(int keepalive, int deadTimer)");
+		logger.debug("Entering: sendOpenMessage(int keepalive, int deadTimer)");
 
-		localLogger("Sending Open Message to" + address.getIPv4Address());
+		logger.info("Sending Open Message to" + address.getIPv4Address());
 
 		PCEPOpenFrame openFrame = PCEPOpenFrameFactory.generateOpenFrame(
 				keepalive, deadTimer, "1", "1"); // TODO
@@ -706,9 +709,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void sendKeepAliveMessage() {
-		localDebugger("Entering: sendKeepAliveMessage()");
+		logger.debug("Entering: sendKeepAliveMessage()");
 
-		localLogger("Sending KeepAlive Message to" + address.getIPv4Address());
+		logger.info("Sending KeepAlive Message to" + address.getIPv4Address());
 
 		PCEPKeepaliveFrame keepaliveFrame = PCEPKeepaliveFrameFactory
 				.generateKeepaliveFrame();
@@ -723,9 +726,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void sendCloseMessage() {
-		localDebugger("Entering: sendCloseMessage()");
+		logger.debug("Entering: sendCloseMessage()");
 
-		localLogger("Sending Close Message to" + address.getIPv4Address());
+		logger.info("Sending Close Message to" + address.getIPv4Address());
 
 		PCEPCloseFrame closeFrame = PCEPCloseFrameFactory.generateCloseFrame(1,
 				"1", "1");
@@ -736,9 +739,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void sendErrorMessage(int type, int value) {
-		localDebugger("Entering: sendErrorMessage(int type, int value)");
+		logger.debug("Entering: sendErrorMessage(int type, int value)");
 
-		localLogger("Sending Error Message to" + address.getIPv4Address());
+		logger.info("Sending Error Message to" + address.getIPv4Address());
 
 		PCEPMessage errorMessage = PCEPMessageFactory
 				.generateSIMPLEErrorMessage(type, value, "1", "0");
@@ -749,15 +752,15 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * Connect
 	 */
 	protected void startConnectTimer() {
-		localDebugger("Entering: startConnectTimer()");
+		logger.debug("Entering: startConnectTimer()");
 
-		localLogger("Starting Connect Timer");
+		logger.info("Starting Connect Timer");
 
 		connectTimerRunning = true;
 
 		connectTimerTask = new TimerTask() {
 			public void run() {
-				localLogger("ConnectTimer Expired");
+				logger.info("ConnectTimer Expired");
 				checkPendingStatus();
 			}
 		};
@@ -765,14 +768,14 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void restartConnectTimer() {
-		localDebugger("Entering: restartConnectTimer()");
+		logger.debug("Entering: restartConnectTimer()");
 
-		localLogger("Restarting Connect Timer");
+		logger.info("Restarting Connect Timer");
 
 		this.connectTimerTask.cancel();
 		connectTimerTask = new TimerTask() {
 			public void run() {
-				localLogger("Connect Timer Expired");
+				logger.info("Connect Timer Expired");
 				checkPendingStatus();
 			}
 		};
@@ -780,10 +783,10 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void cancelConnectTimer() {
-		localDebugger("Entering: cancelConnectTimer()");
+		logger.debug("Entering: cancelConnectTimer()");
 
 		if (connectTimerRunning == true) {
-			localLogger("Cancelling Connect Timer");
+			logger.info("Cancelling Connect Timer");
 
 			this.connectTimerTask.cancel();
 			connectTimerRunning = false;
@@ -795,13 +798,13 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * OpenWait
 	 */
 	protected void startOpenWaitTimer() {
-		localDebugger("Entering: startOpenWaitTimer()");
+		logger.debug("Entering: startOpenWaitTimer()");
 
-		localLogger("Starting OpenWait Timer");
+		logger.info("Starting OpenWait Timer");
 
 		openWaitTimerTask = new TimerTask() {
 			public void run() {
-				localLogger("OpenWaitTimer Expired");
+				logger.info("OpenWaitTimer Expired");
 				sendErrorMessage(1, 2);
 				// releaseResources();
 				closeTCPConnection();
@@ -812,14 +815,14 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void restartOpenWaitTimer() {
-		localDebugger("Entering: restartOpenWaitTimer()");
+		logger.debug("Entering: restartOpenWaitTimer()");
 
-		localLogger("Restarting OpenWait Timer");
+		logger.info("Restarting OpenWait Timer");
 
 		this.openWaitTimerTask.cancel();
 		openWaitTimerTask = new TimerTask() {
 			public void run() {
-				localLogger("OpenWait Timer Expired");
+				logger.info("OpenWait Timer Expired");
 				sendErrorMessage(1, 2);
 				// releaseResources();
 				closeTCPConnection();
@@ -829,9 +832,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void cancelOpenWaitTimer() {
-		localDebugger("Entering: cancelOpenWaitTimer()");
+		logger.debug("Entering: cancelOpenWaitTimer()");
 
-		localLogger("Cancelling OpenWait Timer");
+		logger.info("Cancelling OpenWait Timer");
 
 		this.openWaitTimerTask.cancel();
 	}
@@ -840,13 +843,13 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * KeepWait
 	 */
 	protected void startKeepWaitTimer() {
-		localDebugger("Entering: startKeepWaitTimer()");
+		logger.debug("Entering: startKeepWaitTimer()");
 
-		localLogger("Starting KeepWait Timer");
+		logger.info("Starting KeepWait Timer");
 
 		keepWaitTimerTask = new TimerTask() {
 			public void run() {
-				localLogger("KeepWaitTimer Expired");
+				logger.info("KeepWaitTimer Expired");
 				sendErrorMessage(1, 7);
 				// releaseResources();
 				closeTCPConnection();
@@ -856,14 +859,14 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void restartKeepWaitTimer() {
-		localDebugger("Entering: restartKeepWaitTimer()");
+		logger.debug("Entering: restartKeepWaitTimer()");
 
-		localLogger("Restarting KeepWait Timer");
+		logger.info("Restarting KeepWait Timer");
 
 		this.keepWaitTimerTask.cancel();
 		keepWaitTimerTask = new TimerTask() {
 			public void run() {
-				localLogger("KeepWait Timer Expired");
+				logger.info("KeepWait Timer Expired");
 				sendErrorMessage(1, 7);
 				// releaseResources();
 				closeTCPConnection();
@@ -873,9 +876,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void cancelKeepWaitTimer() {
-		localDebugger("Entering: cancelKeepWaitTimer()");
+		logger.debug("Entering: cancelKeepWaitTimer()");
 
-		localLogger("Cancelling KeepWait Timer");
+		logger.info("Cancelling KeepWait Timer");
 
 		this.keepWaitTimerTask.cancel();
 	}
@@ -884,9 +887,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * KeepAlive
 	 */
 	protected void startKeepAliveTimer() {
-		localDebugger("Entering: startKeepAliveTimer()");
+		logger.debug("Entering: startKeepAliveTimer()");
 
-		localLogger("Starting KeepAlive Timer");
+		logger.info("Starting KeepAlive Timer");
 
 		keepAliveTimerRunning = true;
 
@@ -899,9 +902,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void restartKeepAliveTimer() {
-		localDebugger("Entering: restartKeepAliveTimer()");
+		logger.debug("Entering: restartKeepAliveTimer()");
 
-		localLogger("Restarting KeepAlive Timer");
+		logger.info("Restarting KeepAlive Timer");
 
 		this.keepAliveTimerTask.cancel();
 		keepAliveTimerTask = new TimerTask() {
@@ -913,9 +916,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void cancelKeepAliveTimer() {
-		localDebugger("Entering: cancelKeepAliveTimer()");
+		logger.debug("Entering: cancelKeepAliveTimer()");
 
-		localLogger("Cancelling KeepAlive Timer");
+		logger.info("Cancelling KeepAlive Timer");
 
 		this.keepAliveTimerTask.cancel();
 	}
@@ -924,9 +927,9 @@ public abstract class StateMachineImpl extends StateMachine {
 	 * DeadTimer
 	 */
 	protected void startDeadTimer() {
-		localDebugger("Entering: startDeadTimer()");
+		logger.debug("Entering: startDeadTimer()");
 
-		localLogger("Starting Dead Timer");
+		logger.info("Starting Dead Timer");
 
 		deadTimerRunning = true;
 
@@ -945,11 +948,11 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void restartDeadTimer() {
-		localDebugger("Entering: restartDeadTimer()");
+		logger.debug("Entering: restartDeadTimer()");
 
-		localLogger("Restarting Dead Timer");
+		logger.info("Restarting Dead Timer");
 		if (deadTimerRunning == false) {
-			localDebugger("DeadTimer was not running. Restarting task");
+			logger.debug("DeadTimer was not running. Restarting task");
 		} else
 			this.deadTimerTask.cancel();
 		deadTimerRunning = true;
@@ -967,15 +970,15 @@ public abstract class StateMachineImpl extends StateMachine {
 	}
 
 	protected void cancelDeadTimer() {
-		localDebugger("Entering: cancelDeadTimer()");
+		logger.debug("Entering: cancelDeadTimer()");
 
-		localLogger("Cancelling Dead Timer");
+		logger.info("Cancelling Dead Timer");
 
 		this.deadTimerTask.cancel();
 	}
 
 	public PCEPAddress getAddress() {
-		localDebugger("Entering: getAddress()");
+		logger.debug("Entering: getAddress()");
 
 		return address;
 	}
@@ -984,23 +987,6 @@ public abstract class StateMachineImpl extends StateMachine {
 		return "Address: " + address.getIPv4Address() + " sessionID: "
 				+ sessionID + " State: " + state + " ConnectionInitialized: "
 				+ connectionInitialized;
-	}
-
-	protected static void guiLogger(String event) {
-		// Logger.logGUINotifications(event);
-	}
-
-	protected void localLogger(String event) {
-
-		String prefix = prefixGenerator();
-		Logger.logSystemEvents("[StateMachine: " + address.getIPv4Address() +
-				"]" + prefix + " " + event);
-	}
-
-	protected void localDebugger(String event) {
-		// String prefix = prefixGenerator();
-		// Logger.debugger("[StateMachine: " + address.getIPv4Address() + "]" +
-		// prefix + " " + event);
 	}
 
 	protected String prefixGenerator() {

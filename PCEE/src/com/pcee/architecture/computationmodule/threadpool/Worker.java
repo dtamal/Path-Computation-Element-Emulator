@@ -19,14 +19,18 @@ package com.pcee.architecture.computationmodule.threadpool;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 
 public class Worker extends Thread {
 
+	private Logger logger;
+	
 	private String ID;
 	private LinkedBlockingQueue<PCEPMessage> requestQueue;
 	private ThreadPool pool;
@@ -54,13 +58,14 @@ public class Worker extends Thread {
 		this.pool = pool;
 		this.ID = ID;
 		this.requestQueue = requestQueue;
+		logger = LoggerFactory.getLogger("Worker-" + ID);
 	}
 
 
 	/**Main run method of the worker thread */
 	public void run(){
 
-		localLogger("Initializing Worker Thread ID = " + ID);
+		logger.info("Initializing Worker Thread ID = " + ID);
 		PCEPMessage request = null;
 		int flag=0;
 		while(!terminateWorker){
@@ -69,13 +74,13 @@ public class Worker extends Thread {
 				if (flag==0){
 					request = requestQueue.take();
 					//Record the leaving Queue Time for each request
-//					localLogger("Starting request ID " + request.getRequestID());
-					localLogger("Current Length of Request Queue = " + requestQueue.size());
+//					logger.info("Starting request ID " + request.getRequestID());
+					logger.info("Current Length of Request Queue = " + requestQueue.size());
 				
 				}
 			} catch (InterruptedException e) {
 				if (terminateWorker){
-					localDebugger("Stopping Worker Thread : " + ID);
+					logger.debug("Stopping Worker Thread : " + ID);
 					break;
 				}
 				continue;
@@ -85,11 +90,11 @@ public class Worker extends Thread {
 			if (request!=null){
 				task = new WorkerTask(lm, request, TopologyInformation.getInstance().getGraph().createCopy());
 				task.run();
-//				localLogger("Completed processing of request ID " + request.getRequestID());
+//				logger.info("Completed processing of request ID " + request.getRequestID());
 			}
 			if (Thread.currentThread().isInterrupted()) {
 				if (terminateWorker){
-					localDebugger("Stopping Worker Thread : " + ID);
+					logger.debug("Stopping Worker Thread : " + ID);
 					break;
 				}
 				continue;
@@ -100,19 +105,4 @@ public class Worker extends Thread {
 		}
 	}
 	
-	/**Function to log events in the worker thread
-	 * 
-	 * @param event
-	 */
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[Worker "+ ID +"]     " + event);
-	}
-
-	/**Function to log debugging events 
-	 * 
-	 * @param event
-	 */
-	private void localDebugger(String event) {
-		Logger.debugger("[Worker "+ ID +"]     " + event);
-	}
 }

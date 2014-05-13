@@ -19,7 +19,9 @@ package com.pcee.protocol.message;
 
 import java.util.StringTokenizer;
 
-import com.pcee.logger.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Super class for all header and objects
@@ -28,6 +30,8 @@ import com.pcee.logger.Logger;
  */
 public class PCEPComputationFactory {
 
+	private static Logger logger = LoggerFactory.getLogger(PCEPComputationFactory.class);
+	
 	public static byte[] rawMessageToByteArray(String rawMessage) {
 
 		int byteArrayLength = rawMessage.length() / 8;
@@ -145,10 +149,6 @@ public class PCEPComputationFactory {
 		return x;
 	}
 	
-	public static void main(String[] args){
-		System.out.println("value of 01010101 : " + getDecimalValue("01010101"));
-		System.out.println("value of 01010101 using Integer.valueOf : " + Integer.valueOf("01010101", 2));
-	}
 
 	public static String getBinaryString(String headerMember,
 			int headerMemberBitIndex) {
@@ -205,23 +205,23 @@ public class PCEPComputationFactory {
 				Integer.valueOf(binaryString, 2);
 			}
 		} catch (Exception ex) {
-			Logger.logWarning("Error at: binaryString malformed! Filled binaryString with zeros!");
+			logger.error("Error at: binaryString malformed! Filled binaryString with zeros!");
 			return appendZerosToBinaryString("", headerMemberLength);
 		}
 
 		if (binaryString.length() == headerMemberLength) {
 			return binaryString;
 		} else if (binaryString.length() > headerMemberLength) {
-			Logger.logWarning("Error at: binaryString too long, corrected by cutting of bits!");
+			logger.warn("Error at: binaryString too long, corrected by cutting of bits!");
 			return binaryString.substring(0, headerMemberLength);
 			//what's the logic behind this code? 
 			/*return binaryString.substring(0, binaryString.length()
 			*///		- (binaryString.length() - headerMemberLength));
 		} else if (binaryString.length() < headerMemberLength) {
-			Logger.logWarning("Error at: binaryString too short, corrected by appending zeros!");
+			logger.warn("Error at: binaryString too short, corrected by appending zeros!");
 			return appendZerosToBinaryString(binaryString, headerMemberLength);
 		} else {
-			Logger.logWarning("Error at: binaryString malformed! Filled binaryString with zeros!");
+			logger.warn("Error at: binaryString malformed! Filled binaryString with zeros!");
 			return appendZerosToBinaryString("", headerMemberLength);
 		}
 	}
@@ -231,7 +231,7 @@ public class PCEPComputationFactory {
 		if (decimalValue >= 0 && decimalValue <= headerMaxValue) {
 			return decimalValue;
 		} else {
-			Logger.logWarning("Error at: Wrong decimalValue! Set Value to 0");
+			logger.error("Error at: Wrong decimalValue! Set Value to 0");
 			return decimalValue = 0;
 		}
 	}
@@ -241,7 +241,7 @@ public class PCEPComputationFactory {
 		if (decimalValue >= 0 && decimalValue <= headerMaxValue) {
 			return decimalValue;
 		} else {
-			Logger.logWarning("Error at: Wrong decimalValue! Set Value to 0");
+			logger.error("Error at: Wrong decimalValue! Set Value to 0");
 			return decimalValue = 0;
 		}
 	}
@@ -251,7 +251,7 @@ public class PCEPComputationFactory {
 		if (inputStartingBit >= 0 && inputStartingBit < headerMemberLength) {
 			return inputStartingBit;
 		} else {
-			Logger.logWarning("Error at: startingBit out of Bounds! Set to 0!");
+			logger.error("Error at: startingBit out of Bounds! Set to 0!");
 			return 0;
 		}
 	}

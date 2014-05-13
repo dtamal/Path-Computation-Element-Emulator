@@ -19,7 +19,9 @@ package com.pcee.protocol.open;
 
 import java.util.LinkedList;
 
-import com.pcee.logger.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
@@ -27,6 +29,8 @@ import com.pcee.protocol.message.objectframe.impl.PCEPOpenObject;
 
 public class PCEPOpenFrameFactory {
 
+	private static Logger logger  = LoggerFactory.getLogger(PCEPOpenFrameFactory.class);
+	
 	public static PCEPOpenFrame generateOpenFrame(PCEPOpenObject openObject) {
 
 		PCEPOpenFrame openFrame = new PCEPOpenFrame(openObject);
@@ -47,8 +51,7 @@ public class PCEPOpenFrameFactory {
 		LinkedList<PCEPObjectFrame> objectList = message.getObjectsList();
 
 		if (objectList.size() != 1) {
-			localLogger("Wrong OpenMessage Format!");
-			localDebugger("Object list inside the OPEN Frame is not equal to 1. The size of the object list is " + objectList.size());
+			logger.error("Wrong OpenMessage Format! Object list inside the OPEN Frame is not equal to 1. The size of the object list is " + objectList.size());
 			return null; // TODO
 		}
 
@@ -56,14 +59,6 @@ public class PCEPOpenFrameFactory {
 
 		return new PCEPOpenFrame(openObject);
 
-	}
-
-	private static void localLogger(String event) {
-		Logger.logSystemEvents("[PCEPOpenFrameFactory] " + event);
-	}
-
-	private static void localDebugger(String event) {
-		Logger.debugger("[PCEPOpenFrameFactory] " + event);
 	}
 
 }

@@ -31,7 +31,6 @@ import com.pcee.architecture.networkmodule.NetworkModule;
 import com.pcee.architecture.networkmodule.NetworkModuleImpl;
 import com.pcee.architecture.sessionmodule.SessionModule;
 import com.pcee.architecture.sessionmodule.SessionModuleImpl;
-import com.pcee.logger.Logger;
 
 public class ModuleManagement {
 
@@ -54,8 +53,6 @@ public class ModuleManagement {
 				clientModule = new ClientModuleImpl(this);
 			} else {
 				clientModule = new ClientModuleImpl(this);
-				Logger.logging = true;
-				Logger.debugging = true;
 			}
 
 			running = true;
@@ -71,7 +68,7 @@ public class ModuleManagement {
 			int port = 0, sessionThreads = 0, computationThreads = 0;
 
 			try {
-				String logger = reader.getProperty("logging");
+/*				String logger = reader.getProperty("logging");
 				if (logger.equalsIgnoreCase("on")) {
 					Logger.logging = true;
 				} else {
@@ -84,7 +81,7 @@ public class ModuleManagement {
 				} else {
 					Logger.debugging = false;
 				}
-
+*/
 				port = Integer.valueOf(reader.getProperty("port"));
 				sessionThreads = Integer.valueOf(reader
 						.getProperty("sessionThreads"));

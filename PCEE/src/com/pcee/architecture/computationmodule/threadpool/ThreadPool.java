@@ -21,10 +21,13 @@ package com.pcee.architecture.computationmodule.threadpool;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 
 /**
@@ -35,7 +38,8 @@ import com.pcee.protocol.message.PCEPMessage;
  */
 public class ThreadPool {
 
-
+	private static Logger logger = LoggerFactory.getLogger(ThreadPool.class);
+	
 	// Integer to define the number of threads used
 	private int threadCount;
 
@@ -80,7 +84,7 @@ public class ThreadPool {
 	 * @return
 	 */
 	private boolean initThreadPool() {
-		localLogger("Initializing Thread Pool, size = " + threadCount);
+		logger.info("Initializing Thread Pool, size = " + threadCount);
 		if (isInitialized == false) {
 			threadHashMap = new HashMap<String, Worker>();
 			for (int i = 0; i < threadCount; i++) {
@@ -89,10 +93,10 @@ public class ThreadPool {
 				worker.setName("WorkerThread-" + i);
 				threadHashMap.put(id, worker);
 				worker.start();
-				localLogger("Worker Thread " + i + " initialized");
+				logger.info("Worker Thread " + i + " initialized");
 			}
 			isInitialized = true;
-			localDebugger("Thread Pool Initialized");
+			logger.debug("Thread Pool Initialized");
 			return true;
 		} else
 			return false;
@@ -118,24 +122,6 @@ public class ThreadPool {
 			threadHashMap.get(id).interrupt();
 		}
 
-	}
-
-	/**
-	 * Function to log events inside the thread pool implementation
-	 * 
-	 * @param event
-	 */
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[ThreadPool]     " + event);
-	}
-
-	/**
-	 * Function to log debugging events inside the thread pool implementation
-	 * 
-	 * @param event
-	 */
-	private void localDebugger(String event) {
-		Logger.debugger("[ThreadPool]     " + event);
 	}
 
 }

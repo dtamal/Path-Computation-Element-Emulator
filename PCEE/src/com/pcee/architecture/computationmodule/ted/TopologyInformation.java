@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.graph.elements.edge.EdgeElement;
@@ -38,7 +41,6 @@ import com.graph.graphcontroller.impl.GcontrollerImpl;
 import com.graph.topology.importers.ImportTopology;
 import com.graph.topology.importers.impl.BRITEImportTopology;
 import com.graph.topology.importers.impl.SNDLibImportTopology;
-import com.pcee.logger.Logger;
 
 /**
  * Class to provide Topology Instances to the computation layer
@@ -48,6 +50,7 @@ import com.pcee.logger.Logger;
  */
 public class TopologyInformation {
 
+	private static Logger logger = LoggerFactory.getLogger(TopologyInformation.class);
 
 	//JSON Parser
 	private static Gson json = new Gson();
@@ -113,12 +116,12 @@ public class TopologyInformation {
 		// graph object
 		topology.importTopology(graph, file.getAbsolutePath());
 		if (graph == null)
-			localDebugger("Error in loading graph from file");
+			logger.debug("Error in loading graph from file");
 		else
-			localLogger("NetworkSize: " + networkSize());
+			logger.info("NetworkSize: " + networkSize());
 
 		//Start Topology Update Listener
-		localLogger ("Starting thread to listen for topology updates on port " + topologyUpdatePort);
+		logger.info ("Starting thread to listen for topology updates on port " + topologyUpdatePort);
 		startTopologyUpdateListner();
 	}
 
@@ -159,24 +162,6 @@ public class TopologyInformation {
 	}
 
 	/**
-	 * Function for logging events
-	 * 
-	 * @param event
-	 */
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[TopologyInformation]     " + event);
-	}
-
-	/**
-	 * Function for logging debug information
-	 * 
-	 * @param event
-	 */
-	private void localDebugger(String event) {
-		Logger.debugger("[TopologyInformation]     " + event);
-	}
-
-	/**
 	 * test case
 	 * 
 	 * @param args
@@ -210,7 +195,7 @@ public class TopologyInformation {
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
 										if (!graph.getConnectingEdge(sourceID, destID).getEdgeParams().reserveCapacity(capacity)) {
-											localLogger("Cannot reserve capacity between " + sourceID +" and " + destID);
+											logger.info("Cannot reserve capacity between " + sourceID +" and " + destID);
 											for (int j=0;j<i;j++) {
 												//Releasing capacity that was reserved till before i
 												String srcID = (String)vertexSequence.get(j);
@@ -224,7 +209,7 @@ public class TopologyInformation {
 											return json.toJson(map);
 										}
 									} else {
-										localLogger("Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
+										logger.info("Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
 										for (int j=0;j<i;j++) {
 											//Releasing capacity that was reserved till before i
 											String srcID = (String)vertexSequence.get(j);
@@ -238,7 +223,7 @@ public class TopologyInformation {
 									}
 								}
 								if (i==vertexSequence.size()-1) {
-									localLogger("Successfully reserved capacity on provided sequence");
+									logger.info("Successfully reserved capacity on provided sequence");
 									Map map = new HashMap();
 									map.put("response", new Boolean(true));
 									return json.toJson(map);
@@ -257,7 +242,7 @@ public class TopologyInformation {
 									String destID = (String)vertexSequence.get(i+1);
 									if (graph.aConnectingEdge(sourceID, destID)) {
 										if (!graph.getConnectingEdge(sourceID, destID).getEdgeParams().releaseCapacity(capacity)) {
-											localLogger("Cannot release additional capacity between " + sourceID +" and " + destID);
+											logger.info("Cannot release additional capacity between " + sourceID +" and " + destID);
 											for (int j=0;j<i;j++) {
 												//Releasing capacity that was reserved till before i
 												String srcID = (String)vertexSequence.get(j);
@@ -271,7 +256,7 @@ public class TopologyInformation {
 
 										}
 									} else {
-										localLogger("Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
+										logger.info("Invalid Vertex Sequence sent, no edge found between " + sourceID +" and " + destID);
 										for (int j=0;j<i;j++) {
 											//Releasing capacity that was reserved till before i
 											String srcID = (String)vertexSequence.get(j);
@@ -285,7 +270,7 @@ public class TopologyInformation {
 									}
 								}
 								if (i==vertexSequence.size()-1) {
-									localLogger("Successfully released capacity on provided sequence");
+									logger.info("Successfully released capacity on provided sequence");
 									Map map = new HashMap();
 									map.put("response", new Boolean(true));
 									return json.toJson(map);
@@ -311,12 +296,12 @@ public class TopologyInformation {
 									EdgeParams params = new BasicEdgeParams(edge, delay, weight, capacity);
 									params.setAvailableCapacity(avcapacity);
 									edge.setEdgeParams(params);
-									localLogger("Updated Edge definition from " + sourceID + " to " + destID);
+									logger.info("Updated Edge definition from " + sourceID + " to " + destID);
 									Map map = new HashMap();
 									map.put("response", new Boolean(true));
 									return json.toJson(map);
 								} else {
-									localLogger("No existing edge from " + sourceID + " to " + destID + " foud in topology");
+									logger.info("No existing edge from " + sourceID + " to " + destID + " foud in topology");
 									Map map = new HashMap();
 									map.put("response", new Boolean(false));
 									map.put("reason", "No existing edge from " + sourceID + " to " + destID + " foud in topology");
@@ -327,7 +312,7 @@ public class TopologyInformation {
 						}
 					}
 				} catch (JsonSyntaxException e) {
-					localLogger("Malformed Json sent from Client" + e.getMessage());
+					logger.info("Malformed Json sent from Client" + e.getMessage());
 					Map map = new HashMap();
 					map.put("response", new Boolean(false));
 					map.put("reason", "Malformed Json sent from Client" + e.getMessage());
@@ -373,12 +358,12 @@ public class TopologyInformation {
 							// Ignore close of the socket // should be closed by client
 							//clientSocket.close();
 						} catch (IOException e) {
-							localDebugger("IOException during read for new connections. Discarding update");
+							logger.debug("IOException during read for new connections. Discarding update");
 							continue;
 						} 
 					}
 				} catch (IOException e1) {
-					localDebugger("Could not open server socket to listen for topology updates on port:" + topologyUpdatePort);
+					logger.debug("Could not open server socket to listen for topology updates on port:" + topologyUpdatePort);
 
 				}
 

@@ -20,11 +20,15 @@ package com.pcee.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.PCEPMessageFactory;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
@@ -40,6 +44,8 @@ import com.pcee.protocol.request.PCEPRequestFrameFactory;
  */
 public class ConnectorGUI extends JFrame implements ActionListener {
 
+	private static Logger logger = LoggerFactory.getLogger(ConnectorGUI.class);
+	
 	private static final long serialVersionUID = 1L;
 
 	ModuleManagement lm;
@@ -407,12 +413,12 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 	public void openConnection() throws Exception {
 		PCEPAddress address = new PCEPAddress(serverAddressTextField.getText(), Integer.parseInt(serverPortTextField.getText()));
 		killIDALogo();
-		guiLogger("Trying to connect to " + address.getIPv4Address(true));
+		logger.info("Trying to connect to " + address.getIPv4Address(true));
 		lm.getClientModule().registerConnection(address, false, true, true);
 	}
 	
 	public void requestMessage() throws IOException {
-		localLogger("Sending Request Message");
+		logger.info("Sending Request Message");
 
 		String pFlag = booleanToStringConverter(requestMessagePFlagCheckBox.isSelected());
 		String iFlag = booleanToStringConverter(requestMessageIFlagCheckBox.isSelected());
@@ -439,19 +445,19 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 
 		message.setAddress(destAddress);
 
-		guiLogger("Sending Path Computation Request Message.");
-		guiLogger("Requesting a Way from " + sourceAddress.getIPv4Address(true) + " to " + destinationAddress.getIPv4Address(true));
+		logger.info("Sending Path Computation Request Message.");
+		logger.info("Requesting a Way from " + sourceAddress.getIPv4Address(true) + " to " + destinationAddress.getIPv4Address(true));
 		lm.getClientModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
 	}
 
 	public void actionPerformed(ActionEvent event) {
 		try {
 			if (event.getActionCommand().equals("connect")) {
-				localDebugger("Connection Event Triggered");
+				logger.info("Connection Event Triggered");
 				openConnection();
 			}
 			if (event.getActionCommand().equals("request")) {
-				localLogger("Request Event triggered");
+				logger.info("Request Event triggered");
 				requestMessage();
 			}
 
@@ -497,18 +503,6 @@ public class ConnectorGUI extends JFrame implements ActionListener {
 
 	public static void updateTextArea(String text) {
 		messageTextArea.append("\n" + text);
-	}
-
-	private void guiLogger(String event) {
-		Logger.logGUINotifications(event);
-	}
-
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[PCEClientGUI] " + event);
-	}
-
-	private void localDebugger(String event) {
-		Logger.debugger("[PCEClientGUI] " + event);
 	}
 
 }

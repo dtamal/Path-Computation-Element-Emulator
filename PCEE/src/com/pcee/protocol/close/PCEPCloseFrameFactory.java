@@ -19,7 +19,9 @@ package com.pcee.protocol.close;
 
 import java.util.LinkedList;
 
-import com.pcee.logger.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
@@ -27,6 +29,8 @@ import com.pcee.protocol.message.objectframe.impl.PCEPCloseObject;
 
 public class PCEPCloseFrameFactory {
 
+	private static Logger logger = LoggerFactory.getLogger(PCEPCloseFrameFactory.class);
+	
 	public static PCEPCloseFrame generateCloseFrame(PCEPCloseObject closeObject) {
 
 		PCEPCloseFrame closeFrame = new PCEPCloseFrame(closeObject);
@@ -47,8 +51,7 @@ public class PCEPCloseFrameFactory {
 		LinkedList<PCEPObjectFrame> objectList = message.getObjectsList();
 
 		if (objectList.size() != 1) {
-			localLogger("Wrong Close Message Format!");
-			localDebugger("Close Message should only have one object. The size of the object list is : " + objectList.size());
+			logger.error("Wrong Close Message Format! Close Message should only have one object. The size of the object list is : " + objectList.size());
 			return null; // TODO
 		}
 
@@ -56,14 +59,6 @@ public class PCEPCloseFrameFactory {
 
 		return new PCEPCloseFrame(closeObject);
 
-	}
-
-	private static void localLogger(String event) {
-		Logger.logSystemEvents("[PCEPCloseFrameFactory] " + event);
-	}
-
-	private static void localDebugger(String event) {
-		Logger.debugger("[PCEPCloseFrameFactory] " + event);
 	}
 
 }

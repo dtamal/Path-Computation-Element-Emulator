@@ -19,9 +19,12 @@ package com.pcee.protocol.message.objectframe;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.common.RequestID;
 import com.pcee.common.SessionID;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPComputationFactory;
 import com.pcee.protocol.message.PCEPConstantValues;
 import com.pcee.protocol.message.objectframe.impl.*;
@@ -30,6 +33,8 @@ import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 public class PCEPObjectFrameFactory {
 
+	private static Logger logger = LoggerFactory.getLogger(PCEPObjectFrameFactory.class);
+	
 	public static PCEPOpenObject generatePCEPOpenObject(String pFlag,
 			String iFlag, int keepAlive, int deadTimer) {
 
@@ -270,7 +275,7 @@ public class PCEPObjectFrameFactory {
 		case 21:
 			return new PCEPObjectiveFunctionObject(objectHeader, objectString);
 		default:
-			Logger.logWarning("Error at switch(objectHeader.getClassDecimalValue()). Value = "
+			logger.error("Error at switch(objectHeader.getClassDecimalValue()). Value = "
 					+ objectHeader.getClassDecimalValue());
 			return null;
 		}

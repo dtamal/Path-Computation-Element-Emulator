@@ -18,9 +18,10 @@
 package com.pcee.architecture.computationmodule.threadpool;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import com.graph.elements.edge.EdgeElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.graph.elements.vertex.VertexElement;
 import com.graph.graphcontroller.Gcontroller;
 import com.graph.path.PathElement;
@@ -31,7 +32,6 @@ import com.graph.path.algorithms.impl.MaxBandwidthShortestPathComputationAlgorit
 import com.graph.path.algorithms.impl.SimplePathComputationAlgorithm;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.PCEPMessageFactory;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
@@ -53,6 +53,8 @@ import com.pcee.protocol.response.PCEPResponseFrameFactory;
  * @author Marek Drogon
  */
 public class WorkerTask implements Runnable {
+	
+	private Logger logger = LoggerFactory.getLogger("WorkerTask");
 	// Request to be processed
 	private PCEPMessage request;
 	// Graph used for computation of the request
@@ -75,9 +77,9 @@ public class WorkerTask implements Runnable {
 	/** Function to implement the path computation operations */
 	public void run() {
 		PCEPRequestFrame requestFrame = PCEPRequestFrameFactory.getPathComputationRequestFrame(request);
-		localLogger("Starting Processing of Request: " + requestFrame.getRequestID());
+		logger.info("Starting Processing of Request: " + requestFrame.getRequestID());
 		processSingleDomainRequest(requestFrame);
-		localLogger("Completed Processing of Request: " + requestFrame.getRequestID());		
+		logger.info("Completed Processing of Request: " + requestFrame.getRequestID());		
 	}
 
 
@@ -91,7 +93,7 @@ public class WorkerTask implements Runnable {
 			Constraint constr = null;
 			PathComputationAlgorithm algo = null;
 			if (requestFrame.containsBandwidthObject()) {
-				localLogger("Request Contains bandwidth Object");
+				logger.info("Request Contains bandwidth Object");
 				constr = new SimplePathComputationConstraint (graph.getVertex(sourceID), graph.getVertex(destID), requestFrame.extractBandwidthObject().getBandwidthFloatValue());
 				algo = new MaxBandwidthShortestPathComputationAlgorithm();
 			} else {
@@ -101,7 +103,7 @@ public class WorkerTask implements Runnable {
 			//Start Path Computation
 			PathElement element = algo.computePath(graph, constr);
 			if (element !=null) {
-				localLogger("Computed path is " + element.getVertexSequence());
+				logger.info("Computed path is " + element.getVertexSequence());
 				// return response
 				ArrayList<EROSubobjects> vertexList = getTraversedVertexes(element.getTraversedVertices());
 
@@ -122,7 +124,7 @@ public class WorkerTask implements Runnable {
 				PCEPMessage mesg = PCEPMessageFactory.generateMessage(respFrame);
 				mesg.setAddress(request.getAddress());
 
-				localLogger("Path found in the domain. Sending back to client");
+				logger.info("Path found in the domain. Sending back to client");
 				// Send response message from the computation layer to the session layer
 				lm.getComputationModule().sendMessage(mesg, ModuleEnum.SESSION_MODULE);
 
@@ -135,11 +137,11 @@ public class WorkerTask implements Runnable {
 		} else {
 			//Source and/or destination not present in the PCE
 			if (graph.vertexExists(sourceID))
-				localLogger("Destination IP address " + destID + " not in the topology. Returning a no path object");
+				logger.info("Destination IP address " + destID + " not in the topology. Returning a no path object");
 			else if (graph.vertexExists(destID)) 
-				localLogger("Source IP address " + sourceID + " not in the topology. Returning a no path object");
+				logger.info("Source IP address " + sourceID + " not in the topology. Returning a no path object");
 			else {
-				localLogger("Both source IP address " + sourceID + " and destination IP address " + destID + " not in the topology. Returning a no path object");
+				logger.info("Both source IP address " + sourceID + " and destination IP address " + destID + " not in the topology. Returning a no path object");
 			}
 			returnNoPathMessage(requestFrame.getRequestID());
 		}
@@ -172,24 +174,6 @@ public class WorkerTask implements Runnable {
 			traversedVertexesList.add(new PCEPAddress(vertexArrayList.get(i).getVertexID(), false));			
 		}
 		return traversedVertexesList;
-	}
-
-	/**
-	 * Function to log events inside the WorkerTask
-	 * 
-	 * @param event
-	 */
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[WorkerTask]     " + event);
-	}
-
-	/**
-	 * Function to log debugging information inside the worker task
-	 * 
-	 * @param event
-	 */
-	private void localDebugger(String event) {
-		Logger.debugger("[WorkerTask]     " + event);
 	}
 
 }

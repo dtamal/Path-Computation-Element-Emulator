@@ -21,11 +21,15 @@ import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 
+
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.architecture.computationmodule.threadpool.ThreadPool;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 import com.pcee.protocol.response.PCEPResponseFrame;
@@ -38,6 +42,8 @@ import com.pcee.protocol.response.PCEPResponseFrameFactory;
  */
 public class ComputationModuleImpl extends ComputationModule {
 
+	private static Logger logger = LoggerFactory.getLogger(ComputationModuleImpl.class);
+			
 	// Management Object used to forward communications between the different
 	// modules
 	private ModuleManagement lm;
@@ -102,9 +108,9 @@ public class ComputationModuleImpl extends ComputationModule {
 	}
 
 	public void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-		localDebugger("Entering: receiveMessage(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
-		localDebugger("| sourceLayer: " + sourceLayer);
+		logger.debug("Entering: receiveMessage(PCEPMessage message)");
+		logger.debug("| message: " + message.contentInformation());
+		logger.debug("| sourceLayer: " + sourceLayer);
 		switch (sourceLayer) {
 		case SESSION_MODULE:
 			//If message is a path computation request process message 
@@ -115,8 +121,8 @@ public class ComputationModuleImpl extends ComputationModule {
 				processResponseFromRemotePeer(message);
 			break;
 		default:
-			localLogger("Error in receiveMessage(PCEPMessage message, LayerEnum targetLayer)");
-			localLogger("Wrong sourceLayer");
+			logger.info("Error in receiveMessage(PCEPMessage message, LayerEnum targetLayer)");
+			logger.info("Wrong sourceLayer");
 			break;
 		}
 
@@ -140,7 +146,7 @@ public class ComputationModuleImpl extends ComputationModule {
 			remotePeerResponseAssociationHashMap.put(key, queue);
 		}
 		else
-			localLogger("registerRequestToRemotePeer: Not a valid request");
+			logger.info("registerRequestToRemotePeer: Not a valid request");
 	}
 	
 	//Function to implement a mechanism where a response from another server (hierarchical or PCE peer) is sent to the correct worker task
@@ -152,11 +158,11 @@ public class ComputationModuleImpl extends ComputationModule {
 		String requestID = Integer.toString(responseFrame.getRequestID());
 		String key = getKeyForRemotePeerAssociation(address, requestID);
 		if (remotePeerResponseAssociationHashMap.containsKey(key)) {
-			localLogger("Path Computation Response Received by the computation Module, adding to queue from worker task");
+			logger.info("Path Computation Response Received by the computation Module, adding to queue from worker task");
 			remotePeerResponseAssociationHashMap.get(key).add(message);
 			remotePeerResponseAssociationHashMap.remove(key);
 		} else {
-			localLogger("Response for Peer-requestID combnation that is not registered with the computation module");
+			logger.info("Response for Peer-requestID combnation that is not registered with the computation module");
 		}
 		
 		
@@ -178,30 +184,11 @@ public class ComputationModuleImpl extends ComputationModule {
 			// Not possible
 			break;
 		default:
-			localLogger("Error in sendMessage(PCEPMessage message, LayerEnum targetLayer)");
-			localLogger("Wrong target Layer");
+			logger.info("Error in sendMessage(PCEPMessage message, LayerEnum targetLayer)");
+			logger.info("Wrong target Layer");
 			break;
 		}
 
-	}
-
-
-	/**
-	 * Function to log events in the Computation layer
-	 * 
-	 * @param event
-	 */
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[MessageHandler] " + event);
-	}
-
-	/**
-	 * Function to log debugging information in the computation layer
-	 * 
-	 * @param event
-	 */
-	private void localDebugger(String event) {
-		Logger.debugger("[MessageHandler] " + event);
 	}
 
 }

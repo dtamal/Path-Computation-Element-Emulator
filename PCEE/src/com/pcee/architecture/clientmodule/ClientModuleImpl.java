@@ -18,16 +18,21 @@
 package com.pcee.architecture.clientmodule;
 
 import java.util.concurrent.LinkedBlockingQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.logger.Logger;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 import com.pcee.protocol.response.PCEPResponseFrame;
 import com.pcee.protocol.response.PCEPResponseFrameFactory;
 
 public class ClientModuleImpl extends ClientModule {
-
+	
+	private static Logger logger = LoggerFactory.getLogger(ClientModuleImpl.class);
+	
 	// Module Management Variable to facilitate inter-module communication
 	private ModuleManagement lm;
 
@@ -36,40 +41,40 @@ public class ClientModuleImpl extends ClientModule {
 
 
 	public ClientModuleImpl(ModuleManagement layerManagement) {
-		localDebugger("|");
-		localLogger("Entering: ClientModuleImpl(ModuleManagement layerManagement)");
-		localDebugger("| layerManagement: " + layerManagement);
+		logger.debug("|");
+		logger.info("Entering: ClientModuleImpl(ModuleManagement layerManagement)");
+		logger.debug("| layerManagement: " + layerManagement);
 
 		lm = layerManagement;
 		this.start();
 	}
 
 	public void stop() {
-		localDebugger("|");
-		localLogger("Entering: stop()");
+		logger.debug("|");
+		logger.info("Entering: stop()");
 	}
 
 	public void start() {
-		localDebugger("|");
-		localLogger("Entering: start()");
+		logger.debug("|");
+		logger.info("Entering: start()");
 		receiveQueue = new LinkedBlockingQueue<PCEPMessage>();
 	}
 
 	public void closeConnection(PCEPAddress address) {
-		localDebugger("|");
-		localLogger("Entering: closeConnection(Address address)");
-		localDebugger("| address: " + address.getIPv4Address(true));
+		logger.debug("|");
+		logger.info("Entering: closeConnection(Address address)");
+		logger.debug("| address: " + address.getIPv4Address(true));
 
 		lm.getSessionModule().closeConnection(address);
 	}
 
 	public void registerConnection(PCEPAddress address, boolean connected,
 			boolean connectionInitialized, boolean forceClient) {
-		localDebugger("|");
-		localLogger("Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
-		localDebugger("| address: " + address.getIPv4Address(true));
-		localDebugger("| connected" + connected);
-		localDebugger("| connectionInitialized" + connectionInitialized);
+		logger.debug("|");
+		logger.info("Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
+		logger.debug("| address: " + address.getIPv4Address(true));
+		logger.debug("| connected" + connected);
+		logger.debug("| connectionInitialized" + connectionInitialized);
 
 		if (connected == false) {
 			lm.getSessionModule().registerConnection(address, connected,
@@ -79,10 +84,10 @@ public class ClientModuleImpl extends ClientModule {
 
 	public synchronized void receiveMessage(PCEPMessage message,
 			ModuleEnum sourceLayer) {
-		localDebugger("|");
-		localDebugger("Entering: receiveMessage(PCEPMessage message, ModuleEnum sourceLayer)");
-		localDebugger("| message: " + message.contentInformation());
-		localDebugger("| sourceLayer: " + sourceLayer);
+		logger.debug("|");
+		logger.debug("Entering: receiveMessage(PCEPMessage message, ModuleEnum sourceLayer)");
+		logger.debug("| message: " + message.contentInformation());
+		logger.debug("| sourceLayer: " + sourceLayer);
 
 		switch (sourceLayer) {
 		case SESSION_MODULE:
@@ -91,22 +96,22 @@ public class ClientModuleImpl extends ClientModule {
 				//ClientTest.messageQueue.add(message);
 				PCEPResponseFrame responseFrame = PCEPResponseFrameFactory
 						.getPathComputationResponseFrame(message);
-				localLogger("| COMPUTATION RECEIVED: "
+				logger.info("| COMPUTATION RECEIVED: "
 						+ responseFrame.getTraversedVertexes());
 				receiveQueue.add(message);
 				
 			} else if (message.getMessageHeader().getTypeDecimalValue() == 5) {
 				receiveQueue.add(message);
-				localLogger("| Notification message received");
+				logger.info("| Notification message received");
 			} else if (message.getMessageHeader().getTypeDecimalValue() == 6) {
 				
 				receiveQueue.add(message);
-				localLogger("| Error message received");
+				logger.info("| Error message received");
 				
 			}
 			break;
 		default:
-			localLogger("| Error: Wrong target Layer");
+			logger.info("| Error: Wrong target Layer");
 			break;
 		}
 
@@ -114,10 +119,10 @@ public class ClientModuleImpl extends ClientModule {
 
 	public synchronized void sendMessage(PCEPMessage message,
 			ModuleEnum targetLayer) {
-		localDebugger("|");
-		localDebugger("Entering: sendMessage(PCEPMessage message, ModuleEnum targetLayer)");
-		localDebugger("| message: " + message.contentInformation());
-		localDebugger("| targetLayer: " + targetLayer);
+		logger.debug("|");
+		logger.debug("Entering: sendMessage(PCEPMessage message, ModuleEnum targetLayer)");
+		logger.debug("| message: " + message.contentInformation());
+		logger.debug("| targetLayer: " + targetLayer);
 
 		switch (targetLayer) {
 		case SESSION_MODULE:
@@ -125,27 +130,9 @@ public class ClientModuleImpl extends ClientModule {
 					ModuleEnum.CLIENT_MODULE);
 			break;
 		default:
-			localLogger("| Error: Wrong target Layer");
+			logger.info("| Error: Wrong target Layer");
 			break;
 		}
-	}
-
-	/**
-	 * Function to log events in the Client Layer
-	 * 
-	 * @param event
-	 */
-	private void localLogger(String event) {
-		Logger.logSystemEvents("[ClientLayer]     " + event);
-	}
-
-	/**
-	 * Function to log debugging information in the client layer
-	 * 
-	 * @param event
-	 */
-	private void localDebugger(String event) {
-		Logger.debugger("[ClientModule]     " + event);
 	}
 
 }

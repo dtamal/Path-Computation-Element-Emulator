@@ -17,10 +17,10 @@
 
 package com.pcee.client;
 
+import org.slf4j.impl.StaticLoggerBinder;
+
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.gui.ConnectorGUI;
-import com.pcee.logger.Logger;
-import com.pcee.logger.gui.GUILogObject;
 
 /**GUI based implementation of the PCE client
  * 
@@ -33,15 +33,14 @@ public class ClientLauncher {
 	
 	/**Launch point to initialize the client GUI*/
 	public static void main(String[] args) throws Exception {
+		StaticLoggerBinder.getSingleton();
+		StaticLoggerBinder.getSingleton().logToGUI();
 		
 		String pceServerAddress = "127.0.0.1";
 		//Default source and destination values for path computation requests
 
 		String defaultSourceAddress = "192.169.2.1";
 		String defaultDestinationAddress = "192.169.2.14";
-		
-		//Set Logger to log to the GUI
-		Logger.setLogObject(new GUILogObject());
 		
 		//Initialize the layer management module
 		

@@ -16,8 +16,8 @@ public class StateMachineServerImpl extends StateMachineImpl{
 
 	@Override
 	public void updateState(PCEPMessage message, ModuleEnum sourceModule) {
-		localDebugger("Entering: updateState(PCEPMessage message, ModuleEnum targetLayer)");
-		localDebugger("| message: " + message.contentInformation());
+		logger.debug("Entering: updateState(PCEPMessage message, ModuleEnum targetLayer)");
+		logger.debug("| message: " + message.contentInformation());
 		switch (state) {
 		case 0: {
 			enterIdleState();
@@ -25,7 +25,7 @@ public class StateMachineServerImpl extends StateMachineImpl{
 		}
 		case 1: {
 			// enterTCPPendingState();
-			localLogger("You should not see me!");
+			logger.info("You should not see me!");
 			System.out.println("Message Arrived Before State Was Updated");
 			break;
 		}
@@ -42,15 +42,15 @@ public class StateMachineServerImpl extends StateMachineImpl{
 			break;
 		}
 		default: {
-			localLogger("Lost in a completely not reachable state. wtf?");
+			logger.info("Lost in a completely not reachable state. wtf?");
 		}
 		}
 	}
 
 
 	private void enterSessionUPState(PCEPMessage message, ModuleEnum sourceModule) {
-		localDebugger("Entering: enterSessionUPState(PCEPMessage message)");
-		localDebugger("| message: " + message.contentInformation());
+		logger.debug("Entering: enterSessionUPState(PCEPMessage message)");
+		logger.debug("| message: " + message.contentInformation());
 
 		// System.out.println("[StateMachine: " + address.getAddress() +
 		// "] entering Session up State" );
@@ -61,7 +61,7 @@ public class StateMachineServerImpl extends StateMachineImpl{
 				.checkMessageFormat(message);
 
 		if (noErrorsDetected == false) {
-			localLogger("Message Format Error detected");
+			logger.info("Message Format Error detected");
 			sendCloseMessage();
 			// releaseResources();
 			closeTCPConnection();
@@ -69,29 +69,29 @@ public class StateMachineServerImpl extends StateMachineImpl{
 
 		this.checkMultipleConnections();
 
-		localDebugger("Entering: analyzeMessage(PCEPMessage message)");
+		logger.debug("Entering: analyzeMessage(PCEPMessage message)");
 
 		int messageType = message.getMessageHeader().getTypeDecimalValue();
 
 		switch (messageType) {
 
 		case 1: {
-			localLogger("Received Open Message");
-			localLogger("Waiting to be implemented. Do something with this Message!");
+			logger.info("Received Open Message");
+			logger.info("Waiting to be implemented. Do something with this Message!");
 
 			break;
 		}
 		case 2: {
-			localLogger("Received KeepAlive Message");
+			logger.info("Received KeepAlive Message");
 
 			restartDeadTimer();
-			localLogger("Processing Information: "
+			logger.info("Processing Information: "
 					+ message.contentInformation());
 
 			break;
 		}
 		case 3: {
-			localLogger("Received Path Computation Request Message");
+			logger.info("Received Path Computation Request Message");
 			// System.out.println("Received Path Computation Request Message");
 
 			restartDeadTimer();
@@ -99,43 +99,43 @@ public class StateMachineServerImpl extends StateMachineImpl{
 				lm.getSessionModule().sendMessage(message,
 						ModuleEnum.COMPUTATION_MODULE);
 			} else {
-				localLogger("Server State Machine should not receive Path Computation Requests from any module other than Network");
+				logger.info("Server State Machine should not receive Path Computation Requests from any module other than Network");
 			}
 			break;
 		}
 		case 4: {
-			localLogger("Received Path Computation Response Message");
+			logger.info("Received Path Computation Response Message");
 			restartDeadTimer();
 			// MessageHandler.readResponseMessage(message);
 			if (sourceModule.compareTo(ModuleEnum.COMPUTATION_MODULE) == 0) {
 				lm.getSessionModule().sendMessage(message,
 						ModuleEnum.NETWORK_MODULE);
 			} else {
-				localLogger("Server State Machine should not receive Path Computation Responses from any module other than Computation Module");				
+				logger.info("Server State Machine should not receive Path Computation Responses from any module other than Computation Module");				
 			}
 
 			break;
 		}
 		case 5: {
-			localLogger("Received Notification Message");
+			logger.info("Received Notification Message");
 
 
 			break;
 		}
 		case 6: {
-			localLogger("Received Error Message");
+			logger.info("Received Error Message");
 
 			break;
 		}
 		case 7: {
-			localLogger("Received Close Message");
+			logger.info("Received Close Message");
 
 			this.closeTCPConnection();
 
 			break;
 		}
 		default: {
-			localLogger("ERROR: Unkown Message");
+			logger.info("ERROR: Unkown Message");
 
 			break;
 		}
