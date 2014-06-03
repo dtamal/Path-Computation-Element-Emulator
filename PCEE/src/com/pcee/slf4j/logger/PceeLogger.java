@@ -1,20 +1,24 @@
 package com.pcee.slf4j.logger;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.Marker;
+import org.slf4j.helpers.FormattingTuple;
+import org.slf4j.helpers.MessageFormatter;
 
 public class PceeLogger implements Logger{
 
 	private List<LogModule> logModules;
-	
+
 	private String name;
-	
+
 	private String shortName;
-	
+
 	public PceeLogger(String name) {
 		this.name = name;
 		this.logModules = new ArrayList<LogModule>();
@@ -28,13 +32,22 @@ public class PceeLogger implements Logger{
 		this.shortName = name.substring(name.lastIndexOf(".") + 1);
 	}
 
-	
 
-	
+	private String convertStackTrace(Throwable arg1) {
+		if (arg1!=null) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			arg1.printStackTrace(pw);
+			return sw.toString();
+		} else
+			return "";
+	}
+
+
 	private String getMarker (LogLevelEnum level) {
 		return "[" + level + "-" + shortName + "]";
 	}
-	
+
 	private void log (LogLevelEnum level, String msg) {
 		Iterator<LogModule> iter = logModules.iterator();
 		String out = getMarker(level) + msg; 
@@ -42,27 +55,23 @@ public class PceeLogger implements Logger{
 			iter.next().log(level, out);
 		}
 	}
-	
+
 	private void log (LogLevelEnum level, String arg0, Object arg1) {
-		String out = arg0 + "[" + arg1.toString() + "]";
-		log (level, out);
+		FormattingTuple tp = MessageFormatter.format(arg0, arg1);
+		log(level, tp.getMessage(), tp.getThrowable());
 	}
-	
+
 	private void log(LogLevelEnum level, String arg0, Object... arg1) {
-		String arrString = "[";
-		for (int i=0;i<arg1.length; i++) {
-			arrString += arg1[i].toString() + ",";
-		}
-		arrString = arrString.substring(0, arrString.length()-1) + "]";
-		String out = arg0 + arrString;
-		log (level, out);
+		FormattingTuple tp = MessageFormatter.format(arg0, arg1);
+		log(level, tp.getMessage(), tp.getThrowable());
 	}
-	
+
 	private void log(LogLevelEnum level, String arg0, Throwable arg1) {
-		String out = arg0 + ":" + arg1.getStackTrace().toString();
+		String out = arg0 + ":" + convertStackTrace(arg1);
+
 		log (level, out);
 	}
-	
+
 	private void log(LogLevelEnum level, Marker arg0, String arg1) {
 		String out = arg0 + ":" + arg1;
 		log(level, out);		
@@ -72,7 +81,7 @@ public class PceeLogger implements Logger{
 		String out =  arg0 + "[" + arg1 + "," + arg2 + "]";
 		log(level, out);
 	}
-	
+
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Object arg2) {
 		String out = arg0 + "[" + arg1 + "," + arg2 + "]";
 		log (level, out);
@@ -87,18 +96,18 @@ public class PceeLogger implements Logger{
 		String out = arg0 + "[" + arg1 + "," + arrString + "]";
 		log(level, out);		
 	}
-	
+
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Throwable arg2) {
-		String out = arg0 + "-" + arg1 +":" + arg2.getStackTrace().toString();
+		String out = arg0 + "-" + arg1 +":" + convertStackTrace(arg2);
 		log(level, out);
 	}
 
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Object arg2, Object arg3) {
 		String out = arg0 + "-" + arg1 +"[" + arg2 + "," + arg3 + "]";
-		log(LogLevelEnum.DEBUG, out);
+		log(level, out);
 	}
 
-	
+
 	@Override
 	public void debug(String arg0) {
 		log (LogLevelEnum.DEBUG, arg0);
@@ -149,8 +158,8 @@ public class PceeLogger implements Logger{
 		log(LogLevelEnum.DEBUG, arg0, arg1, arg2, arg3);
 	}
 
-	
-	
+
+
 	@Override
 	public void error(String arg0) {
 		log (LogLevelEnum.ERROR, arg0);
