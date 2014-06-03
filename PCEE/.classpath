@@ -5,5 +5,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JavaGraphLib"/>
 	<classpathentry kind="lib" path="jars/logging/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="jars/gson-2.2.2.jar"/>
+	<classpathentry kind="lib" path="jars/logging/jul-to-slf4j-1.7.5.jar"/>
+	<classpathentry kind="lib" path="jars/ws/asm-3.3.1.jar"/>
+	<classpathentry kind="lib" path="jars/ws/jackson-all-1.9.11.jar"/>
+	<classpathentry kind="lib" path="jars/ws/jersey-bundle-1.18.jar"/>
+	<classpathentry kind="lib" path="jars/ws/jetty-all-9.0.3.v20130506.jar"/>
+	<classpathentry kind="lib" path="jars/ws/servlet-api-3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
