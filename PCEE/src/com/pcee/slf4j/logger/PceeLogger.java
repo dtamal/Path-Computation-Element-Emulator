@@ -48,6 +48,11 @@ public class PceeLogger implements Logger{
 		return "[" + level + "-" + shortName + "]";
 	}
 
+	private String formatLog(Marker arg0, String arg1) {
+		return "(" + arg0 + ")" + arg1;
+	}
+
+	
 	private void log (LogLevelEnum level, String msg) {
 		Iterator<LogModule> iter = logModules.iterator();
 		String out = getMarker(level) + msg; 
@@ -78,33 +83,27 @@ public class PceeLogger implements Logger{
 	}
 
 	private void log(LogLevelEnum level, String arg0, Object arg1, Object arg2) {
-		String out =  arg0 + "[" + arg1 + "," + arg2 + "]";
-		log(level, out);
+		FormattingTuple tp = MessageFormatter.format(arg0, arg1, arg2);
+		log(level, tp.getMessage(), tp.getThrowable());
 	}
 
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Object arg2) {
-		String out = arg0 + "[" + arg1 + "," + arg2 + "]";
-		log (level, out);
+		FormattingTuple tp = MessageFormatter.format(arg1, arg2);
+		log(level, formatLog(arg0, tp.getMessage()), tp.getThrowable());
 	}
 
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Object... arg2) {
-		String arrString = "[";
-		for (int i=0;i<arg2.length; i++) {
-			arrString += arg2[i].toString() + ",";
-		}
-		arrString = arrString.substring(0, arrString.length()-1) + "]";
-		String out = arg0 + "[" + arg1 + "," + arrString + "]";
-		log(level, out);		
+		FormattingTuple tp = MessageFormatter.format(arg1, arg2);
+		log(level, formatLog(arg0, tp.getMessage()), tp.getThrowable());
 	}
 
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Throwable arg2) {
-		String out = arg0 + "-" + arg1 +":" + convertStackTrace(arg2);
-		log(level, out);
+		log(level, formatLog(arg0, arg1), arg2);
 	}
 
 	private void log(LogLevelEnum level, Marker arg0, String arg1, Object arg2, Object arg3) {
-		String out = arg0 + "-" + arg1 +"[" + arg2 + "," + arg3 + "]";
-		log(level, out);
+		FormattingTuple tp = MessageFormatter.format(arg1, arg2, arg3);
+		log(level, formatLog(arg0, tp.getMessage()), tp.getThrowable());
 	}
 
 
