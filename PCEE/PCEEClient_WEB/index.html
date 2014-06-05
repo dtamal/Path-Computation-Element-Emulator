@@ -48,67 +48,6 @@
   
   <div class="container">
 
-      <h1>PCE Server</h1>
-
-	<div class="jumbotron">
-    <div style="margin-left: 2em">
-      <div class="row">
-        <div class="col-lg-4">
-        <h2>Server instance</h2>
-        <label for="server">Select an IP and port to launch the server</label> 
-        <form role="form">
-          <div class="row">
-            <div class="col-xs-6">
-              <input type="text" class="form-control" value="127.0.0.1" id="ip" />
-  
-                <label for="server">IP</label>
-            
-            </div>
-            <div class="col-xs-6">
-              <input type="text" class="form-control" value="4189" id="port" />
-        
-                <label for="port">Port</label>
-          
-            </div>
-          </div>
-        </form>
-        <label for="server">Select the network:</label> 
-        <img src="images/atlanta.png" id="network" class="img-responsive" alt="Responsive image" />
-        <div class="radio">
-          <label>
-          <input type="radio" name="optionsRadios" id="radios1" value="option1" onchange="changeImage()" checked="checked" />
-          Atlanta</label>
-        </div>
-        <div class="radio">
-          <label>
-          <input type="radio" name="optionsRadios" id="radios2" value="option2" onchange="changeImage()" /> NewYork</label>
-        </div>
-        <div class="radio">
-          <label>
-          <input type="radio" name="optionsRadios" id="radios3" value="option1" onchange="changeImage()" /> 24nodes</label>
-        </div>
-        <br />
-        <div class="btn-group">
-        <button type="button" id="runButton" class="btn btn-lg btn-success" onclick="runServer(false)">
-        <span id="startSpan" class="glyphicon glyphicon-play"></span>Run</button> 
-        <button type="button" id="stopButton" class="btn btn-lg btn-danger" disabled="disabled"
-        onclick="runServer(true)"> <span id="startSpan" class="glyphicon glyphicon-stop"></span>Stop</button></div></div>
-        <div class="col-lg-8">
-          <h2>Server log</h2>
-          <label for="server">Server system stats</label>
-          <iframe id="serverIframe" width="100%" height="400" scrolling="auto" style="background: #FFFFFF;"></iframe>
-          <p>
-            <a class="btn btn-primary" id="clearButton1" onclick="clearFrame('serverIframe')" role="button">Clear</a>
-          </p>
-        </div>
-      </div>
-    </div>
-	</div>
-  </div>
-  
-  
-  <div class="container">
-
       <h1>PCE Client</h1>
 
 	<div class="jumbotron">

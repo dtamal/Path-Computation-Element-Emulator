@@ -19,7 +19,6 @@ package com.pcee.architecture.sessionmodule.statemachine;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
