@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 public class PceeLoggerFactory implements ILoggerFactory {
 
 	public static boolean LOG_TO_GUI = false;
+
+	public static boolean LOG_TO_WS = false;
 	
 	private ConcurrentMap<String, Logger> map;
 
@@ -25,7 +27,11 @@ public class PceeLoggerFactory implements ILoggerFactory {
 	public void logToGUI() {
 		logModules.add(new GUILogModule());
 	}
-	
+
+	public void logToWs() {
+		logModules.add(new WsLogModule());
+	}
+
 	@Override
 	public Logger getLogger(String name) {
 		if (map.containsKey(name)) {

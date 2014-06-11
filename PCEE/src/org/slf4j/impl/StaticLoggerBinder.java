@@ -11,6 +11,10 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
 		((PceeLoggerFactory)loggerFactory).logToGUI();
 	}
 
+	public void logToWs() {
+		((PceeLoggerFactory)loggerFactory).logToWs();
+	}
+
 	private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 
 	public static final StaticLoggerBinder getSingleton() {

@@ -15,6 +15,7 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.slf4j.impl.StaticLoggerBinder;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
@@ -119,7 +120,10 @@ public class PCEEWebServerLauncher {
 	
 	public static void main (String[] args) {
 		try {
+			
+			StaticLoggerBinder.getSingleton().logToWs();
 
+			
 			//Check if instance is initialized as a server or a client
 			serverRole = getRole(args);
 			if (serverRole)

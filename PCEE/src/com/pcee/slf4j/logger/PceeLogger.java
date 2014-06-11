@@ -13,6 +13,16 @@ import org.slf4j.helpers.MessageFormatter;
 
 public class PceeLogger implements Logger{
 
+	private boolean debugEnabled = false;
+
+	private boolean warnEnabled = false;
+
+	private boolean infoEnabled = true; 
+
+	private boolean traceEnabled = false; 
+
+	private boolean errorEnabled = true; 
+
 	private List<LogModule> logModules;
 
 	private String name;
@@ -44,6 +54,18 @@ public class PceeLogger implements Logger{
 	}
 
 
+	private boolean isLevelEnabled(LogLevelEnum level) {
+		switch (level) {
+		case DEBUG : return isDebugEnabled();
+		case ERROR : return isErrorEnabled();
+		case TRACE : return isTraceEnabled();
+		case WARN : return isWarnEnabled();
+		case INFO : return isInfoEnabled();
+		default: return false;
+		}
+	}
+
+
 	private String getMarker (LogLevelEnum level) {
 		return "[" + level + "-" + shortName + "]";
 	}
@@ -52,12 +74,14 @@ public class PceeLogger implements Logger{
 		return "(" + arg0 + ")" + arg1;
 	}
 
-	
+
 	private void log (LogLevelEnum level, String msg) {
-		Iterator<LogModule> iter = logModules.iterator();
-		String out = getMarker(level) + msg; 
-		while(iter.hasNext()) {
-			iter.next().log(level, out);
+		if (isLevelEnabled(level)) {
+			Iterator<LogModule> iter = logModules.iterator();
+			String out = getMarker(level) + msg; 
+			while(iter.hasNext()) {
+				iter.next().log(level, out);
+			}
 		}
 	}
 
@@ -266,20 +290,17 @@ public class PceeLogger implements Logger{
 
 	@Override
 	public boolean isDebugEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return debugEnabled;
 	}
 
 	@Override
 	public boolean isDebugEnabled(Marker arg0) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isErrorEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return errorEnabled;
 	}
 
 	@Override
@@ -291,7 +312,7 @@ public class PceeLogger implements Logger{
 	@Override
 	public boolean isInfoEnabled() {
 		// TODO Auto-generated method stub
-		return false;
+		return infoEnabled;
 	}
 
 	@Override
@@ -303,7 +324,7 @@ public class PceeLogger implements Logger{
 	@Override
 	public boolean isTraceEnabled() {
 		// TODO Auto-generated method stub
-		return false;
+		return traceEnabled;
 	}
 
 	@Override
@@ -315,7 +336,7 @@ public class PceeLogger implements Logger{
 	@Override
 	public boolean isWarnEnabled() {
 		// TODO Auto-generated method stub
-		return false;
+		return warnEnabled;
 	}
 
 	@Override
