@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en" ng-app = "pceeApp">
   <head>
     <meta name="generator"
     content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
@@ -54,9 +54,8 @@
     	<div style="margin-left: 2em">
       	<h2>Client log</h2>
 			<div ng-controller="logCtrl">
-				<input type="hidden"ng-model="log">
-				<div>{{log}}</div> 
-    	 	 	<p><a class="btn btn-primary" id="clearButton2" onclick="clearFrame('clientIframe')" role="button">Clear</a>
+				<div ng-repeat="logEntry in log" ng-bind-html="logEntry.html"></div> 
+    	 	 	<p><a class="btn btn-primary" id="clearButton2" onclick="window.oldLogs = [];" role="button">Clear</a>
 			</div>
     	</div>
 	</div>
@@ -71,15 +70,38 @@
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="bootstrap/js/bootstrap.min.js"></script>
   <script src="js/angular.min.js"></script>
+  <script src="js/angular-sanitize.min.js"></script>
   <script type="text/javascript">
-    function logCtrl($scope, $http) {
-        $http.get('http://localhost:8081/ctrl/logs').
-        success(function(data) {
-        	for (var i=data.length-1;i>=0;i--) {
-                $scope.log = '<p>[' + data[i].level + "] " + data[i].message + "</p>" + $scope.log;        		
-        	}
-        });
-    }
+
+  window.oldLogs = [];
+
+  angular.module('pceeApp', ['ngSanitize'])
+
+  .controller('logCtrl', ['$scope', '$http', '$timeout', function logCtrl($scope, $http, $timeout) {
+      $scope.log=[];   
+      
+	  (function getLogs() {
+            $http.get('http://localhost:8081/ctrl/logs').
+            success(function(data) {
+		    	for (var i=0;i<data.length;i++) {
+      				var index = oldLogs.length;
+      				oldLogs[index] = {};
+      				oldLogs[index] = data[i];
+      			}
+		    	var out = [];
+		    	var logCount = 50;
+		    	for (var i=oldLogs.length-1;i>=0;i--) {
+		            out[i] = {}; 
+		    		out[i].html = '<p>[' + oldLogs[i].level + '] ' + oldLogs[i].message + '</p>'; 
+		    		logCount--;
+		    		if (logCount==0)
+		    			break;
+		      	}
+		        $scope.log=out;    	  		    	
+		    	$timeout(getLogs, 2000);
+            });
+      	})();
+  }]);
 </script>
   
   </body>
