@@ -4,9 +4,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.ws.primitives.server.ServerStatus;
 
 @Path("/server")
 public class PCEEServerControlResource {
@@ -16,11 +16,17 @@ public class PCEEServerControlResource {
 	@GET
 	@Path("/status")
 	@Produces ({MediaType.APPLICATION_JSON})
-	public ServerStatus getStatus() {
+	public Response getStatus() {
 		if (server==null)
-			return ServerStatus._FALSE;
+			return Response.status(400) //200
+		            .header("Access-Control-Allow-Origin", "*")
+		            .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+		            .build();
 		else 
-			return ServerStatus._TRUE;
+			return Response.ok() //200
+		            .header("Access-Control-Allow-Origin", "*")
+		            .header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+		            .build();
 	}
 	
 	
