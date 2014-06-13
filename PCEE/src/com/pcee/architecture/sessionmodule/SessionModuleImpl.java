@@ -43,7 +43,7 @@ import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 public class SessionModuleImpl extends SessionModule {
 
 	private static Logger logger = LoggerFactory.getLogger(SessionModuleImpl.class);
-	
+
 	// Management Object used to forward communications between the different
 	// modules
 	private ModuleManagement lm;
@@ -132,20 +132,22 @@ public class SessionModuleImpl extends SessionModule {
 
 	}
 
-	public void stop() {
-		logger.debug("Entering: stop()");
+	public void stop(boolean graceful) {
+		logger.debug("Entering: stop(" + (graceful?"true":"false") + ")");
+		if (graceful) {
+			//include code for graceful stop
+		} else {
+			Iterator<StateMachine> iter = addressToStateMachineHashMap.values()
+					.iterator();
+			while (iter.hasNext()) {
 
-		Iterator<StateMachine> iter = addressToStateMachineHashMap.values()
-				.iterator();
-		while (iter.hasNext()) {
-
-			StateMachine sm = iter.next();
-			closeConnection(sm.getAddress());
+				StateMachine sm = iter.next();
+				closeConnection(sm.getAddress());
+			}
+			for (int i = 0; i < sessionThreads; i++)
+				readingQueueThread[i].interrupt();
+			stateMachineTimer.cancel();
 		}
-		for (int i = 0; i < sessionThreads; i++)
-			readingQueueThread[i].interrupt();
-		stateMachineTimer.cancel();
-
 	}
 
 	public void start() {
@@ -182,10 +184,10 @@ public class SessionModuleImpl extends SessionModule {
 			readingQueueThread[x].addMessage(message, sourceLayer);
 			break;
 		case COMPUTATION_MODULE:
-			 x =
-			 Integer.parseInt(message.getAddress().getIPv4Address().split(":")[1])
-			 % sessionThreads;
-			 readingQueueThread[x].addMessage(message, sourceLayer);
+			x =
+			Integer.parseInt(message.getAddress().getIPv4Address().split(":")[1])
+			% sessionThreads;
+			readingQueueThread[x].addMessage(message, sourceLayer);
 			//sendMessage(message, ModuleEnum.NETWORK_MODULE);
 			break;
 		case CLIENT_MODULE:
@@ -301,7 +303,7 @@ public class SessionModuleImpl extends SessionModule {
 		} else {
 			stateMachine = new StateMachineClientImpl(lm, address,stateMachineTimer, connectionInitialized);
 		}
-		
+
 		// adding state machine to hash map
 		insertStateMachineToHashMap(address, stateMachine);
 	}
@@ -355,7 +357,7 @@ public class SessionModuleImpl extends SessionModule {
 
 		logger.info("Inserting StateMachine for " + address.getIPv4Address());
 		addressToStateMachineHashMap
-				.put(address.getIPv4Address(), stateMachine);
+		.put(address.getIPv4Address(), stateMachine);
 		logger.info("| StateMachines active: "
 				+ addressToStateMachineHashMap.size());
 	}

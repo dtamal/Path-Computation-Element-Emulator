@@ -25,7 +25,7 @@ public interface Module {
 	
 	public abstract  void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer);
 	public abstract  void sendMessage(PCEPMessage message, ModuleEnum targetLayer);
-	public abstract void stop();
+	public abstract void stop(boolean graceful);
 	public abstract void start();
 
 	

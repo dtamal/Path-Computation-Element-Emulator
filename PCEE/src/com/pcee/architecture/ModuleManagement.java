@@ -68,7 +68,7 @@ public class ModuleManagement {
 			int port = 0, sessionThreads = 0, computationThreads = 0;
 
 			try {
-/*				String logger = reader.getProperty("logging");
+				/*				String logger = reader.getProperty("logging");
 				if (logger.equalsIgnoreCase("on")) {
 					Logger.logging = true;
 				} else {
@@ -81,7 +81,7 @@ public class ModuleManagement {
 				} else {
 					Logger.debugging = false;
 				}
-*/
+				 */
 				port = Integer.valueOf(reader.getProperty("port"));
 				sessionThreads = Integer.valueOf(reader
 						.getProperty("sessionThreads"));
@@ -118,14 +118,18 @@ public class ModuleManagement {
 		}
 	}
 
-	public void stop() {
-		running = false;
-		sessionModule.stop();
-		networkModule.stop();
-		if (isServer == true) {
-			computationModule.stop();
-		} else {
-			clientModule.stop();
+	public void stop(boolean graceful) {
+		if (graceful) {
+			//Include code for graceful stop
+		} else  {
+			running = false;
+			sessionModule.stop(graceful);
+			networkModule.stop(graceful);
+			if (isServer == true) {
+				computationModule.stop(graceful);
+			} else {
+				clientModule.stop(graceful);
+			}
 		}
 	}
 

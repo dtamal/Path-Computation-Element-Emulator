@@ -78,9 +78,14 @@ public class ComputationModuleImpl extends ComputationModule {
 		start();
 	}
 
-	public void stop() {
-		threadPool.stop();
-		requestQueue.clear();
+	public void stop(boolean graceful) {
+		logger.info("Stopping Computation Module, graceful=" + (graceful?"true":"false"));
+		if (graceful) {
+			//Include code for graceful stop
+		} else {
+			threadPool.stop();
+			requestQueue.clear();
+		}
 	}
 
 	public void start() {

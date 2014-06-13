@@ -49,13 +49,11 @@ public class ClientModuleImpl extends ClientModule {
 		this.start();
 	}
 
-	public void stop() {
-		logger.debug("|");
-		logger.info("Entering: stop()");
+	public void stop(boolean graceful) {
+		logger.info("Entering: stop(" + (graceful ? "true":"false") + ")");
 	}
 
 	public void start() {
-		logger.debug("|");
 		logger.info("Entering: start()");
 		receiveQueue = new LinkedBlockingQueue<PCEPMessage>();
 	}

@@ -50,7 +50,7 @@ import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 public class NetworkModuleImpl extends NetworkModule {
 
 	private static Logger logger = LoggerFactory.getLogger(NetworkModuleImpl.class);
-	
+
 	// Management Object used to forward communications between the different
 	// modules
 	private ModuleManagement lm;
@@ -114,17 +114,20 @@ public class NetworkModuleImpl extends NetworkModule {
 		this.start();
 	}
 
-	public void stop() {
-		logger.debug("Entering: stop()");
-
-		// Clear mappings
-		addressToSelectionKeyHashMap.clear();
-		addressToSocketChannelHashMap.clear();
-		partialMessageHashMap.clear();
-		registerConnQueue.clear();
-		// Close the selector
-		selectorStop = true;
-		selector.wakeup();
+	public void stop(boolean graceful) {
+		logger.debug("Entering: stop(" + (graceful?"true":"false") + ")");
+		if (graceful) {
+			//Include code for graceful stop
+		} else {
+			// Clear mappings
+			addressToSelectionKeyHashMap.clear();
+			addressToSocketChannelHashMap.clear();
+			partialMessageHashMap.clear();
+			registerConnQueue.clear();
+			// Close the selector
+			selectorStop = true;
+			selector.wakeup();
+		}
 	}
 
 	public void start() {
@@ -343,7 +346,7 @@ public class NetworkModuleImpl extends NetworkModule {
 				ServerSocketChannel serverSocketChannel = ServerSocketChannel
 						.open();
 				try {
-				serverSocketChannel.socket().bind(new InetSocketAddress(port));
+					serverSocketChannel.socket().bind(new InetSocketAddress(port));
 				} catch (java.net.BindException e){
 					logger.error("The PCEP Port is Already in use by another application. Terminating Server Instance");
 					System.exit(-1);
@@ -377,7 +380,7 @@ public class NetworkModuleImpl extends NetworkModule {
 			// Configure Socket Properties
 			socketChannel.configureBlocking(false);
 			insertSocketChannelToHashMap(address, socketChannel);
-			
+
 			//if the server is receiving a connection then the remote peer is a client 
 			lm.getSessionModule().registerConnection(address, true, false, false);
 
@@ -484,11 +487,11 @@ public class NetworkModuleImpl extends NetworkModule {
 						receivedMessage.setAddress(address);
 
 
-/*						System.out.println("Received Message type  = "
+						/*						System.out.println("Received Message type  = "
 								+ receivedMessage.getMessageHeader()
 										.getTypeDecimalValue());
 						System.out.println("Received message data " + temp);
-*/						sendMessage(receivedMessage, ModuleEnum.SESSION_MODULE);
+						 */						sendMessage(receivedMessage, ModuleEnum.SESSION_MODULE);
 
 					}
 				}
