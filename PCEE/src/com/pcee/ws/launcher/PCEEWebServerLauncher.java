@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.impl.StaticLoggerBinder;
 
+import com.pcee.architecture.ModuleManagement;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 public class PCEEWebServerLauncher {
@@ -29,7 +30,17 @@ public class PCEEWebServerLauncher {
 
 	private static int clientWsPort = 8081;
 	private static int serverWsPort = 8080;
+	
+	private static ModuleManagement moduleManagement;
 
+
+	public static ModuleManagement getModuleManagement() {
+		return moduleManagement;
+	}
+
+	public static void setModuleManagement(ModuleManagement moduleManagement) {
+		PCEEWebServerLauncher.moduleManagement = moduleManagement;
+	}
 
 	/**Function to indicate if the WebServer is running as a client or a server
 	 * 
