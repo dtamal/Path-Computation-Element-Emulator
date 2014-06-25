@@ -74,9 +74,9 @@
 
 					<div class="col-lg-5">
 
-						
+
 						<p class="lead">Select the IP and port of the server</p>
-						<div ng-controller="serverConnection">
+						<div ng-controller="clientForm">
 							<form role="form">
 								<div class="row">
 									<div class="col-xs-4">
@@ -84,33 +84,35 @@
 											class="form-control" /> <label for="server">Server</label>
 									</div>
 									<div class="col-xs-4">
-										<input type="text" ng-model="connectionPort" id="connectionPort"
-											class="form-control" /> <label for="port">Port</label>
+										<input type="text" ng-model="connectionPort"
+											id="connectionPort" class="form-control" /> <label
+											for="port">Port</label>
 									</div>
 									<div class="col-xs-2">
-										<button class="btn btn-default" ng-click="connectToServer()" id="connectToServerButton">Connect</button>
+										<button class="btn btn-default" ng-click="connectToServer()"
+											id="connectToServerButton">Connect</button>
+									</div>
+								</div>
+							</form>
+
+							<p class="lead">Request Message</p>
+							<form role="form">
+								<div class="row">
+									<div class="col-xs-4">
+										<input type="text" class="form-control" ng-model="srcAddr"
+											id="srcAddr" disabled="disabled" /> <label for="source">Source</label>
+									</div>
+									<div class="col-xs-4">
+										<input type="text" class="form-control" ng-model="dstAddr"
+											id="dstAddr" disabled="disabled" /> <label for="dest">Destination</label>
+									</div>
+									<div class="col-xs-2">
+										<button type="button" class="btn btn-default" id="sendButton"
+											ng-click="sendRequest()" disabled="disabled">Send</button>
 									</div>
 								</div>
 							</form>
 						</div>
-
-						<p class="lead">Request Message</p>
-						<form role="form">
-							<div class="row">
-								<div class="col-xs-4">
-									<input type="text" class="form-control" value="192.169.2.1"
-										id="srcAddr" disabled="disabled" /> <label for="source">Source</label>
-								</div>
-								<div class="col-xs-4">
-									<input type="text" class="form-control" value="192.169.2.14"
-										id="dstAddr" disabled="disabled" /> <label for="dest">Destination</label>
-								</div>
-								<div class="col-xs-2">
-									<button type="button" class="btn btn-default" id="sendButton"
-										onclick="sendRequest()" disabled="disabled">Send</button>
-								</div>
-							</div>
-						</form>
 						</br>
 						<p class="lead">Client log</p>
 						<div ng-controller="logCtrl">
@@ -145,10 +147,11 @@
 				</div>
 			</div>
 		</div>
-		<div id="footer">
-			<div class="container">
-				<p class="text-muted">Path Computation Element Emulator</p>
-			</div>
+	</div>
+	<div id="footer">
+		<div class="container">
+			<p class="text-muted">Path Computation Element Emulator</p>
 		</div>
+	</div>
 </body>
 </html>

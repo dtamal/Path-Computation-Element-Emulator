@@ -29,7 +29,7 @@ public class LoggingResource {
 	@GET
 	@Produces ({MediaType.APPLICATION_JSON})
 	public List<WsLogMessage> getLogs() {
-		logger.info("Generating logs for consumption via WS");
+//		logger.info("Generating logs for consumption via WS");
 		synchronized (logs) {
 			List<WsLogMessage> out = logs;
 			logs = new ArrayList<WsLogMessage>();

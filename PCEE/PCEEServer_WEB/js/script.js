@@ -1,4 +1,6 @@
-function runServer(isStarted) {
+
+var isStarted = false;
+function runServer() {
 	if (!isStarted) {
 		document.getElementById("ip").disabled = true;
 		document.getElementById("port").disabled = true;
@@ -6,6 +8,7 @@ function runServer(isStarted) {
 		document.getElementById("runServerButton").disabled = true;
 		document.getElementById("stopServerButton").disabled = false;
 		document.getElementById("select").disabled = true;
+		isStarted = true;
 	} else {
 		document.getElementById("ip").disabled = false;
 		document.getElementById("port").disabled = false;
@@ -13,6 +16,7 @@ function runServer(isStarted) {
 		document.getElementById("runServerButton").innerHTML = "<span id = 'startSpan' class='glyphicon glyphicon-play'></span>Run";
 		document.getElementById("stopServerButton").disabled = true;
 		document.getElementById("select").disabled = false;
+		isStarted = false;
 	}
 }
 

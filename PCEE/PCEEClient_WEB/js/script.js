@@ -25,15 +25,6 @@ function connectClient() {
 	}
 }
 
-function sendRequest() {
-
-	var src = document.getElementById("srcAddr").value;
-	var dst = document.getElementById("dstAddr").value;
-	this.write("clientIframe", "Request message [" + src + "-->" + dst
-			+ "] <br/>");
-
-}
-
 function write(frame, message) {
     
     document.getElementById(frame).contentWindow.document.write(message);

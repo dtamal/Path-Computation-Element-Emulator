@@ -36,7 +36,7 @@ public class ClientModuleImpl extends ClientModule {
 	// Module Management Variable to facilitate inter-module communication
 	private ModuleManagement lm;
 
-	public LinkedBlockingQueue<PCEPMessage> receiveQueue;
+	//public LinkedBlockingQueue<PCEPMessage> receiveQueue;
 
 
 

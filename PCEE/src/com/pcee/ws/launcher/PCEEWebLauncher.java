@@ -20,26 +20,35 @@ import org.slf4j.impl.StaticLoggerBinder;
 import com.pcee.architecture.ModuleManagement;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 
-public class PCEEWebServerLauncher {
+public class PCEEWebLauncher {
 
 	private static Server server;
 
-	private static Logger logger = LoggerFactory.getLogger(PCEEWebServerLauncher.class);
+	private static Logger logger = LoggerFactory.getLogger(PCEEWebLauncher.class);
 
 	private static boolean serverRole;
 
 	private static int clientWsPort = 8081;
 	private static int serverWsPort = 8080;
 	
-	private static ModuleManagement moduleManagement;
+	private static ModuleManagement serverModuleManagement;
+	private static ModuleManagement clientModuleManagement;
 
-
-	public static ModuleManagement getModuleManagement() {
-		return moduleManagement;
+	public static ModuleManagement getClientModuleManagement() {
+		return clientModuleManagement;
 	}
 
-	public static void setModuleManagement(ModuleManagement moduleManagement) {
-		PCEEWebServerLauncher.moduleManagement = moduleManagement;
+	public static void setClientModuleManagement(
+			ModuleManagement clientModuleManagement) {
+		PCEEWebLauncher.clientModuleManagement = clientModuleManagement;
+	}
+
+	public static ModuleManagement getServerModuleManagement() {
+		return serverModuleManagement;
+	}
+
+	public static void setServerModuleManagement(ModuleManagement moduleManagement) {
+		PCEEWebLauncher.serverModuleManagement = moduleManagement;
 	}
 
 	/**Function to indicate if the WebServer is running as a client or a server

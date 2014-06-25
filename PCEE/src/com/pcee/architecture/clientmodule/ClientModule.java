@@ -17,7 +17,16 @@
 
 package com.pcee.architecture.clientmodule;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
 import com.pcee.architecture.Module;
+import com.pcee.protocol.message.PCEPMessage;
 
 public abstract class ClientModule implements Module{
+	
+	LinkedBlockingQueue<PCEPMessage> receiveQueue;
+	
+	public LinkedBlockingQueue<PCEPMessage> getReceiveQueue() {
+		return receiveQueue;
+	}
 }

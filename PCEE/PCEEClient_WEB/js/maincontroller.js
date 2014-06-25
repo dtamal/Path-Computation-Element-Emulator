@@ -39,35 +39,23 @@ app.controller('logCtrl', [
 
 app
 		.controller(
-				'serverConnection',
+				'clientForm',
 				function($scope, $http) {
 					$scope.connectionIP = '127.0.0.1';
 					$scope.connectionPort = '8080';
 
 					$scope.connectToServer = function() {
 						if (!isConnected) {
-							(function getStatus() {
+							(function setConnection() {
 								$http
 										.get(
-												'http://' + $scope.connectionIP
-														+ ':'
-														+ $scope.connectionPort
-														+ '/ctrl/server/status')
+												'http://localhost:8081/ctrl/client/connect')
 										.success(
 												function(data) {
-													alert('Connection established: '
-															+ data);
+//													alert('Connection established: '
+//															+ data);
 
 													this.connectClient();
-													// /////////Temporal test
-													// method to draw the
-													// network
-													// $.get("SNDlib/15nodes.txt",
-													// function(data) {
-													// loadNetworkGraph(data,
-													// 1.1, 20, -20);
-													// }, 'text');
-													// ///////
 
 													$http
 															.get(
@@ -75,7 +63,7 @@ app
 																			+ $scope.connectionIP
 																			+ ':'
 																			+ $scope.connectionPort
-																			+ '/ctrl/server/nodes')
+																			+ '/ctrl/server/topology/nodes')
 															.success(
 																	function(
 																			nodes) {
@@ -85,14 +73,10 @@ app
 																								+ $scope.connectionIP
 																								+ ':'
 																								+ $scope.connectionPort
-																								+ '/ctrl/server/links')
+																								+ '/ctrl/server/topology/links')
 																				.success(
 																						function(
 																								links) {
-																							// loadNetworkGraph(data,
-																							// 1.1,
-																							// 20,
-																							// -20);
 																							drawNetworkgraph(
 																									nodes,
 																									links);
@@ -102,29 +86,58 @@ app
 															.error(
 																	function(
 																			data) {
-																		alert('Error: '
-																				+ data);
+																		alert('Error trying to get the topology');
 
 																	});
+
+												}).error(function(data) {
+											alert('Error: Connection failed');
+
+										});
+
+							})();
+						} else {
+							(function disconnection() {
+
+								$http
+										.get(
+												'http://localhost:8081/ctrl/client/disconnect')
+										.success(
+												function(data) {
+//													alert('Disconnected from the server');
+													this.connectClient();
 
 												})
 										.error(
 												function(data) {
-													alert('Error: server not running'
-															+ data);
+													alert('Error: Disconnection failed');
 
 												});
-
 							})();
-						} else {
-							(function setStatus() {
-								alert('Disconnected from the server');
-								this.connectClient();
-
-							})();
-
 						}
-
 					}
 
+					$scope.srcAddr = '192.169.2.1';
+					$scope.dstAddr = '192.169.2.14';
+					
+					$scope.sendRequest = function() {
+						(function sendRequest() {
+							var params = $scope.srcAddr + " " +$scope.dstAddr;
+							$http
+							.post(
+									'http://localhost:8081/ctrl/client/request', JSON.stringify(params))
+							.success(
+									function(data) {
+//										alert('Received path: ' + data);
+							            highlightPath(data);
+
+									})
+							.error(
+									function() {
+										alert('Error: wrong path received');
+
+									});
+						})();
+
+					}
 				});

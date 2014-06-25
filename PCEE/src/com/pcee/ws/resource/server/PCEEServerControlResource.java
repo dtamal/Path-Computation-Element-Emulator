@@ -13,26 +13,27 @@ import com.graph.elements.edge.EdgeElement;
 import com.graph.elements.vertex.VertexElement;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
-import com.pcee.ws.launcher.PCEEWebServerLauncher;
+import com.pcee.ws.launcher.PCEEWebLauncher;
 
 @Path("/server")
 public class PCEEServerControlResource {
 
-	private ModuleManagement server = PCEEWebServerLauncher.getModuleManagement();
-	
+	private ModuleManagement serverModuleManagement = PCEEWebLauncher
+			.getServerModuleManagement();
+
 	@GET
 	@Path("/status")
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response getStatus() {
-		if (server == null)
-			return Response.status(400)
-					// 200
+		if (serverModuleManagement == null)
+			return Response
+					.status(400)
 					.header("Access-Control-Allow-Origin", "*")
 					.header("Access-Control-Allow-Methods",
 							"GET, POST, DELETE, PUT").build();
 		else
-			return Response.ok()
-					// 200
+			return Response
+					.ok()
 					.header("Access-Control-Allow-Origin", "*")
 					.header("Access-Control-Allow-Methods",
 							"GET, POST, DELETE, PUT").build();
@@ -42,21 +43,48 @@ public class PCEEServerControlResource {
 	@Path("/start")
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response startServer() {
-		if (server == null) {
-			PCEEWebServerLauncher.setModuleManagement(new ModuleManagement(true));
-			return Response.ok()
+		if (serverModuleManagement == null) {
+			PCEEWebLauncher
+					.setServerModuleManagement(new ModuleManagement(true));
+			return Response
+					.ok()
 					.header("Access-Control-Allow-Origin", "*")
 					.header("Access-Control-Allow-Methods",
 							"GET, POST, DELETE, PUT").build();
 		} else
-			return Response.status(400)
+			return Response
+					.status(400)
 					.header("Access-Control-Allow-Origin", "*")
 					.header("Access-Control-Allow-Methods",
 							"GET, POST, DELETE, PUT").build();
 	}
 
 	@GET
-	@Path("/nodes")
+	@Path("/stop")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response stopServer() {
+		if (serverModuleManagement != null) {
+
+			// This is not the correct way to stop the server
+			serverModuleManagement.stop(false);
+			PCEEWebLauncher.setServerModuleManagement(null);
+			// ///////////////////////////////////
+
+			return Response
+					.ok()
+					.header("Access-Control-Allow-Origin", "*")
+					.header("Access-Control-Allow-Methods",
+							"GET, POST, DELETE, PUT").build();
+		} else
+			return Response
+					.status(400)
+					.header("Access-Control-Allow-Origin", "*")
+					.header("Access-Control-Allow-Methods",
+							"GET, POST, DELETE, PUT").build();
+	}
+
+	@GET
+	@Path("/topology/nodes")
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response getNodes() {
 
@@ -76,7 +104,7 @@ public class PCEEServerControlResource {
 	}
 
 	@GET
-	@Path("/links")
+	@Path("/topology/links")
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response getLinks() {
 
@@ -94,5 +122,4 @@ public class PCEEServerControlResource {
 				.header("Access-Control-Allow-Methods",
 						"GET, POST, DELETE, PUT").build();
 	}
-
 }
