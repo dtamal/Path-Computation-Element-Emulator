@@ -8,6 +8,33 @@ app
 					$scope.serverIP = '127.0.0.1';
 					$scope.serverPort = '8080';
 
+					$scope.topologies = [ {
+						name : 'atlanta'
+					}, {
+						name : 'newyork'
+					}, {
+						name : 'austria'
+					} ];
+					
+					$scope.images = [ {
+						path : 'images/atlanta.png'
+					}, {
+						path : 'images/newyork.png'
+					}, {
+						path : 'images/austria.png'
+					} ];
+					
+					$scope.choosenImage = $scope.images[0];
+
+					$scope.choosen = $scope.topologies[0];
+
+					$scope.select = function(i) {
+						if (angular.isDefined(i)){
+							$scope.choosen = $scope.topologies[i];
+							$scope.choosenImage = $scope.images[i];
+						}
+					};
+
 					$scope.launchServer = function() {
 						(function getStatus() {
 							$http
@@ -20,19 +47,22 @@ app
 									})
 									.error(
 											function(data) {
-//												alert('Starting the server'
-//														+ data);
+												// alert('Starting the server'
+												// + data);
 												runServer(false);
+												var params = $scope.choosen.name;
 												$http
-														.get(
-																'http://'
-																		+ $scope.serverIP
-																		+ ':'
+														.post(
+																'http://localhost:'
 																		+ $scope.serverPort
-																		+ '/ctrl/server/start')
+																		+ '/ctrl/server/start',
+																JSON
+																		.stringify(params))
 														.success(
 																function() {
-//																	alert('The server is running');
+																	// alert('The
+																	// server is
+																	// running');
 																	serverIP = $scope.serverIP;
 																	serverPort = $scope.serverPort;
 																})
@@ -85,54 +115,41 @@ app
 
 window.oldLogs = [];
 
-app
-		.controller(
-				'logCtrl',
-				[
-						'$scope',
-						'$http',
-						'$timeout',
-						function logCtrl($scope, $http, $timeout) {
-							$scope.log = [];
+app.controller('logCtrl', [
+		'$scope',
+		'$http',
+		'$timeout',
+		function logCtrl($scope, $http, $timeout) {
+			$scope.log = [];
 
-							(function getLogs() {
-								if (isStarted) {
-									$http
-											.get(
-													'http://' + serverIP
-															+ ':'
-															+ serverPort
-															+ '/ctrl/logs')
-											.success(
-													function(data) {
+			(function getLogs() {
+				if (isStarted) {
+					$http.get(
+							'http://localhost:' + serverPort
+									+ '/ctrl/logs').success(
+							function(data) {
 
-														for ( var i = 0; i < data.length; i++) {
-															var index = oldLogs.length;
-															oldLogs[index] = {};
-															oldLogs[index] = data[i];
-														}
-														var out = [];
-														var logCount = 50;
-														this
-																.clearFrame('serverIframe');
-														for ( var i = 0; i < oldLogs.length; i++) {
-															this
-																	.write(
-																			"serverIframe",
-																			'['
-																					+ oldLogs[i].level
-																					+ '] '
-																					+ oldLogs[i].message
-																					+ '<br/>');
-															logCount--;
-															if (logCount == 0)
-																break;
-														}
-														$scope.log = out;
-
-													});
+								for ( var i = 0; i < data.length; i++) {
+									var index = oldLogs.length;
+									oldLogs[index] = {};
+									oldLogs[index] = data[i];
 								}
-								$timeout(getLogs, 2000);
-							})();
+								var out = [];
+								var logCount = 50;
+								this.clearFrame('serverIframe');
+								for ( var i = 0; i < oldLogs.length; i++) {
+									this.write("serverIframe", '['
+											+ oldLogs[i].level + '] '
+											+ oldLogs[i].message + '<br/>');
+									logCount--;
+									if (logCount == 0)
+										break;
+								}
+								$scope.log = out;
 
-						} ]);
+							});
+				}
+				$timeout(getLogs, 2000);
+			})();
+
+		} ]);

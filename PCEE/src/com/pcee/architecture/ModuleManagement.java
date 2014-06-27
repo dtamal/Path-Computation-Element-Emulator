@@ -58,6 +58,26 @@ public class ModuleManagement {
 			running = true;
 		}
 	}
+	
+	public ModuleManagement(String topologyFile, boolean isServer) {
+		
+		TopologyInformation.setTopoPath(topologyFile);
+		
+		if (running == false) {
+
+			this.isServer = isServer;
+			networkModule = new NetworkModuleImpl(isServer, this); // FIXME
+			sessionModule = new SessionModuleImpl(this);
+			if (isServer == true) {
+				computationModule = new ComputationModuleImpl(this);
+				clientModule = new ClientModuleImpl(this);
+			} else {
+				clientModule = new ClientModuleImpl(this);
+			}
+
+			running = true;
+		}
+	}
 
 	public ModuleManagement(boolean isServer, String configFile) {
 

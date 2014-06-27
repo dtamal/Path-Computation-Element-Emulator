@@ -3,7 +3,9 @@ package com.pcee.ws.resource.server;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -20,6 +22,7 @@ public class PCEEServerControlResource {
 
 	private ModuleManagement serverModuleManagement = PCEEWebLauncher
 			.getServerModuleManagement();
+	private String topology = PCEEWebLauncher.getTopology();
 
 	@GET
 	@Path("/status")
@@ -39,13 +42,21 @@ public class PCEEServerControlResource {
 							"GET, POST, DELETE, PUT").build();
 	}
 
-	@GET
+	@POST
 	@Path("/start")
+	@Consumes({ MediaType.APPLICATION_JSON })
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response startServer() {
+	public Response startServer(String topology) {
+
+		topology = topology.substring(1, topology.length() - 1);
+
+		PCEEWebLauncher.setTopology(topology);
+
+		topology = ".//" + topology + ".txt";
+
 		if (serverModuleManagement == null) {
-			PCEEWebLauncher
-					.setServerModuleManagement(new ModuleManagement(true));
+			PCEEWebLauncher.setServerModuleManagement(new ModuleManagement(
+					topology, true));
 			return Response
 					.ok()
 					.header("Access-Control-Allow-Origin", "*")
@@ -88,12 +99,16 @@ public class PCEEServerControlResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response getNodes() {
 
+		double scalingFactor = 1.0;
+		if (this.topology.equals("austria"))
+			scalingFactor = 1.7;
+
 		List<String> setOfNodes = new ArrayList<String>();
 
 		for (VertexElement v : TopologyInformation.getInstance().getGraph()
 				.createCopy().getVertexSet()) {
-			setOfNodes.add(v.getVertexID() + " " + v.getXCoord() + " "
-					+ v.getYCoord());
+			setOfNodes.add(v.getVertexID() + " " + v.getXCoord()
+					* scalingFactor + " " + v.getYCoord() * scalingFactor);
 		}
 
 		return Response

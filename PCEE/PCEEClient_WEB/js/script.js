@@ -21,6 +21,8 @@ function connectClient() {
 		document.getElementById("srcAddr").disabled = true;
 		document.getElementById("dstAddr").disabled = true;
 		document.getElementById("sendButton").disabled = true;
+		clearFrame("clientIframe");
+		deleteNetworkgraph();
 		isConnected = false;
 	}
 }
@@ -28,5 +30,7 @@ function connectClient() {
 function write(frame, message) {
     
     document.getElementById(frame).contentWindow.document.write(message);
+	    document.getElementById(frame).contentWindow.scrollTo(0, document
+			.getElementById(frame).contentWindow.document.body.scrollHeight);
 
    }

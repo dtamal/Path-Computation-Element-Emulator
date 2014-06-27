@@ -1,4 +1,3 @@
-
 var isStarted = false;
 function runServer() {
 	if (!isStarted) {
@@ -16,6 +15,7 @@ function runServer() {
 		document.getElementById("runServerButton").innerHTML = "<span id = 'startSpan' class='glyphicon glyphicon-play'></span>Run";
 		document.getElementById("stopServerButton").disabled = true;
 		document.getElementById("select").disabled = false;
+		clearFrame("serverIframe");
 		isStarted = false;
 	}
 }
@@ -26,6 +26,9 @@ function clearFrame(frame) {
 }
 
 function write(frame, message) {
-    
-    document.getElementById(frame).contentWindow.document.write(message);
-   }
+
+	document.getElementById(frame).contentWindow.document.write(message);
+	document.getElementById(frame).contentWindow.scrollTo(0, document
+			.getElementById(frame).contentWindow.document.body.scrollHeight);
+
+}
