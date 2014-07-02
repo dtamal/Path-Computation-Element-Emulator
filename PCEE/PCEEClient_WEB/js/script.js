@@ -22,6 +22,7 @@ function connectClient() {
 		document.getElementById("dstAddr").disabled = true;
 		document.getElementById("sendButton").disabled = true;
 		clearFrame("clientIframe");
+		window.oldLogs = [];
 		deleteNetworkgraph();
 		isConnected = false;
 	}

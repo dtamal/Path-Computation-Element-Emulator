@@ -85,6 +85,7 @@ public class ComputationModuleImpl extends ComputationModule {
 		} else {
 			threadPool.stop();
 			requestQueue.clear();
+			TopologyInformation.closeInstance();
 		}
 	}
 

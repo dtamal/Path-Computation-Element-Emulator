@@ -146,6 +146,12 @@ public class TopologyInformation {
 			_instance = new TopologyInformation();
 		return _instance;
 	}
+	
+	/** Function to close the instance of the TopologyInformation class */
+	public static void closeInstance() {
+		if (_instance != null)
+			_instance = null;
+	}
 
 	/** Function to get the graph object used */
 	public Gcontroller getGraph() {

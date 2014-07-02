@@ -49,7 +49,8 @@ import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 
 public class NetworkModuleImpl extends NetworkModule {
 
-	private static Logger logger = LoggerFactory.getLogger(NetworkModuleImpl.class);
+	private static Logger logger = LoggerFactory
+			.getLogger(NetworkModuleImpl.class);
 
 	// Management Object used to forward communications between the different
 	// modules
@@ -89,6 +90,8 @@ public class NetworkModuleImpl extends NetworkModule {
 	// (indicating if it should listen for new connection requests
 	private boolean isServer;
 
+	private ServerSocketChannel serverSocketChannel;
+
 	/**
 	 * Default Constructor
 	 * 
@@ -115,9 +118,9 @@ public class NetworkModuleImpl extends NetworkModule {
 	}
 
 	public void stop(boolean graceful) {
-		logger.debug("Entering: stop(" + (graceful?"true":"false") + ")");
+		logger.debug("Entering: stop(" + (graceful ? "true" : "false") + ")");
 		if (graceful) {
-			//Include code for graceful stop
+			// Include code for graceful stop
 		} else {
 			// Clear mappings
 			addressToSelectionKeyHashMap.clear();
@@ -127,6 +130,14 @@ public class NetworkModuleImpl extends NetworkModule {
 			// Close the selector
 			selectorStop = true;
 			selector.wakeup();
+			if (isServer) {
+				try {
+					serverSocketChannel.socket().close();
+				} catch (IOException e) {
+					logger.error("The PCEP Port cannot be closed");
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -215,7 +226,7 @@ public class NetworkModuleImpl extends NetworkModule {
 				selector.wakeup();
 
 			}
-		}catch (java.net.ConnectException e){
+		} catch (java.net.ConnectException e) {
 			logger.error("Could not connect to Server. Please Check if server is running on the remote address");
 		} catch (IOException e) {
 			logger.error(e.getMessage());
@@ -343,11 +354,11 @@ public class NetworkModuleImpl extends NetworkModule {
 			selector = Selector.open();
 
 			if (isServer) {
-				ServerSocketChannel serverSocketChannel = ServerSocketChannel
-						.open();
+				serverSocketChannel = ServerSocketChannel.open();
 				try {
-					serverSocketChannel.socket().bind(new InetSocketAddress(port));
-				} catch (java.net.BindException e){
+					serverSocketChannel.socket().bind(
+							new InetSocketAddress(port));
+				} catch (java.net.BindException e) {
 					logger.error("The PCEP Port is Already in use by another application. Terminating Server Instance");
 					System.exit(-1);
 				}
@@ -381,8 +392,10 @@ public class NetworkModuleImpl extends NetworkModule {
 			socketChannel.configureBlocking(false);
 			insertSocketChannelToHashMap(address, socketChannel);
 
-			//if the server is receiving a connection then the remote peer is a client 
-			lm.getSessionModule().registerConnection(address, true, false, false);
+			// if the server is receiving a connection then the remote peer is a
+			// client
+			lm.getSessionModule().registerConnection(address, true, false,
+					false);
 
 			logger.info("New Connection Accepted, registering with selector");
 			SelectionKey key = socketChannel.register(selector,
@@ -486,12 +499,13 @@ public class NetworkModuleImpl extends NetworkModule {
 								messageByteArray);
 						receivedMessage.setAddress(address);
 
-
-						/*						System.out.println("Received Message type  = "
-								+ receivedMessage.getMessageHeader()
-										.getTypeDecimalValue());
-						System.out.println("Received message data " + temp);
-						 */						sendMessage(receivedMessage, ModuleEnum.SESSION_MODULE);
+						/*
+						 * System.out.println("Received Message type  = " +
+						 * receivedMessage.getMessageHeader()
+						 * .getTypeDecimalValue());
+						 * System.out.println("Received message data " + temp);
+						 */sendMessage(receivedMessage,
+								ModuleEnum.SESSION_MODULE);
 
 					}
 				}

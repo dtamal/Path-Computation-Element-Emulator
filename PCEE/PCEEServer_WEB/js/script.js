@@ -16,6 +16,7 @@ function runServer() {
 		document.getElementById("stopServerButton").disabled = true;
 		document.getElementById("select").disabled = false;
 		clearFrame("serverIframe");
+		window.oldLogs = [];
 		isStarted = false;
 	}
 }

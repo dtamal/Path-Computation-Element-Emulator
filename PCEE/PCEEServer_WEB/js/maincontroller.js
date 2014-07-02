@@ -85,7 +85,7 @@ app
 													+ '/ctrl/server/status')
 									.success(
 											function() {
-												alert('Stoping the server');
+//												alert('Stoping the server');
 												runServer(true);
 												$http
 														.get(
@@ -96,7 +96,7 @@ app
 																		+ '/ctrl/server/stop')
 														.success(
 																function() {
-																	alert('The server is stopped');
+//																	alert('The server is stopped');
 																})
 														.error(
 																function(data) {
@@ -135,15 +135,15 @@ app.controller('logCtrl', [
 									oldLogs[index] = data[i];
 								}
 								var out = [];
-								var logCount = 50;
+//								var logCount = 50;
 								this.clearFrame('serverIframe');
 								for ( var i = 0; i < oldLogs.length; i++) {
 									this.write("serverIframe", '['
 											+ oldLogs[i].level + '] '
 											+ oldLogs[i].message + '<br/>');
-									logCount--;
-									if (logCount == 0)
-										break;
+//									logCount--;
+//									if (logCount == 0)
+//										break;
 								}
 								$scope.log = out;
 
