@@ -19,17 +19,13 @@ package com.pcee.architecture.computationmodule;
 
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-
-
-
-
+import com.pcee.architecture.computationmodule.threadpoolManager.ThreadPool;
+import com.pcee.architecture.computationmodule.ted.TopoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.architecture.computationmodule.ted.TopologyInformation;
-import com.pcee.architecture.computationmodule.threadpool.ThreadPool;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
 import com.pcee.protocol.response.PCEPResponseFrame;
@@ -49,7 +45,7 @@ public class ComputationModuleImpl extends ComputationModule {
 	private ModuleManagement lm;
 
 	// Thread Pool Implementation to compute incoming requests
-	private ThreadPool threadPool;
+    private ThreadPool threadPool;
 
 	// Used by the ThreadPool class to initialize the given amount of Threads
 	private int computationThreads;
@@ -83,16 +79,17 @@ public class ComputationModuleImpl extends ComputationModule {
 		if (graceful) {
 			//Include code for graceful stop
 		} else {
-			threadPool.stop();
+            threadPool.stop();
 			requestQueue.clear();
-			TopologyInformation.closeInstance();
+//			TopologyInformation.closeInstance();
+            TopoManager.closeInstance();
 		}
 	}
 
 	public void start() {
 		//Initialize the topology to import the definition from file and start the thread to listen for topology updates
-		TopologyInformation.getInstance();
-		
+//		TopologyInformation.getInstance();
+        TopoManager manager = TopoManager.get_instance();
 		//Innitialize the map that will record the responses coming from remote peers
 		remotePeerResponseAssociationHashMap = new HashMap<String, LinkedBlockingQueue<PCEPMessage>>();
 		// Initialize a new request Queue

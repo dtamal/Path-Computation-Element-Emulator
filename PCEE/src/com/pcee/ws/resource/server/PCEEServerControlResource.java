@@ -11,11 +11,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.graph.elements.edge.EdgeElement;
-import com.graph.elements.vertex.VertexElement;
+//import com.graph.elements.edge.EdgeElement;
+//import com.graph.elements.vertex.VertexElement;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+//import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+import com.pcee.architecture.computationmodule.ted.TopoManager;
 import com.pcee.ws.launcher.PCEEWebLauncher;
+import com.topology.primitives.Link;
+import com.topology.primitives.NetworkElement;
+import com.topology.primitives.exception.properties.PropertyException;
+import com.topology.primitives.properties.keys.TEPropertyKey;
 
 @Path("/server")
 public class PCEEServerControlResource {
@@ -94,47 +99,102 @@ public class PCEEServerControlResource {
 							"GET, POST, DELETE, PUT").build();
 	}
 
-	@GET
-	@Path("/topology/nodes")
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getNodes() {
+//	@GET
+//	@Path("/topology/nodes")
+//	@Produces({ MediaType.APPLICATION_JSON })
+//	public Response getNodes() {
+//
+//		double scalingFactor = 1.0;
+//		if (this.topology.equals("austria"))
+//			scalingFactor = 1.7;
+//
+//		List<String> setOfNodes = new ArrayList<String>();
+//
+//		for (VertexElement v : TopologyInformation.getInstance().getGraph()
+//				.createCopy().getVertexSet()) {
+//			setOfNodes.add(v.getVertexID() + " " + v.getXCoord()
+//					* scalingFactor + " " + v.getYCoord() * scalingFactor);
+//		}
+//
+//		return Response
+//				.ok(setOfNodes)
+//				.header("Access-Control-Allow-Origin", "*")
+//				.header("Access-Control-Allow-Methods",
+//						"GET, POST, DELETE, PUT").build();
+//	}
+//
+//	@GET
+//	@Path("/topology/links")
+//	@Produces({ MediaType.APPLICATION_JSON })
+//	public Response getLinks() {
+//
+//		List<String> setOfLinks = new ArrayList<String>();
+//
+//		for (EdgeElement e : TopologyInformation.getInstance().getGraph()
+//				.createCopy().getEdgeSet()) {
+//			setOfLinks.add(e.getSourceVertex().getVertexID() + " "
+//					+ e.getDestinationVertex().getVertexID());
+//		}
+//
+//		return Response
+//				.ok(setOfLinks)
+//				.header("Access-Control-Allow-Origin", "*")
+//				.header("Access-Control-Allow-Methods",
+//						"GET, POST, DELETE, PUT").build();
+//	}
 
-		double scalingFactor = 1.0;
-		if (this.topology.equals("austria"))
-			scalingFactor = 1.7;
+    @GET
+    @Path("/topology/nodes")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getNodes() {
 
-		List<String> setOfNodes = new ArrayList<String>();
+        double scalingFactor = 1.0;
+        if (this.topology.equals("austria"))
+            scalingFactor = 1.7;
 
-		for (VertexElement v : TopologyInformation.getInstance().getGraph()
-				.createCopy().getVertexSet()) {
-			setOfNodes.add(v.getVertexID() + " " + v.getXCoord()
-					* scalingFactor + " " + v.getYCoord() * scalingFactor);
-		}
+        List<String> setOfNodes = new ArrayList<String>();
 
-		return Response
-				.ok(setOfNodes)
-				.header("Access-Control-Allow-Origin", "*")
-				.header("Access-Control-Allow-Methods",
-						"GET, POST, DELETE, PUT").build();
-	}
+        for (NetworkElement ne : TopoManager.get_instance().getManager().getAllElements(NetworkElement.class)) {
+            try {
+                setOfNodes.add(ne.getLabel() + " " + (double) ne.getProperty(TEPropertyKey.XCOORD) * scalingFactor + " " + (double) ne.getProperty(TEPropertyKey.YCOORD) * scalingFactor);
+            } catch (PropertyException e) {
+                e.printStackTrace();
+            }
+        }
+//        for (VertexElement v : TopologyInformation.getInstance().getGraph()
+//                .createCopy().getVertexSet()) {
+//            setOfNodes.add(v.getVertexID() + " " + v.getXCoord()
+//                    * scalingFactor + " " + v.getYCoord() * scalingFactor);
+//        }
 
-	@GET
-	@Path("/topology/links")
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getLinks() {
+        return Response
+                .ok(setOfNodes)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods",
+                        "GET, POST, DELETE, PUT").build();
+    }
 
-		List<String> setOfLinks = new ArrayList<String>();
+    @GET
+    @Path("/topology/links")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getLinks() {
 
-		for (EdgeElement e : TopologyInformation.getInstance().getGraph()
-				.createCopy().getEdgeSet()) {
-			setOfLinks.add(e.getSourceVertex().getVertexID() + " "
-					+ e.getDestinationVertex().getVertexID());
-		}
+        List<String> setOfLinks = new ArrayList<String>();
 
-		return Response
-				.ok(setOfLinks)
-				.header("Access-Control-Allow-Origin", "*")
-				.header("Access-Control-Allow-Methods",
-						"GET, POST, DELETE, PUT").build();
-	}
+        for (Link l:TopoManager.get_instance().getManager().getAllElements(Link.class)){
+            setOfLinks.add(l.getaEnd().getLabel()+ " "
+                    + l.getzEnd().getLabel());
+        }
+//        for (EdgeElement e : TopologyInformation.getInstance().getGraph()
+//                .createCopy().getEdgeSet()) {
+//            setOfLinks.add(e.getSourceVertex().getVertexID() + " "
+//                    + e.getDestinationVertex().getVertexID());
+//        }
+
+        return Response
+                .ok(setOfLinks)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Methods",
+                        "GET, POST, DELETE, PUT").build();
+    }
 }

@@ -79,7 +79,7 @@ public class PCEEWebLauncher {
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 
 	/**

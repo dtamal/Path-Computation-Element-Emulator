@@ -26,7 +26,7 @@ import com.pcee.architecture.clientmodule.ClientModule;
 import com.pcee.architecture.clientmodule.ClientModuleImpl;
 import com.pcee.architecture.computationmodule.ComputationModule;
 import com.pcee.architecture.computationmodule.ComputationModuleImpl;
-import com.pcee.architecture.computationmodule.ted.TopologyInformation;
+//import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.architecture.networkmodule.NetworkModule;
 import com.pcee.architecture.networkmodule.NetworkModuleImpl;
 import com.pcee.architecture.sessionmodule.SessionModule;
@@ -60,8 +60,8 @@ public class ModuleManagement {
 	}
 	
 	public ModuleManagement(String topologyFile, boolean isServer) {
-		
-		TopologyInformation.setTopoPath(topologyFile);
+
+//		TopologyInformation.setTopoPath(topologyFile);
 		
 		if (running == false) {
 
@@ -107,9 +107,9 @@ public class ModuleManagement {
 						.getProperty("sessionThreads"));
 				computationThreads = Integer.valueOf(reader
 						.getProperty("computationThreads"));
-				TopologyInformation.setTopoPath(reader.getProperty("topology"));
-				TopologyInformation.setImporter(reader.getProperty("importer"));
-				TopologyInformation.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
+//				TopologyInformation.setTopoPath(reader.getProperty("topology"));
+//				TopologyInformation.setImporter(reader.getProperty("importer"));
+//				TopologyInformation.setTopologyUpdatePort(Integer.parseInt(reader.getProperty("topologyUpdatePort")));
 			} catch (Exception e) {
 				System.out.println("Wrong Configuration Inputs!");
 				System.exit(0);
