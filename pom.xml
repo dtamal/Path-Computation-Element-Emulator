@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.pcee</groupId>
+  <artifactId>path-computation-element-emulator</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>protocol</module>
+    <module>common</module>
+    <module>modulemanagement</module>
+    <module>graph-lib</module>
+    <module>webgui</module>
+    <module>cli-launcher</module>
+    <module>logger</module>
+  </modules>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>25</java.version>
+    <revision>0.0.1-SNAPSHOT</revision>
+    <slf4j.version>2.0.18</slf4j.version>
+    <google-gson.version>2.14.0</google-gson.version>
+    <jdsl.version>2.1</jdsl.version>
+    <jackson.version>2.21.2</jackson.version>
+    <jackson-annotations.version>2.21</jackson-annotations.version>
+    <jetty.version>12.1.9</jetty.version>
+    <jersey.version>4.0.2</jersey.version>
+    <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
+    <maven-flatten-plugin.version>1.7.3</maven-flatten-plugin.version>
+    <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
+    <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <configuration>
+          <release>${java.version}</release>
+        </configuration>
+      </plugin>
+      <!--Maven Flatten plugin to remove ${revision} tags in installed poms -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>${maven-flatten-plugin.version}</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <!-- This mode resolves properties like ${revision} without touching other POM elements, -->
+          <!-- preventing conflicts with the central-publishing-maven-plugin. -->
+          <flattenMode>oss</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
