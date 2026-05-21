@@ -1,69 +1,64 @@
 /**
- *  This file is part of Path Computation Element Emulator (PCEE).
+ * This file is part of Path Computation Element Emulator (PCEE).
  *
- *  PCEE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * <p>PCEE is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  PCEE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * <p>PCEE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with PCEE.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>You should have received a copy of the GNU General Public License along with PCEE. If not, see
+ * http://www.gnu.org/licenses/.
  */
-
 package com.pcee.protocol.open;
-
-import java.util.LinkedList;
 
 import com.pcee.protocol.message.PCEPMessageFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.impl.PCEPOpenObject;
+import java.util.LinkedList;
 
 public class PCEPOpenFrame implements PCEPMessageFrame {
 
-	public final int MESSAGE_TYPE = 1;
+  public final int MESSAGE_TYPE = 1;
 
-	private PCEPOpenObject openObject;
+  private PCEPOpenObject openObject;
 
-	public PCEPOpenFrame(PCEPOpenObject openObject) {
-		this.openObject = openObject;
-	}
+  public PCEPOpenFrame(PCEPOpenObject openObject) {
+    this.openObject = openObject;
+  }
 
-	public PCEPOpenObject getOpenObject() {
-		return openObject;
-	}
+  public PCEPOpenObject getOpenObject() {
+    return openObject;
+  }
 
-	public int getByteLength() {
-		int length = 0;
+  public int getByteLength() {
+    int length = 0;
 
-		length += openObject.getObjectFrameByteLength();
+    length += openObject.getObjectFrameByteLength();
 
-		return length;
-	}
+    return length;
+  }
 
-	public String getBinaryString() {
+  public String getBinaryString() {
 
-		StringBuffer objectsString = new StringBuffer();
+    StringBuffer objectsString = new StringBuffer();
 
-		objectsString.append(openObject.getObjectFrameBinaryString());
+    objectsString.append(openObject.getObjectFrameBinaryString());
 
-		return objectsString.toString();
-	}
+    return objectsString.toString();
+  }
 
-	public LinkedList<PCEPObjectFrame> getObjectFrameLinkedList() {
+  public LinkedList<PCEPObjectFrame> getObjectFrameLinkedList() {
 
-		LinkedList<PCEPObjectFrame> requestObjects = new LinkedList<PCEPObjectFrame>();
-		requestObjects.add(openObject);
+    LinkedList<PCEPObjectFrame> requestObjects = new LinkedList<PCEPObjectFrame>();
+    requestObjects.add(openObject);
 
-		return requestObjects;
-	}
+    return requestObjects;
+  }
 
-	public int getMessageType() {
-		return MESSAGE_TYPE;
-	}
-
+  public int getMessageType() {
+    return MESSAGE_TYPE;
+  }
 }

@@ -23,7 +23,7 @@
   <dependencies>
     <dependency>
       <groupId>com.pcee</groupId>
-      <artifactId>modulemanagement</artifactId>
+      <artifactId>module-management</artifactId>
       <version>${revision}</version>
     </dependency>
     <!-- runtime logging -->

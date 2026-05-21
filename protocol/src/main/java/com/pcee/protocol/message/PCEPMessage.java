@@ -1,139 +1,135 @@
 /**
- *  This file is part of Path Computation Element Emulator (PCEE).
+ * This file is part of Path Computation Element Emulator (PCEE).
  *
- *  PCEE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * <p>PCEE is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  PCEE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * <p>PCEE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with PCEE.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>You should have received a copy of the GNU General Public License along with PCEE. If not, see
+ * http://www.gnu.org/licenses/.
  */
-
 package com.pcee.protocol.message;
 
-import java.util.LinkedList;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
 import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import java.util.LinkedList;
 
 public class PCEPMessage {
-	
-	private final String NAME = "Message Header";
 
-	
-	private PCEPCommonMessageHeader messageHeader;
-	private LinkedList<PCEPObjectFrame> objectsList;
-	private PCEPAddress address;
-	
-	public PCEPMessage(byte[] messageByteArray){
-		String rawMessageString = PCEPComputationFactory.byteArrayToRawMessage(messageByteArray);
-		
-		
-		String messageHeaderString = rawMessageString.substring(0, PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
-		String objectsRawString = rawMessageString.substring(PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
+  private final String NAME = "Message Header";
 
-		this.messageHeader = new PCEPCommonMessageHeader(messageHeaderString);
-		this.objectsList = PCEPObjectFrameFactory.PCEPObjectFabrication(objectsRawString);
-		
-	}
-	
-//	public PCEPMessage(String rawMessageString) {
-//		String messageHeaderString = rawMessageString.substring(0, PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
-//		String objectsRawString = rawMessageString.substring(PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
-//
-//		this.messageHeader = new PCEPCommonMessageHeader(messageHeaderString);
-//		this.objectsList = PCEPObjectFrameFactory.PCEPObjectFabrication(objectsRawString);
-//	}
+  private PCEPCommonMessageHeader messageHeader;
+  private LinkedList<PCEPObjectFrame> objectsList;
+  private PCEPAddress address;
 
-	public PCEPMessage(PCEPCommonMessageHeader header, LinkedList<PCEPObjectFrame> objectsList) {
-		this.messageHeader = header;
-		this.objectsList = objectsList;
-	}
+  public PCEPMessage(byte[] messageByteArray) {
+    String rawMessageString = PCEPComputationFactory.byteArrayToRawMessage(messageByteArray);
 
-	public PCEPCommonMessageHeader getMessageHeader() {
-		return messageHeader;
-	}
+    String messageHeaderString =
+        rawMessageString.substring(0, PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
+    String objectsRawString =
+        rawMessageString.substring(PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
 
-	public LinkedList<PCEPObjectFrame> getObjectsList() {
-		return objectsList;
-	}
+    this.messageHeader = new PCEPCommonMessageHeader(messageHeaderString);
+    this.objectsList = PCEPObjectFrameFactory.PCEPObjectFabrication(objectsRawString);
+  }
 
-	public String getMessageString() {
+  //	public PCEPMessage(String rawMessageString) {
+  //		String messageHeaderString = rawMessageString.substring(0,
+  // PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
+  //		String objectsRawString =
+  // rawMessageString.substring(PCEPConstantValues.COMMON_MESSAGE_HEADER_LENGTH);
+  //
+  //		this.messageHeader = new PCEPCommonMessageHeader(messageHeaderString);
+  //		this.objectsList = PCEPObjectFrameFactory.PCEPObjectFabrication(objectsRawString);
+  //	}
 
-		StringBuffer messageStringBuffer = new StringBuffer();
-		messageStringBuffer.append(messageHeader.getHeaderBinaryString());
+  public PCEPMessage(PCEPCommonMessageHeader header, LinkedList<PCEPObjectFrame> objectsList) {
+    this.messageHeader = header;
+    this.objectsList = objectsList;
+  }
 
-		for (short i = 0; i < objectsList.size(); i++) {
+  public PCEPCommonMessageHeader getMessageHeader() {
+    return messageHeader;
+  }
 
-			String currentHeaderString = objectsList.get(i).getObjectHeader().getHeaderBinaryString();
-			String currentObjectString = objectsList.get(i).getObjectBinaryString();
-			messageStringBuffer.append(currentHeaderString + currentObjectString);
-		}
+  public LinkedList<PCEPObjectFrame> getObjectsList() {
+    return objectsList;
+  }
 
-		String outputString = messageStringBuffer.toString();
+  public String getMessageString() {
 
-		return outputString;
-	}
-	
-	
-	public byte[] getMessageByteArray(){
-		byte[] byteArray = PCEPComputationFactory.rawMessageToByteArray(getMessageString());
-		
-		return byteArray;
-	}
+    StringBuffer messageStringBuffer = new StringBuffer();
+    messageStringBuffer.append(messageHeader.getHeaderBinaryString());
 
-	public PCEPAddress getAddress() {
-		return address;
-	}
+    for (short i = 0; i < objectsList.size(); i++) {
 
-	public void setAddress(PCEPAddress address) {
-		this.address = address;
-	}
+      String currentHeaderString = objectsList.get(i).getObjectHeader().getHeaderBinaryString();
+      String currentObjectString = objectsList.get(i).getObjectBinaryString();
+      messageStringBuffer.append(currentHeaderString + currentObjectString);
+    }
 
-	public String toString() {
-		String messageHeaderInfo = messageHeader.toString();
-		StringBuffer objectFrameBuffer = new StringBuffer();
+    String outputString = messageStringBuffer.toString();
 
-		for (short i = 0; i < objectsList.size(); i++) {
-			objectFrameBuffer.append(objectsList.get(i).toString());
-		}
+    return outputString;
+  }
 
-		return messageHeaderInfo + objectFrameBuffer.toString();
-	}
+  public byte[] getMessageByteArray() {
+    byte[] byteArray = PCEPComputationFactory.rawMessageToByteArray(getMessageString());
 
-	public String binaryInformation() {
-		String messageHeaderInfo = messageHeader.binaryInformation();
-		StringBuffer objectFrameBuffer = new StringBuffer();
+    return byteArray;
+  }
 
-		for (short i = 0; i < objectsList.size(); i++) {
-			String msg = objectsList.get(i).binaryInformation();
-			objectFrameBuffer.append(msg);
-		}
+  public PCEPAddress getAddress() {
+    return address;
+  }
 
-		return messageHeaderInfo + objectFrameBuffer.toString();
-	}
+  public void setAddress(PCEPAddress address) {
+    this.address = address;
+  }
 
-	public String contentInformation() {
-		StringBuffer objectFrameBuffer = new StringBuffer();
+  public String toString() {
+    String messageHeaderInfo = messageHeader.toString();
+    StringBuffer objectFrameBuffer = new StringBuffer();
 
-		objectFrameBuffer.append("[" + NAME + "]");
+    for (short i = 0; i < objectsList.size(); i++) {
+      objectFrameBuffer.append(objectsList.get(i).toString());
+    }
 
-		for (short i = 0; i < objectsList.size(); i++) {
-/*			System.out.println("*****************************************************");
-			System.out.println("objectList.size() = " + objectsList.size());
-			System.out.println("contentInformation() "+ i + " : " + objectsList.get(i));
-			System.out.println("*****************************************************"); */
-			String msg = objectsList.get(i).contentInformation();
-			objectFrameBuffer.append(msg);
-		}
+    return messageHeaderInfo + objectFrameBuffer.toString();
+  }
 
-		return objectFrameBuffer.toString();
-	}
+  public String binaryInformation() {
+    String messageHeaderInfo = messageHeader.binaryInformation();
+    StringBuffer objectFrameBuffer = new StringBuffer();
 
+    for (short i = 0; i < objectsList.size(); i++) {
+      String msg = objectsList.get(i).binaryInformation();
+      objectFrameBuffer.append(msg);
+    }
+
+    return messageHeaderInfo + objectFrameBuffer.toString();
+  }
+
+  public String contentInformation() {
+    StringBuffer objectFrameBuffer = new StringBuffer();
+
+    objectFrameBuffer.append("[" + NAME + "]");
+
+    for (short i = 0; i < objectsList.size(); i++) {
+      /*			System.out.println("*****************************************************");
+      System.out.println("objectList.size() = " + objectsList.size());
+      System.out.println("contentInformation() "+ i + " : " + objectsList.get(i));
+      System.out.println("*****************************************************"); */
+      String msg = objectsList.get(i).contentInformation();
+      objectFrameBuffer.append(msg);
+    }
+
+    return objectFrameBuffer.toString();
+  }
 }

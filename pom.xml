@@ -12,9 +12,9 @@
   <modules>
     <module>protocol</module>
     <module>common</module>
-    <module>modulemanagement</module>
+    <module>module-management</module>
     <module>graph-lib</module>
-    <module>webgui</module>
+    <module>web-gui</module>
     <module>cli-launcher</module>
     <module>logger</module>
   </modules>
@@ -33,15 +33,13 @@
     <maven-flatten-plugin.version>1.7.3</maven-flatten-plugin.version>
     <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
     <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
+    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+    <checkstyle.version>10.21.2</checkstyle.version>
+    <spotbugs-maven-plugin.version>4.9.8.3</spotbugs-maven-plugin.version>
+    <spotbugs.version>4.9.8</spotbugs.version>
+    <spotbugs-exclusion-configuration-file>${maven.multiModuleProjectDirectory}/config/spotbugs-exclude.xml</spotbugs-exclusion-configuration-file>
+    <spotify-fmt-maven-plugin.version>2.29</spotify-fmt-maven-plugin.version>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <plugins>
@@ -77,6 +75,85 @@
             <phase>clean</phase>
             <goals>
               <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${maven-checkstyle-plugin.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${checkstyle.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <configLocation>google_checks.xml</configLocation>
+          <consoleOutput>true</consoleOutput>
+          <failsOnError>true</failsOnError>
+          <linkXRef>false</linkXRef>
+          <suppressionsLocation>
+            ${maven.multiModuleProjectDirectory}/config/checkstyle-suppressions.xml
+          </suppressionsLocation>
+        </configuration>
+        <executions>
+          <execution>
+            <id>checkstyle-validation</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.spotbugs</groupId>
+        <artifactId>spotbugs-maven-plugin</artifactId>
+        <version>${spotbugs-maven-plugin.version}</version>
+        <dependencies>
+          <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>${spotbugs.version}</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <effort>Max</effort>
+          <threshold>Low</threshold>
+          <xmlOutput>true</xmlOutput>
+          <excludeFilterFile>${spotbugs-exclusion-configuration-file}</excludeFilterFile>
+          <failOnError>false</failOnError>
+        </configuration>
+        <executions>
+          <execution>
+            <id>spotbugs-check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.spotify.fmt</groupId>
+        <artifactId>fmt-maven-plugin</artifactId>
+        <version>${spotify-fmt-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>fmt-check</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>fmt-format</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>format</goal>
             </goals>
           </execution>
         </executions>

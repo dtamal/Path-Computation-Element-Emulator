@@ -22,5 +22,10 @@
       <artifactId>common</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>com.pcee</groupId>
+      <artifactId>logger</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
 </project>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.pcee</groupId>
+    <artifactId>path-computation-element-emulator</artifactId>
+    <version>${revision}</version>
+  </parent>
+
+  <artifactId>module-management</artifactId>
+
+  <!-- Module Metadata -->
+  <name>${project.groupId}.${project.artifactId}</name>
+  <description>
+    Implementation of the general modules in the PCEP architecture.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.pcee</groupId>
+      <artifactId>protocol</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.pcee</groupId>
+      <artifactId>graph-lib</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.pcee</groupId>
+      <artifactId>logger</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${google-gson.version}</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,64 +1,61 @@
 /**
- *  This file is part of Path Computation Element Emulator (PCEE).
+ * This file is part of Path Computation Element Emulator (PCEE).
  *
- *  PCEE is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * <p>PCEE is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  PCEE is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * <p>PCEE is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with PCEE.  If not, see <http://www.gnu.org/licenses/>.
+ * <p>You should have received a copy of the GNU General Public License along with PCEE. If not, see
+ * http://www.gnu.org/licenses/.
  */
-
 package com.pcee.protocol.open;
 
-import java.util.LinkedList;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.pcee.logger.PceeLoggerFactory;
 import com.pcee.protocol.message.PCEPMessage;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
 import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
 import com.pcee.protocol.message.objectframe.impl.PCEPOpenObject;
+import java.util.LinkedList;
+import org.slf4j.Logger;
 
 public class PCEPOpenFrameFactory {
 
-	private static Logger logger  = LoggerFactory.getLogger(PCEPOpenFrameFactory.class);
-	
-	public static PCEPOpenFrame generateOpenFrame(PCEPOpenObject openObject) {
+  private static Logger logger = PceeLoggerFactory.getLogger(PCEPOpenFrameFactory.class);
 
-		PCEPOpenFrame openFrame = new PCEPOpenFrame(openObject);
+  public static PCEPOpenFrame generateOpenFrame(PCEPOpenObject openObject) {
 
-		return openFrame;
-	}
+    PCEPOpenFrame openFrame = new PCEPOpenFrame(openObject);
 
-	public static PCEPOpenFrame generateOpenFrame(int keepAlive, int deadTimer, String pFlag, String iFlag) {
+    return openFrame;
+  }
 
-		PCEPOpenObject openObject = PCEPObjectFrameFactory.generatePCEPOpenObject(pFlag, iFlag, keepAlive, deadTimer);
-		PCEPOpenFrame open = new PCEPOpenFrame(openObject);
+  public static PCEPOpenFrame generateOpenFrame(
+      int keepAlive, int deadTimer, String pFlag, String iFlag) {
 
-		return open;
-	}
+    PCEPOpenObject openObject =
+        PCEPObjectFrameFactory.generatePCEPOpenObject(pFlag, iFlag, keepAlive, deadTimer);
+    PCEPOpenFrame open = new PCEPOpenFrame(openObject);
 
-	public static PCEPOpenFrame getOpenFrame(PCEPMessage message) {
+    return open;
+  }
 
-		LinkedList<PCEPObjectFrame> objectList = message.getObjectsList();
+  public static PCEPOpenFrame getOpenFrame(PCEPMessage message) {
 
-		if (objectList.size() != 1) {
-			logger.error("Wrong OpenMessage Format! Object list inside the OPEN Frame is not equal to 1. The size of the object list is " + objectList.size());
-			return null; // TODO
-		}
+    LinkedList<PCEPObjectFrame> objectList = message.getObjectsList();
 
-		PCEPOpenObject openObject = (PCEPOpenObject) objectList.get(0);
+    if (objectList.size() != 1) {
+      logger.error(
+          "Wrong OpenMessage Format! Object list inside the OPEN Frame is not equal to 1. The size of the object list is "
+              + objectList.size());
+      return null; // TODO
+    }
 
-		return new PCEPOpenFrame(openObject);
+    PCEPOpenObject openObject = (PCEPOpenObject) objectList.get(0);
 
-	}
-
+    return new PCEPOpenFrame(openObject);
+  }
 }
