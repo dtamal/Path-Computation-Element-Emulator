@@ -2,16 +2,16 @@ package com.pcee.ws.resource.client;
 
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.PCEPMessageFactory;
-import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
-import com.pcee.protocol.message.objectframe.impl.PCEPEndPointsObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
-import com.pcee.protocol.request.PCEPRequestFrame;
-import com.pcee.protocol.request.PCEPRequestFrameFactory;
-import com.pcee.protocol.response.PCEPResponseFrame;
-import com.pcee.protocol.response.PCEPResponseFrameFactory;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.PceMessageFactory;
+import com.pcee.protocol.message.objectframe.PceObjectFrameFactory;
+import com.pcee.protocol.message.objectframe.impl.PceEndPointsObject;
+import com.pcee.protocol.message.objectframe.impl.PceRequestParametersObject;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
+import com.pcee.protocol.request.PceRequestFrame;
+import com.pcee.protocol.request.PceRequestFrameFactory;
+import com.pcee.protocol.response.PceResponseFrame;
+import com.pcee.protocol.response.PceResponseFrameFactory;
 import com.pcee.ws.launcher.PCEEWebLauncher;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -34,7 +34,7 @@ public class PCEEClientControlResource {
     if (clientModuleManagement == null) {
 
       PCEEWebLauncher.setClientModuleManagement(new ModuleManagement(false));
-      PCEPAddress address = new PCEPAddress("127.0.0.1", Integer.parseInt("4189"));
+      PceAddress address = new PceAddress("127.0.0.1", Integer.parseInt("4189"));
       PCEEWebLauncher.getClientModuleManagement()
           .getClientModule()
           .registerConnection(address, false, true, true);
@@ -72,29 +72,29 @@ public class PCEEClientControlResource {
       String srcAddr = part[0];
       String dstAddr = part[1];
 
-      PCEPAddress sourceAddress = new PCEPAddress(srcAddr, false);
-      PCEPAddress destinationAddress = new PCEPAddress(dstAddr, false);
-      PCEPRequestParametersObject RP =
-          PCEPObjectFrameFactory.generatePCEPRequestParametersObject(
+      PceAddress sourceAddress = new PceAddress(srcAddr, false);
+      PceAddress destinationAddress = new PceAddress(dstAddr, false);
+      PceRequestParametersObject RP =
+          PceObjectFrameFactory.generatePCEPRequestParametersObject(
               "1", "0", "1", "0", "0", "1", "432");
-      PCEPEndPointsObject endPoints =
-          PCEPObjectFrameFactory.generatePCEPEndPointsObject(
+      PceEndPointsObject endPoints =
+          PceObjectFrameFactory.generatePCEPEndPointsObject(
               "0", "0", sourceAddress, destinationAddress);
-      PCEPAddress destAddress = new PCEPAddress(serverAddr, Integer.parseInt(serverPort));
-      PCEPRequestFrame requestMessage =
-          PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
-      PCEPMessage message = PCEPMessageFactory.generateMessage(requestMessage);
+      PceAddress destAddress = new PceAddress(serverAddr, Integer.parseInt(serverPort));
+      PceRequestFrame requestMessage =
+          PceRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
+      PceMessage message = PceMessageFactory.generateMessage(requestMessage);
       message.setAddress(destAddress);
       clientModuleManagement.getClientModule().sendMessage(message, ModuleEnum.SESSION_MODULE);
 
-      LinkedBlockingQueue<PCEPMessage> receiveQueue =
+      LinkedBlockingQueue<PceMessage> receiveQueue =
           clientModuleManagement.getClientModule().getReceiveQueue();
 
-      PCEPResponseFrame responseFrame;
+      PceResponseFrame responseFrame;
       String traversedNodes = null;
       try {
         responseFrame =
-            PCEPResponseFrameFactory.getPathComputationResponseFrame(receiveQueue.take());
+            PceResponseFrameFactory.getPathComputationResponseFrame(receiveQueue.take());
 
         traversedNodes = responseFrame.getTraversedVertexes();
 

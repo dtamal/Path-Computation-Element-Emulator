@@ -15,14 +15,14 @@
 package com.pcee.architecture.clientmodule;
 
 import com.pcee.architecture.Module;
-import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.protocol.message.PceMessage;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class ClientModule implements Module {
 
-  LinkedBlockingQueue<PCEPMessage> receiveQueue;
+  LinkedBlockingQueue<PceMessage> receiveQueue;
 
-  public LinkedBlockingQueue<PCEPMessage> getReceiveQueue() {
+  public LinkedBlockingQueue<PceMessage> getReceiveQueue() {
     return receiveQueue;
   }
 }

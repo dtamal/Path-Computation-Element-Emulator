@@ -2,24 +2,24 @@ package com.pcee.architecture.sessionmodule.statemachine;
 
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.PCEPMessageAnalyser;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.PceMessageAnalyser;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
 import java.util.Timer;
 
 public class StateMachineServerImpl extends StateMachineImpl {
 
   public StateMachineServerImpl(
       ModuleManagement layerManagement,
-      PCEPAddress Address,
+      PceAddress Address,
       Timer stateTimer,
       boolean connectionInitialized) {
     super(layerManagement, Address, stateTimer, connectionInitialized);
   }
 
   @Override
-  public void updateState(PCEPMessage message, ModuleEnum sourceModule) {
-    logger.debug("Entering: updateState(PCEPMessage message, ModuleEnum targetLayer)");
+  public void updateState(PceMessage message, ModuleEnum sourceModule) {
+    logger.debug("Entering: updateState(PceMessage message, ModuleEnum targetLayer)");
     logger.debug("| message: {}", message.contentInformation());
     switch (state) {
       case 0:
@@ -56,8 +56,8 @@ public class StateMachineServerImpl extends StateMachineImpl {
     }
   }
 
-  private void enterSessionUPState(PCEPMessage message, ModuleEnum sourceModule) {
-    logger.debug("Entering: enterSessionUPState(PCEPMessage message)");
+  private void enterSessionUPState(PceMessage message, ModuleEnum sourceModule) {
+    logger.debug("Entering: enterSessionUPState(PceMessage message)");
     logger.debug("| message: {}", message.contentInformation());
 
     // System.out.println("[StateMachine: " + address.getAddress() +
@@ -65,7 +65,7 @@ public class StateMachineServerImpl extends StateMachineImpl {
 
     // flushBuffer();
 
-    boolean noErrorsDetected = PCEPMessageAnalyser.checkMessageFormat(message);
+    boolean noErrorsDetected = PceMessageAnalyser.checkMessageFormat(message);
 
     if (!noErrorsDetected) {
       logger.info("Message Format Error detected");
@@ -76,7 +76,7 @@ public class StateMachineServerImpl extends StateMachineImpl {
 
     this.checkMultipleConnections();
 
-    logger.debug("Entering: analyzeMessage(PCEPMessage message)");
+    logger.debug("Entering: analyzeMessage(PceMessage message)");
 
     int messageType = message.getMessageHeader().getTypeDecimalValue();
 

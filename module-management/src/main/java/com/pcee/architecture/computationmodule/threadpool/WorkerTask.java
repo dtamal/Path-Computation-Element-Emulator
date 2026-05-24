@@ -25,19 +25,19 @@ import com.graph.path.algorithms.impl.SimplePathComputationAlgorithm;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.logger.PceeLoggerFactory;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.PCEPMessageFactory;
-import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
-import com.pcee.protocol.message.objectframe.impl.PCEPBandwidthObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPExplicitRouteObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPNoPathObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.EROSubobjects;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
-import com.pcee.protocol.request.PCEPRequestFrame;
-import com.pcee.protocol.request.PCEPRequestFrameFactory;
-import com.pcee.protocol.response.PCEPResponseFrame;
-import com.pcee.protocol.response.PCEPResponseFrameFactory;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.PceMessageFactory;
+import com.pcee.protocol.message.objectframe.PceObjectFrameFactory;
+import com.pcee.protocol.message.objectframe.impl.PceBandwidthObject;
+import com.pcee.protocol.message.objectframe.impl.PceExplicitRouteObject;
+import com.pcee.protocol.message.objectframe.impl.PceNoPathObject;
+import com.pcee.protocol.message.objectframe.impl.PceRequestParametersObject;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.EroSubobjects;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
+import com.pcee.protocol.request.PceRequestFrame;
+import com.pcee.protocol.request.PceRequestFrameFactory;
+import com.pcee.protocol.response.PceResponseFrame;
+import com.pcee.protocol.response.PceResponseFrameFactory;
 import java.util.ArrayList;
 import org.slf4j.Logger;
 
@@ -51,14 +51,14 @@ public class WorkerTask implements Runnable {
 
   private Logger logger = PceeLoggerFactory.getLogger("WorkerTask");
   // Request to be processed
-  private PCEPMessage request;
+  private PceMessage request;
   // Graph used for computation of the request
   private Gcontroller graph;
   // Module management object to send the response to the session layer
   private ModuleManagement lm;
 
   /** Default Constructor */
-  public WorkerTask(ModuleManagement layerManagement, PCEPMessage request, Gcontroller graph) {
+  public WorkerTask(ModuleManagement layerManagement, PceMessage request, Gcontroller graph) {
     lm = layerManagement;
     this.request = request;
     this.graph = graph;
@@ -71,13 +71,13 @@ public class WorkerTask implements Runnable {
 
   /** Function to implement the path computation operations */
   public void run() {
-    PCEPRequestFrame requestFrame = PCEPRequestFrameFactory.getPathComputationRequestFrame(request);
+    PceRequestFrame requestFrame = PceRequestFrameFactory.getPathComputationRequestFrame(request);
     logger.info("Starting Processing of Request: " + requestFrame.getRequestID());
     processSingleDomainRequest(requestFrame);
     logger.info("Completed Processing of Request: " + requestFrame.getRequestID());
   }
 
-  private void processSingleDomainRequest(PCEPRequestFrame requestFrame) {
+  private void processSingleDomainRequest(PceRequestFrame requestFrame) {
     // Check if source and destination domain are available in the graph, if not send a no path
     // object
     String sourceID = requestFrame.getSourceAddress().getIPv4Address(false).trim();
@@ -105,29 +105,29 @@ public class WorkerTask implements Runnable {
       if (element != null) {
         logger.info("Computed path is " + element.getVertexSequence());
         // return response
-        ArrayList<EROSubobjects> vertexList = getTraversedVertexes(element.getTraversedVertices());
+        ArrayList<EroSubobjects> vertexList = getTraversedVertexes(element.getTraversedVertices());
 
         // Generate ERO Object
-        PCEPExplicitRouteObject ERO =
-            PCEPObjectFrameFactory.generatePCEPExplicitRouteObject("1", "0", vertexList);
+        PceExplicitRouteObject ERO =
+            PceObjectFrameFactory.generatePCEPExplicitRouteObject("1", "0", vertexList);
         // atleast one path was computed
-        PCEPRequestParametersObject RP =
-            PCEPObjectFrameFactory.generatePCEPRequestParametersObject(
+        PceRequestParametersObject RP =
+            PceObjectFrameFactory.generatePCEPRequestParametersObject(
                 "1", "0", "0", "0", "0", "1", Integer.toString(requestFrame.getRequestID()));
 
-        PCEPResponseFrame respFrame =
-            PCEPResponseFrameFactory.generatePathComputationResponseFrame(RP);
+        PceResponseFrame respFrame =
+            PceResponseFrameFactory.generatePathComputationResponseFrame(RP);
 
         respFrame.insertExplicitRouteObject(ERO);
 
         if (requestFrame.containsBandwidthObject()) {
-          PCEPBandwidthObject bw =
-              PCEPObjectFrameFactory.generatePCEPBandwidthObject(
+          PceBandwidthObject bw =
+              PceObjectFrameFactory.generatePCEPBandwidthObject(
                   "1", "0", (float) element.getPathParams().getAvailableCapacity());
           respFrame.insertBandwidthObject(bw);
         }
 
-        PCEPMessage mesg = PCEPMessageFactory.generateMessage(respFrame);
+        PceMessage mesg = PceMessageFactory.generateMessage(respFrame);
         mesg.setAddress(request.getAddress());
 
         logger.info("Path found in the domain. Sending back to client");
@@ -164,14 +164,14 @@ public class WorkerTask implements Runnable {
   /** Function to return the no Path message to the Client */
   protected void returnNoPathMessage(int requestID) {
     // Generate a No path object
-    PCEPRequestParametersObject RP =
-        PCEPObjectFrameFactory.generatePCEPRequestParametersObject(
+    PceRequestParametersObject RP =
+        PceObjectFrameFactory.generatePCEPRequestParametersObject(
             "1", "0", "0", "0", "0", "1", Integer.toString(requestID));
-    PCEPNoPathObject noPath = PCEPObjectFrameFactory.generatePCEPNoPathObject("1", "0", 1, "0");
-    PCEPResponseFrame responseFrame =
-        PCEPResponseFrameFactory.generatePathComputationResponseFrame(RP);
+    PceNoPathObject noPath = PceObjectFrameFactory.generatePCEPNoPathObject("1", "0", 1, "0");
+    PceResponseFrame responseFrame =
+        PceResponseFrameFactory.generatePathComputationResponseFrame(RP);
     responseFrame.insertNoPathObject(noPath);
-    PCEPMessage mesg = PCEPMessageFactory.generateMessage(responseFrame);
+    PceMessage mesg = PceMessageFactory.generateMessage(responseFrame);
     mesg.setAddress(request.getAddress());
     lm.getComputationModule().sendMessage(mesg, ModuleEnum.SESSION_MODULE);
   }
@@ -183,13 +183,13 @@ public class WorkerTask implements Runnable {
    * @param resp
    * @return
    */
-  protected ArrayList<EROSubobjects> getTraversedVertexes(
+  protected ArrayList<EroSubobjects> getTraversedVertexes(
       ArrayList<VertexElement> vertexArrayList) {
 
-    ArrayList<EROSubobjects> traversedVertexesList = new ArrayList<EROSubobjects>();
+    ArrayList<EroSubobjects> traversedVertexesList = new ArrayList<EroSubobjects>();
 
     for (int i = 0; i < vertexArrayList.size(); i++) {
-      traversedVertexesList.add(new PCEPAddress(vertexArrayList.get(i).getVertexID(), false));
+      traversedVertexesList.add(new PceAddress(vertexArrayList.get(i).getVertexID(), false));
     }
     return traversedVertexesList;
   }

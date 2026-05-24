@@ -14,33 +14,33 @@
  */
 package com.pcee.protocol.response;
 
-import com.pcee.protocol.message.objectframe.PCEPObjectFrame;
-import com.pcee.protocol.message.objectframe.impl.PCEPBandwidthObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPIncludeRouteObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPLabelSwitchedPathAttributesObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPMetricObject;
+import com.pcee.protocol.message.objectframe.PceObjectFrame;
+import com.pcee.protocol.message.objectframe.impl.PceBandwidthObject;
+import com.pcee.protocol.message.objectframe.impl.PceIncludeRouteObject;
+import com.pcee.protocol.message.objectframe.impl.PceLabelSwitchedPathAttributesObject;
+import com.pcee.protocol.message.objectframe.impl.PceMetricObject;
 import java.util.LinkedList;
 
 public class AttributeListObject {
 
-  PCEPLabelSwitchedPathAttributesObject LSPA;
-  PCEPBandwidthObject bandwidth;
-  LinkedList<PCEPMetricObject> metricList;
-  PCEPIncludeRouteObject IRO;
+  PceLabelSwitchedPathAttributesObject LSPA;
+  PceBandwidthObject bandwidth;
+  LinkedList<PceMetricObject> metricList;
+  PceIncludeRouteObject IRO;
 
-  public void insertLabelSwitchedPathAttributesObject(PCEPLabelSwitchedPathAttributesObject LSPA) {
+  public void insertLabelSwitchedPathAttributesObject(PceLabelSwitchedPathAttributesObject LSPA) {
     this.LSPA = LSPA;
   }
 
-  public void insertBandwidthObject(PCEPBandwidthObject bandwidth) {
+  public void insertBandwidthObject(PceBandwidthObject bandwidth) {
     this.bandwidth = bandwidth;
   }
 
-  public void insertMetricObjectList(LinkedList<PCEPMetricObject> metricList) {
+  public void insertMetricObjectList(LinkedList<PceMetricObject> metricList) {
     this.metricList = metricList;
   }
 
-  public void insertIncludeRouteObject(PCEPIncludeRouteObject IRO) {
+  public void insertIncludeRouteObject(PceIncludeRouteObject IRO) {
     this.IRO = IRO;
   }
 
@@ -72,9 +72,9 @@ public class AttributeListObject {
     return true;
   }
 
-  public LinkedList<PCEPObjectFrame> getObjectFrameList() {
+  public LinkedList<PceObjectFrame> getObjectFrameList() {
 
-    LinkedList<PCEPObjectFrame> objectsLinkedList = new LinkedList<PCEPObjectFrame>();
+    LinkedList<PceObjectFrame> objectsLinkedList = new LinkedList<PceObjectFrame>();
 
     if (LSPA != null) {
       objectsLinkedList.add(LSPA);

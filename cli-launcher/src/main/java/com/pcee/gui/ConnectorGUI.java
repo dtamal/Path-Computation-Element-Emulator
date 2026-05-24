@@ -16,14 +16,14 @@ package com.pcee.gui;
 
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.PCEPMessageFactory;
-import com.pcee.protocol.message.objectframe.PCEPObjectFrameFactory;
-import com.pcee.protocol.message.objectframe.impl.PCEPEndPointsObject;
-import com.pcee.protocol.message.objectframe.impl.PCEPRequestParametersObject;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
-import com.pcee.protocol.request.PCEPRequestFrame;
-import com.pcee.protocol.request.PCEPRequestFrameFactory;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.PceMessageFactory;
+import com.pcee.protocol.message.objectframe.PceObjectFrameFactory;
+import com.pcee.protocol.message.objectframe.impl.PceEndPointsObject;
+import com.pcee.protocol.message.objectframe.impl.PceRequestParametersObject;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
+import com.pcee.protocol.request.PceRequestFrame;
+import com.pcee.protocol.request.PceRequestFrameFactory;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -77,14 +77,14 @@ public class ConnectorGUI extends JFrame implements ActionListener {
   static JTextArea messageTextArea;
   JScrollPane scrollPane;
 
-  PCEPAddress address, sourceAddress, destAddress;
+  PceAddress address, sourceAddress, destAddress;
 
   public ConnectorGUI(
       ModuleManagement layerManagement, String address, String sourceAddress, String destAddress) {
     lm = layerManagement;
-    this.address = new PCEPAddress(address, port);
-    this.sourceAddress = new PCEPAddress(sourceAddress, false);
-    this.destAddress = new PCEPAddress(destAddress, false);
+    this.address = new PceAddress(address, port);
+    this.sourceAddress = new PceAddress(sourceAddress, false);
+    this.destAddress = new PceAddress(destAddress, false);
 
     gridbag = new GridBagLayout();
 
@@ -415,8 +415,8 @@ public class ConnectorGUI extends JFrame implements ActionListener {
   }
 
   public void openConnection() throws Exception {
-    PCEPAddress address =
-        new PCEPAddress(
+    PceAddress address =
+        new PceAddress(
             serverAddressTextField.getText(), Integer.parseInt(serverPortTextField.getText()));
     killIDALogo();
     logger.info("Trying to connect to " + address.getIPv4Address(true));
@@ -437,24 +437,24 @@ public class ConnectorGUI extends JFrame implements ActionListener {
     String endPointsPFlag = booleanToStringConverter(false);
     String endPointsIFlag = booleanToStringConverter(false);
 
-    PCEPAddress sourceAddress = new PCEPAddress(sourceTextField.getText().trim(), false);
-    PCEPAddress destinationAddress = new PCEPAddress(destinationTextField.getText().trim(), false);
+    PceAddress sourceAddress = new PceAddress(sourceTextField.getText().trim(), false);
+    PceAddress destinationAddress = new PceAddress(destinationTextField.getText().trim(), false);
 
-    PCEPRequestParametersObject RP =
-        PCEPObjectFrameFactory.generatePCEPRequestParametersObject(
+    PceRequestParametersObject RP =
+        PceObjectFrameFactory.generatePCEPRequestParametersObject(
             pFlag, iFlag, oFlag, bFlag, rFlag, priFlag, "432");
-    PCEPEndPointsObject endPoints =
-        PCEPObjectFrameFactory.generatePCEPEndPointsObject(
+    PceEndPointsObject endPoints =
+        PceObjectFrameFactory.generatePCEPEndPointsObject(
             endPointsPFlag, endPointsIFlag, sourceAddress, destinationAddress);
 
     // Address destAddress = new Address(serverAddressTextField.getText());
-    PCEPAddress destAddress =
-        new PCEPAddress(
+    PceAddress destAddress =
+        new PceAddress(
             serverAddressTextField.getText(), Integer.parseInt(serverPortTextField.getText()));
 
-    PCEPRequestFrame requestMessage =
-        PCEPRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
-    PCEPMessage message = PCEPMessageFactory.generateMessage(requestMessage);
+    PceRequestFrame requestMessage =
+        PceRequestFrameFactory.generatePathComputationRequestFrame(RP, endPoints);
+    PceMessage message = PceMessageFactory.generateMessage(requestMessage);
 
     message.setAddress(destAddress);
 

@@ -17,17 +17,17 @@ package com.pcee.architecture.sessionmodule.statemachine;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.common.SessionId;
-import com.pcee.protocol.close.PCEPCloseFrame;
-import com.pcee.protocol.close.PCEPCloseFrameFactory;
-import com.pcee.protocol.keepalive.PCEPKeepaliveFrame;
-import com.pcee.protocol.keepalive.PCEPKeepaliveFrameFactory;
-import com.pcee.protocol.message.PCEPConstantValues;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.PCEPMessageAnalyser;
-import com.pcee.protocol.message.PCEPMessageFactory;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
-import com.pcee.protocol.open.PCEPOpenFrame;
-import com.pcee.protocol.open.PCEPOpenFrameFactory;
+import com.pcee.protocol.close.PceCloseFrame;
+import com.pcee.protocol.close.PceCloseFrameFactory;
+import com.pcee.protocol.keepalive.PceKeepaliveFrame;
+import com.pcee.protocol.keepalive.PceKeepaliveFrameFactory;
+import com.pcee.protocol.message.PceConstantValues;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.PceMessageAnalyser;
+import com.pcee.protocol.message.PceMessageFactory;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
+import com.pcee.protocol.open.PceOpenFrame;
+import com.pcee.protocol.open.PceOpenFrameFactory;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.slf4j.Logger;
@@ -91,7 +91,7 @@ public abstract class StateMachineImpl extends StateMachine {
   protected int sessionID = SessionId.INSTANCE.getId(); // TODO read from
   // message
   // Remote address of the PCEP connection
-  protected PCEPAddress address;
+  protected PceAddress address;
 
   // Boolean to indicate if the peer initialized the connection
   protected boolean connectionInitialized;
@@ -128,11 +128,11 @@ public abstract class StateMachineImpl extends StateMachine {
   protected final int connectMaxRetry = 5;
 
   // FIXME change to non-debugging values back
-  protected final int connect = PCEPConstantValues.CONNECT_TIMER;
-  protected int openWait = PCEPConstantValues.OPENWAIT_TIMER;
-  protected int keepWait = PCEPConstantValues.KEEPWAIT_TIMER;
-  protected int keepAlive = PCEPConstantValues.KEEPALIVE_TIMER;
-  protected int deadTimer = PCEPConstantValues.DEAD_TIMER;
+  protected final int connect = PceConstantValues.CONNECT_TIMER;
+  protected int openWait = PceConstantValues.OPENWAIT_TIMER;
+  protected int keepWait = PceConstantValues.KEEPWAIT_TIMER;
+  protected int keepAlive = PceConstantValues.KEEPALIVE_TIMER;
+  protected int deadTimer = PceConstantValues.DEAD_TIMER;
 
   protected int openRetry;
 
@@ -141,10 +141,10 @@ public abstract class StateMachineImpl extends StateMachine {
 
   public StateMachineImpl(
       ModuleManagement layerManagement,
-      PCEPAddress Address,
+      PceAddress Address,
       Timer stateTimer,
       boolean connectionInitialized) {
-    // logger.debug("Entering: StateMachineImpl(ModuleManagement layerManagement, PCEPAddress
+    // logger.debug("Entering: StateMachineImpl(ModuleManagement layerManagement, PceAddress
     // Address, Timer stateTimer, boolean connectionInitialized)");
 
     lm = layerManagement;
@@ -234,7 +234,7 @@ public abstract class StateMachineImpl extends StateMachine {
     enterTCPPendingState();
   }
 
-  public abstract void updateState(PCEPMessage message, ModuleEnum sourceModule);
+  public abstract void updateState(PceMessage message, ModuleEnum sourceModule);
 
   /** enterIdleState */
   protected void enterIdleState() {
@@ -285,12 +285,12 @@ public abstract class StateMachineImpl extends StateMachine {
    *
    * @param message
    */
-  protected void enterOpenWaitState(PCEPMessage message) {
-    logger.debug("Entering: enterOpenWaitState(PCEPMessage message)");
+  protected void enterOpenWaitState(PceMessage message) {
+    logger.debug("Entering: enterOpenWaitState(PceMessage message)");
     logger.debug("| message: {}", message.contentInformation());
 
-    // PCEPMessageFrame frame =
-    // PCEPMessageFactory.getPCEPMessageFrame(message);
+    // PceMessageFrame frame =
+    // PceMessageFactory.getPCEPMessageFrame(message);
     int messageType = message.getMessageHeader().getTypeDecimalValue();
 
     if (messageType != 1) { // (h)
@@ -301,7 +301,7 @@ public abstract class StateMachineImpl extends StateMachine {
 
     this.checkMultipleConnections(); // (a)
 
-    boolean noErrorsDetected = PCEPMessageAnalyser.checkMessageFormat(message);
+    boolean noErrorsDetected = PceMessageAnalyser.checkMessageFormat(message);
 
     if (!noErrorsDetected) { // (b)
       logger.info("Message Format Error detected");
@@ -311,7 +311,7 @@ public abstract class StateMachineImpl extends StateMachine {
       this.closeTCPConnection();
     }
 
-    int sessionCharacteristics = PCEPMessageAnalyser.checkSessionCharacteristics(message);
+    int sessionCharacteristics = PceMessageAnalyser.checkSessionCharacteristics(message);
 
     if (noErrorsDetected && sessionCharacteristics == 0) { // (c)
       logger.info(
@@ -381,8 +381,8 @@ public abstract class StateMachineImpl extends StateMachine {
    *
    * @param message
    */
-  protected void enterKeepWaitState(PCEPMessage message) {
-    logger.debug("Entering: enterKeepWaitState(PCEPMessage message)");
+  protected void enterKeepWaitState(PceMessage message) {
+    logger.debug("Entering: enterKeepWaitState(PceMessage message)");
     logger.debug("| message: {}", message.contentInformation());
 
     int messageType = message.getMessageHeader().getTypeDecimalValue();
@@ -392,7 +392,7 @@ public abstract class StateMachineImpl extends StateMachine {
       this.releaseResources();
     }
 
-    boolean noErrorsDetected = PCEPMessageAnalyser.checkMessageFormat(message);
+    boolean noErrorsDetected = PceMessageAnalyser.checkMessageFormat(message);
 
     if (!noErrorsDetected) { // (b)
       logger.info("Message Format Error detected");
@@ -424,7 +424,7 @@ public abstract class StateMachineImpl extends StateMachine {
       logger.info("Processing Error Message");
 
       // TODO New Proposal through error msg
-      int sessionCharacteristics = PCEPMessageAnalyser.checkSessionCharacteristics(message);
+      int sessionCharacteristics = PceMessageAnalyser.checkSessionCharacteristics(message);
 
       if (sessionCharacteristics == -1) {
         logger.info("Session Characteristics are not acceptable, and not negotiable");
@@ -460,8 +460,8 @@ public abstract class StateMachineImpl extends StateMachine {
    *
    * @param message
    */
-  protected void enterSessionUPState(PCEPMessage message) {
-    logger.debug("Entering: enterSessionUPState(PCEPMessage message)");
+  protected void enterSessionUPState(PceMessage message) {
+    logger.debug("Entering: enterSessionUPState(PceMessage message)");
     logger.debug("| message: {}", message.contentInformation());
 
     // System.out.println("[StateMachine: " + address.getAddress() +
@@ -469,7 +469,7 @@ public abstract class StateMachineImpl extends StateMachine {
 
     // flushBuffer();
 
-    boolean noErrorsDetected = PCEPMessageAnalyser.checkMessageFormat(message);
+    boolean noErrorsDetected = PceMessageAnalyser.checkMessageFormat(message);
 
     if (!noErrorsDetected) {
       logger.info("Message Format Error detected");
@@ -483,8 +483,8 @@ public abstract class StateMachineImpl extends StateMachine {
     this.analyzeMessage(message);
   }
 
-  private void analyzeMessage(PCEPMessage message) {
-    logger.debug("Entering: analyzeMessage(PCEPMessage message)");
+  private void analyzeMessage(PceMessage message) {
+    logger.debug("Entering: analyzeMessage(PceMessage message)");
 
     int messageType = message.getMessageHeader().getTypeDecimalValue();
 
@@ -599,8 +599,8 @@ public abstract class StateMachineImpl extends StateMachine {
    * Various
    */
 
-  protected void sendMessageToPeer(PCEPMessage message, ModuleEnum targetLayer) {
-    logger.debug("Entering: sendMessageToPeer(PCEPMessage message)");
+  protected void sendMessageToPeer(PceMessage message, ModuleEnum targetLayer) {
+    logger.debug("Entering: sendMessageToPeer(PceMessage message)");
     logger.debug("| message: {}", message.contentInformation());
 
     message.setAddress(address);
@@ -676,9 +676,9 @@ public abstract class StateMachineImpl extends StateMachine {
 
     logger.info("Sending Open Message to{}", address.getIPv4Address());
 
-    PCEPOpenFrame openFrame =
-        PCEPOpenFrameFactory.generateOpenFrame(keepalive, deadTimer, "1", "1"); // TODO
-    PCEPMessage openMessage = PCEPMessageFactory.generateMessage(openFrame);
+    PceOpenFrame openFrame =
+        PceOpenFrameFactory.generateOpenFrame(keepalive, deadTimer, "1", "1"); // TODO
+    PceMessage openMessage = PceMessageFactory.generateMessage(openFrame);
 
     sendMessageToPeer(openMessage, ModuleEnum.NETWORK_MODULE);
   }
@@ -688,8 +688,8 @@ public abstract class StateMachineImpl extends StateMachine {
 
     logger.info("Sending KeepAlive Message to{}", address.getIPv4Address());
 
-    PCEPKeepaliveFrame keepaliveFrame = PCEPKeepaliveFrameFactory.generateKeepaliveFrame();
-    PCEPMessage keepaliveMessage = PCEPMessageFactory.generateMessage(keepaliveFrame);
+    PceKeepaliveFrame keepaliveFrame = PceKeepaliveFrameFactory.generateKeepaliveFrame();
+    PceMessage keepaliveMessage = PceMessageFactory.generateMessage(keepaliveFrame);
 
     sendMessageToPeer(keepaliveMessage, ModuleEnum.NETWORK_MODULE);
 
@@ -703,8 +703,8 @@ public abstract class StateMachineImpl extends StateMachine {
 
     logger.info("Sending Close Message to{}", address.getIPv4Address());
 
-    PCEPCloseFrame closeFrame = PCEPCloseFrameFactory.generateCloseFrame(1, "1", "1");
-    PCEPMessage closeMessage = PCEPMessageFactory.generateMessage(closeFrame);
+    PceCloseFrame closeFrame = PceCloseFrameFactory.generateCloseFrame(1, "1", "1");
+    PceMessage closeMessage = PceMessageFactory.generateMessage(closeFrame);
 
     sendMessageToPeer(closeMessage, ModuleEnum.NETWORK_MODULE);
   }
@@ -714,7 +714,7 @@ public abstract class StateMachineImpl extends StateMachine {
 
     logger.info("Sending Error Message to{}", address.getIPv4Address());
 
-    PCEPMessage errorMessage = PCEPMessageFactory.generateSIMPLEErrorMessage(type, value, "1", "0");
+    PceMessage errorMessage = PceMessageFactory.generateSIMPLEErrorMessage(type, value, "1", "0");
     sendMessageToPeer(errorMessage, ModuleEnum.NETWORK_MODULE);
   }
 
@@ -953,7 +953,7 @@ public abstract class StateMachineImpl extends StateMachine {
     this.deadTimerTask.cancel();
   }
 
-  public PCEPAddress getAddress() {
+  public PceAddress getAddress() {
     logger.debug("Entering: getAddress()");
 
     return address;

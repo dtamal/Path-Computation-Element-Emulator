@@ -18,7 +18,7 @@ import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.logger.PceeLoggerFactory;
-import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.protocol.message.PceMessage;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -45,7 +45,7 @@ public class ThreadPool {
   private HashMap<String, Worker> threadHashMap;
 
   // Blocking queue used by workers to read incoming requests
-  private LinkedBlockingQueue<PCEPMessage> requestQueue;
+  private LinkedBlockingQueue<PceMessage> requestQueue;
 
   // Graph instance used by workers to perform path computations
   private Gcontroller graph;
@@ -66,7 +66,7 @@ public class ThreadPool {
   public ThreadPool(
       ModuleManagement layerManagement,
       int threadCount,
-      LinkedBlockingQueue<PCEPMessage> requestQueue) {
+      LinkedBlockingQueue<PceMessage> requestQueue) {
     lm = layerManagement;
     this.threadCount = threadCount;
     isInitialized = false;

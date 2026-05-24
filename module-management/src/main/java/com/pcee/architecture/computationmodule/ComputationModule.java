@@ -15,8 +15,8 @@
 package com.pcee.architecture.computationmodule;
 
 import com.pcee.architecture.Module;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -27,10 +27,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class ComputationModule implements Module {
 
   // Functions to suppoort worker tasks to receive incoming messages from other PCE peers
-  public abstract boolean isValidRequestToRemotePeer(PCEPAddress address, String requestID);
+  public abstract boolean isValidRequestToRemotePeer(PceAddress address, String requestID);
 
   public abstract void registerRequestToRemotePeer(
-      PCEPAddress address, String requestID, LinkedBlockingQueue<PCEPMessage> queue);
+      PceAddress address, String requestID, LinkedBlockingQueue<PceMessage> queue);
 
-  protected abstract void processResponseFromRemotePeer(PCEPMessage message);
+  protected abstract void processResponseFromRemotePeer(PceMessage message);
 }

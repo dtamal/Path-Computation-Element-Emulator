@@ -14,22 +14,22 @@
  */
 package com.pcee.architecture;
 
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
 
 // TODO make module implementations AutoCloseable to clean up at shutdown.
 public interface Module {
 
-  void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer);
+  void receiveMessage(PceMessage message, ModuleEnum sourceLayer);
 
-  void sendMessage(PCEPMessage message, ModuleEnum targetLayer);
+  void sendMessage(PceMessage message, ModuleEnum targetLayer);
 
   void stop(boolean graceful);
 
   void start();
 
-  void closeConnection(PCEPAddress address);
+  void closeConnection(PceAddress address);
 
   void registerConnection(
-      PCEPAddress address, boolean connected, boolean connectionInitialized, boolean forceClient);
+      PceAddress address, boolean connected, boolean connectionInitialized, boolean forceClient);
 }

@@ -19,8 +19,8 @@ import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.sessionmodule.statemachine.StateMachine;
 import com.pcee.architecture.sessionmodule.statemachine.StateMachineClientImpl;
 import com.pcee.architecture.sessionmodule.statemachine.StateMachineServerImpl;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Timer;
@@ -79,10 +79,10 @@ public class SessionModuleImpl extends SessionModule {
   }
 
   private class ReadingQueueBuffer {
-    PCEPMessage message;
+    PceMessage message;
     ModuleEnum sourceLayer;
 
-    public ReadingQueueBuffer(PCEPMessage message, ModuleEnum sourceLayer) {
+    public ReadingQueueBuffer(PceMessage message, ModuleEnum sourceLayer) {
       this.message = message;
       this.sourceLayer = sourceLayer;
     }
@@ -100,8 +100,8 @@ public class SessionModuleImpl extends SessionModule {
      *
      * @param message
      */
-    public void addMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-      logger.debug("Entering: addMessage(PCEPMessage message)");
+    public void addMessage(PceMessage message, ModuleEnum sourceLayer) {
+      logger.debug("Entering: addMessage(PceMessage message)");
 
       readingQueue.add(new ReadingQueueBuffer(message, sourceLayer));
     }
@@ -157,8 +157,8 @@ public class SessionModuleImpl extends SessionModule {
     }
   }
 
-  public void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-    logger.debug("Entering: receiveMessage(PCEPMessage message, ModuleEnum sourceLayer)");
+  public void receiveMessage(PceMessage message, ModuleEnum sourceLayer) {
+    logger.debug("Entering: receiveMessage(PceMessage message, ModuleEnum sourceLayer)");
     logger.debug("| message: " + message.contentInformation());
     logger.debug("| sourceLayer: " + sourceLayer);
 
@@ -186,14 +186,14 @@ public class SessionModuleImpl extends SessionModule {
         // readingQueueThread[x].addMessage(message);
         break;
       default:
-        logger.info("Error in recieveMessage(PCEPMessage message, LayerEnum sourceLayer)");
+        logger.info("Error in recieveMessage(PceMessage message, LayerEnum sourceLayer)");
         logger.info("Wrong source Layer");
         break;
     }
   }
 
-  public void sendMessage(PCEPMessage message, ModuleEnum targetLayer) {
-    logger.debug("Entering: sendMessage(PCEPMessage message, ModuleEnum targetLayer)");
+  public void sendMessage(PceMessage message, ModuleEnum targetLayer) {
+    logger.debug("Entering: sendMessage(PceMessage message, ModuleEnum targetLayer)");
     logger.debug("| message: " + message.contentInformation());
     logger.debug("| targetLayer: " + targetLayer);
 
@@ -208,14 +208,14 @@ public class SessionModuleImpl extends SessionModule {
         lm.getClientModule().receiveMessage(message, ModuleEnum.SESSION_MODULE);
         break;
       default:
-        logger.info("Error in sendMessage(PCEPMessage message, LayerEnum targetLayer)");
+        logger.info("Error in sendMessage(PceMessage message, LayerEnum targetLayer)");
         logger.info("Wrong target Layer 11");
         break;
     }
   }
 
   public void registerConnection(
-      PCEPAddress address, boolean connected, boolean connectionInitialized, boolean forceClient) {
+      PceAddress address, boolean connected, boolean connectionInitialized, boolean forceClient) {
     logger.debug(
         "Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
     logger.debug("| address: " + address.getIPv4Address());
@@ -239,8 +239,8 @@ public class SessionModuleImpl extends SessionModule {
     }
   }
 
-  public void closeConnection(PCEPAddress address) {
-    logger.debug("Entering: closeConnection(PCEPAddress address)");
+  public void closeConnection(PceAddress address) {
+    logger.debug("Entering: closeConnection(PceAddress address)");
     logger.debug("| address: " + address.getIPv4Address());
 
     if (addressToStateMachineHashMap.containsKey(address.getIPv4Address())) {
@@ -263,9 +263,9 @@ public class SessionModuleImpl extends SessionModule {
    * @param connectionInitialized
    */
   private void createNewStateMachine(
-      PCEPAddress address, boolean connectionInitialized, boolean forceClient) {
+      PceAddress address, boolean connectionInitialized, boolean forceClient) {
     logger.debug(
-        "Entering: createNewStateMachine(PCEPAddress address, boolean connectionInitialized)");
+        "Entering: createNewStateMachine(PceAddress address, boolean connectionInitialized)");
     logger.debug("| address: " + address.getIPv4Address());
     logger.debug("| connectionInitialized: " + connectionInitialized);
 
@@ -298,8 +298,8 @@ public class SessionModuleImpl extends SessionModule {
    *
    * @param message
    */
-  private void processMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-    logger.debug("Entering: processMessage(PCEPMessage message)");
+  private void processMessage(PceMessage message, ModuleEnum sourceLayer) {
+    logger.debug("Entering: processMessage(PceMessage message)");
     logger.debug("| message: " + message.contentInformation());
     logger.debug("| address: " + message.getAddress().getIPv4Address());
 
@@ -319,8 +319,8 @@ public class SessionModuleImpl extends SessionModule {
    * @param address
    * @return
    */
-  private StateMachine getStateMachineFromHashMap(PCEPAddress address) {
-    logger.debug("Entering: getStateMachineFromHashMap(PCEPAddress address)");
+  private StateMachine getStateMachineFromHashMap(PceAddress address) {
+    logger.debug("Entering: getStateMachineFromHashMap(PceAddress address)");
     logger.debug("| address: " + address.getIPv4Address());
 
     logger.info("Getting StateMachine for " + address.getIPv4Address());
@@ -333,7 +333,7 @@ public class SessionModuleImpl extends SessionModule {
    * @param address
    * @param stateMachine
    */
-  private void insertStateMachineToHashMap(PCEPAddress address, StateMachine stateMachine) {
+  private void insertStateMachineToHashMap(PceAddress address, StateMachine stateMachine) {
     logger.debug(
         "Entering: insertStateMachineToHashMap(Address address, StateMachineImpl stateMachine)");
     logger.debug("| address: " + address.getIPv4Address());
@@ -349,8 +349,8 @@ public class SessionModuleImpl extends SessionModule {
    *
    * @param address
    */
-  private void removeStateMachineFromHashMap(PCEPAddress address) {
-    logger.debug("Entering: removeStateMachineFromHashMap(PCEPAddress address)");
+  private void removeStateMachineFromHashMap(PceAddress address) {
+    logger.debug("Entering: removeStateMachineFromHashMap(PceAddress address)");
     logger.debug("| address: " + address.getIPv4Address());
 
     logger.info("Removing StateMachine for " + address.getIPv4Address());

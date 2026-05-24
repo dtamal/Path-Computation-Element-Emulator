@@ -17,7 +17,7 @@ package com.pcee.architecture.computationmodule.threadpool;
 import com.graph.graphcontroller.Gcontroller;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
-import com.pcee.protocol.message.PCEPMessage;
+import com.pcee.protocol.message.PceMessage;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class Worker extends Thread {
   private Logger logger;
 
   private String ID;
-  private LinkedBlockingQueue<PCEPMessage> requestQueue;
+  private LinkedBlockingQueue<PceMessage> requestQueue;
   private ThreadPool pool;
   private ModuleManagement lm;
   private boolean terminateWorker = false;
@@ -54,7 +54,7 @@ public class Worker extends Thread {
       ModuleManagement layerManagement,
       ThreadPool pool,
       String ID,
-      LinkedBlockingQueue<PCEPMessage> requestQueue,
+      LinkedBlockingQueue<PceMessage> requestQueue,
       Gcontroller graph) {
     lm = layerManagement;
     this.pool = pool;
@@ -67,7 +67,7 @@ public class Worker extends Thread {
   public void run() {
 
     logger.info("Initializing Worker Thread ID = " + ID);
-    PCEPMessage request = null;
+    PceMessage request = null;
     int flag = 0;
     while (!terminateWorker) {
       WorkerTask task = null;

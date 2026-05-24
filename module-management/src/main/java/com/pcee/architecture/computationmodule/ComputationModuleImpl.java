@@ -19,10 +19,10 @@ import com.pcee.architecture.ModuleManagement;
 import com.pcee.architecture.computationmodule.ted.TopologyInformation;
 import com.pcee.architecture.computationmodule.threadpool.ThreadPool;
 import com.pcee.logger.PceeLoggerFactory;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
-import com.pcee.protocol.response.PCEPResponseFrame;
-import com.pcee.protocol.response.PCEPResponseFrameFactory;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
+import com.pcee.protocol.response.PceResponseFrame;
+import com.pcee.protocol.response.PceResponseFrameFactory;
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
@@ -46,10 +46,10 @@ public class ComputationModuleImpl extends ComputationModule {
   private final int computationThreads;
 
   // Thread-safe queue to store requests to be used by the thread pool
-  private LinkedBlockingQueue<PCEPMessage> requestQueue;
+  private LinkedBlockingQueue<PceMessage> requestQueue;
 
   // HashMap for keeping track of requests made to remote peers and the associated worker tasks
-  private HashMap<String, LinkedBlockingQueue<PCEPMessage>> remotePeerResponseAssociationHashMap;
+  private HashMap<String, LinkedBlockingQueue<PceMessage>> remotePeerResponseAssociationHashMap;
 
   /**
    * Default Constructor
@@ -85,27 +85,27 @@ public class ComputationModuleImpl extends ComputationModule {
     TopologyInformation.getInstance();
 
     // Innitialize the map that will record the responses coming from remote peers
-    remotePeerResponseAssociationHashMap = new HashMap<String, LinkedBlockingQueue<PCEPMessage>>();
+    remotePeerResponseAssociationHashMap = new HashMap<String, LinkedBlockingQueue<PceMessage>>();
     // Initialize a new request Queue
-    requestQueue = new LinkedBlockingQueue<PCEPMessage>();
+    requestQueue = new LinkedBlockingQueue<PceMessage>();
     // Initialize the thread pool used for computing requests
     threadPool = new ThreadPool(lm, computationThreads, requestQueue);
   }
 
-  public void closeConnection(PCEPAddress address) {
+  public void closeConnection(PceAddress address) {
     // TODO Auto-generated method stub
     // Explicit removal of requests from closed connections not implemented
   }
 
   public void registerConnection(
-      PCEPAddress address, boolean connected, boolean connectionInitialized, boolean forceClient) {
+      PceAddress address, boolean connected, boolean connectionInitialized, boolean forceClient) {
     // TODO Auto-generated method stub
     // Explicit registration of connections not implemented
 
   }
 
-  public void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-    logger.debug("Entering: receiveMessage(PCEPMessage message)");
+  public void receiveMessage(PceMessage message, ModuleEnum sourceLayer) {
+    logger.debug("Entering: receiveMessage(PceMessage message)");
     logger.debug("| message: {}", message.contentInformation());
     logger.debug("| sourceLayer: {}", sourceLayer);
     switch (sourceLayer) {
@@ -118,17 +118,17 @@ public class ComputationModuleImpl extends ComputationModule {
           processResponseFromRemotePeer(message);
         break;
       default:
-        logger.info("Error in receiveMessage(PCEPMessage message, LayerEnum targetLayer)");
+        logger.info("Error in receiveMessage(PceMessage message, LayerEnum targetLayer)");
         logger.info("Wrong sourceLayer");
         break;
     }
   }
 
-  private String getKeyForRemotePeerAssociation(PCEPAddress address, String requestID) {
+  private String getKeyForRemotePeerAssociation(PceAddress address, String requestID) {
     return address.getIPv4Address(true) + "-" + requestID;
   }
 
-  public synchronized boolean isValidRequestToRemotePeer(PCEPAddress address, String requestID) {
+  public synchronized boolean isValidRequestToRemotePeer(PceAddress address, String requestID) {
     // If the particular combination of remote PCE peer and request ID already exist do not make a
     // new association
     String key = getKeyForRemotePeerAssociation(address, requestID);
@@ -136,7 +136,7 @@ public class ComputationModuleImpl extends ComputationModule {
   }
 
   public synchronized void registerRequestToRemotePeer(
-      PCEPAddress address, String requestID, LinkedBlockingQueue<PCEPMessage> queue) {
+      PceAddress address, String requestID, LinkedBlockingQueue<PceMessage> queue) {
     if (isValidRequestToRemotePeer(address, requestID)) {
       String key = getKeyForRemotePeerAssociation(address, requestID);
       remotePeerResponseAssociationHashMap.put(key, queue);
@@ -145,11 +145,11 @@ public class ComputationModuleImpl extends ComputationModule {
 
   // Function to implement a mechanism where a response from another server (hierarchical or PCE
   // peer) is sent to the correct worker task
-  protected synchronized void processResponseFromRemotePeer(PCEPMessage message) {
-    PCEPAddress address = message.getAddress();
+  protected synchronized void processResponseFromRemotePeer(PceMessage message) {
+    PceAddress address = message.getAddress();
     // Message is of type PCEP Response
-    PCEPResponseFrame responseFrame =
-        PCEPResponseFrameFactory.getPathComputationResponseFrame(message);
+    PceResponseFrame responseFrame =
+        PceResponseFrameFactory.getPathComputationResponseFrame(message);
     String requestID = Integer.toString(responseFrame.getRequestID());
     String key = getKeyForRemotePeerAssociation(address, requestID);
     if (remotePeerResponseAssociationHashMap.containsKey(key)) {
@@ -163,7 +163,7 @@ public class ComputationModuleImpl extends ComputationModule {
     }
   }
 
-  public void sendMessage(PCEPMessage message, ModuleEnum targetLayer) {
+  public void sendMessage(PceMessage message, ModuleEnum targetLayer) {
     switch (targetLayer) {
       case NETWORK_MODULE:
         // undefined
@@ -178,7 +178,7 @@ public class ComputationModuleImpl extends ComputationModule {
         // Not possible
         break;
       default:
-        logger.info("Error in sendMessage(PCEPMessage message, LayerEnum targetLayer)");
+        logger.info("Error in sendMessage(PceMessage message, LayerEnum targetLayer)");
         logger.info("Wrong target Layer");
         break;
     }

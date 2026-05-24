@@ -17,10 +17,10 @@ package com.pcee.architecture.networkmodule;
 import com.pcee.architecture.ModuleEnum;
 import com.pcee.architecture.ModuleManagement;
 import com.pcee.logger.PceeLoggerFactory;
-import com.pcee.protocol.message.PCEPCommonMessageHeader;
-import com.pcee.protocol.message.PCEPComputationFactory;
-import com.pcee.protocol.message.PCEPMessage;
-import com.pcee.protocol.message.objectframe.impl.erosubobjects.PCEPAddress;
+import com.pcee.protocol.message.PceCommonMessageHeader;
+import com.pcee.protocol.message.PceComputationFactory;
+import com.pcee.protocol.message.PceMessage;
+import com.pcee.protocol.message.objectframe.impl.erosubobjects.PceAddress;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -144,16 +144,16 @@ public class NetworkModuleImpl extends NetworkModule {
     startSelectorThread();
   }
 
-  public void receiveMessage(PCEPMessage message, ModuleEnum sourceLayer) {
-    logger.debug("Entering: receiveMessage(PCEPMessage message, ModuleEnum sourceLayer)");
+  public void receiveMessage(PceMessage message, ModuleEnum sourceLayer) {
+    logger.debug("Entering: receiveMessage(PceMessage message, ModuleEnum sourceLayer)");
     logger.debug("| message: " + message.contentInformation());
     logger.debug("| sourceLayer: " + sourceLayer);
 
     writeSocket(message);
   }
 
-  public void sendMessage(PCEPMessage message, ModuleEnum targetLayer) {
-    logger.debug("Entering: sendMessage(PCEPMessage message, ModuleEnum targetLayer)");
+  public void sendMessage(PceMessage message, ModuleEnum targetLayer) {
+    logger.debug("Entering: sendMessage(PceMessage message, ModuleEnum targetLayer)");
     logger.debug("message:" + message.binaryInformation());
     logger.debug("| message: " + message.contentInformation());
     logger.debug("| targetLayer: " + targetLayer);
@@ -169,14 +169,14 @@ public class NetworkModuleImpl extends NetworkModule {
         // Not possible
         break;
       default:
-        logger.info("Error in sendMessage(PCEPMessage message, LayerEnum targetLayer)");
+        logger.info("Error in sendMessage(PceMessage message, LayerEnum targetLayer)");
         logger.info("Wrong target Layer");
         break;
     }
   }
 
   public void registerConnection(
-      PCEPAddress address, boolean connected, boolean connectionInitialized, boolean forceClient) {
+      PceAddress address, boolean connected, boolean connectionInitialized, boolean forceClient) {
     logger.debug(
         "Entering: registerConnection(Address address, boolean connected, boolean connectionInitialized)");
     logger.debug("| address: " + address.getIPv4Address(false));
@@ -197,8 +197,8 @@ public class NetworkModuleImpl extends NetworkModule {
 
       if (socketChannel.isConnected() == true) {
         logger.info("Connected to " + address.getIPv4Address(false) + ":" + address.getPort());
-        PCEPAddress remoteAddress =
-            new PCEPAddress(
+        PceAddress remoteAddress =
+            new PceAddress(
                 socketChannel.socket().getInetAddress().getHostAddress(),
                 socketChannel.socket().getPort());
 
@@ -227,7 +227,7 @@ public class NetworkModuleImpl extends NetworkModule {
     }
   }
 
-  public void closeConnection(PCEPAddress address) {
+  public void closeConnection(PceAddress address) {
     logger.debug("Entering: closeConnection(Address address)");
     logger.debug("| address: " + address.getIPv4Address());
 
@@ -301,8 +301,8 @@ public class NetworkModuleImpl extends NetworkModule {
                   // channel
                   SelectionKey key = socketChannel.register(selector, SelectionKey.OP_READ);
                   // Register the socket channel in the hash map
-                  PCEPAddress address =
-                      new PCEPAddress(
+                  PceAddress address =
+                      new PceAddress(
                           socketChannel.socket().getInetAddress().getHostAddress().trim(),
                           socketChannel.socket().getPort());
                   insertSelectionKeyToHashMap(address, key);
@@ -369,7 +369,7 @@ public class NetworkModuleImpl extends NetworkModule {
 
     String addressString = socketChannel.socket().getInetAddress().getHostAddress().trim();
     int port = socketChannel.socket().getPort();
-    PCEPAddress address = new PCEPAddress(addressString, port);
+    PceAddress address = new PceAddress(addressString, port);
 
     // Check if a selection key is already registered
     if (getSelectionKeyFromHashMap(address) == null) {
@@ -407,7 +407,7 @@ public class NetworkModuleImpl extends NetworkModule {
 
     String addressString = inputSocketChannel.socket().getInetAddress().getHostAddress().trim();
     int port = inputSocketChannel.socket().getPort();
-    PCEPAddress address = new PCEPAddress(addressString, port);
+    PceAddress address = new PceAddress(addressString, port);
 
     if (inputSocketChannel.isConnected()) {
       try {
@@ -465,7 +465,7 @@ public class NetworkModuleImpl extends NetworkModule {
 
           // Append the received string onto the existing buffered
           // data
-          messageString += PCEPComputationFactory.byteArrayToRawMessage(receivedMessageByteArray);
+          messageString += PceComputationFactory.byteArrayToRawMessage(receivedMessageByteArray);
           // //System.out.println("MessageString = " + messageString);
           loopCount++;
         }
@@ -477,9 +477,9 @@ public class NetworkModuleImpl extends NetworkModule {
           Iterator<String> iter = messages.iterator();
           while (iter.hasNext()) {
             String temp = iter.next();
-            byte[] messageByteArray = PCEPComputationFactory.rawMessageToByteArray(temp);
+            byte[] messageByteArray = PceComputationFactory.rawMessageToByteArray(temp);
 
-            PCEPMessage receivedMessage = new PCEPMessage(messageByteArray);
+            PceMessage receivedMessage = new PceMessage(messageByteArray);
             receivedMessage.setAddress(address);
 
             /*
@@ -514,14 +514,14 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @return LinkedList<String> containing the complete concatenated messages
    */
-  private LinkedList<String> parseMultipleMessages(String binaryString, PCEPAddress address) {
+  private LinkedList<String> parseMultipleMessages(String binaryString, PceAddress address) {
     logger.debug("Entering: parseMultipleMessages(String binaryString, Address address)");
 
     LinkedList<String> output = new LinkedList<String>();
     while (binaryString.length() > 0) {
       if (binaryString.length() >= 32) {
         String currentHeaderString = binaryString.substring(0, 32);
-        PCEPCommonMessageHeader messageHeader = new PCEPCommonMessageHeader(currentHeaderString);
+        PceCommonMessageHeader messageHeader = new PceCommonMessageHeader(currentHeaderString);
 
         int bitLength = messageHeader.getLengthDecimalValue() * 8;
 
@@ -544,12 +544,12 @@ public class NetworkModuleImpl extends NetworkModule {
   }
 
   /**
-   * Function to write a PCEPMessage to the network
+   * Function to write a PceMessage to the network
    *
    * @param message
    */
-  private void writeSocket(PCEPMessage message) {
-    logger.debug("Entering: writeSocket(PCEPMessage message)");
+  private void writeSocket(PceMessage message) {
+    logger.debug("Entering: writeSocket(PceMessage message)");
     logger.debug("| message: " + message.contentInformation());
     logger.debug("| " + message.binaryInformation());
     logger.debug("| " + message.toString());
@@ -598,7 +598,7 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @return
    */
-  private SocketChannel getSocketChannelFromHashMap(PCEPAddress address) {
+  private SocketChannel getSocketChannelFromHashMap(PceAddress address) {
     logger.debug("Entering: getSocketChannel(Address address)");
     logger.debug("| address: " + address.getIPv4Address());
 
@@ -615,7 +615,7 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @return
    */
-  private SelectionKey getSelectionKeyFromHashMap(PCEPAddress address) {
+  private SelectionKey getSelectionKeyFromHashMap(PceAddress address) {
     logger.debug("Entering: getSelectionKey(Address address)");
 
     logger.info("| Getting SelectionKey for " + address.getIPv4Address());
@@ -631,7 +631,7 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @param key
    */
-  private void insertSelectionKeyToHashMap(PCEPAddress address, SelectionKey key) {
+  private void insertSelectionKeyToHashMap(PceAddress address, SelectionKey key) {
     logger.debug("Entering: insertSelectionKeyToHashMap(Address address, SelectionKey key)");
     logger.debug("| address: " + address.getIPv4Address());
 
@@ -644,9 +644,9 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @param channel
    */
-  private void insertSocketChannelToHashMap(PCEPAddress address, SocketChannel channel) {
+  private void insertSocketChannelToHashMap(PceAddress address, SocketChannel channel) {
     logger.debug(
-        "Entering: insertSocketChannelToHashMap(PCEPAddress address, SocketChannel channel)");
+        "Entering: insertSocketChannelToHashMap(PceAddress address, SocketChannel channel)");
     logger.debug("| address: " + address.getIPv4Address(false));
 
     addressToSocketChannelHashMap.put(address.getIPv4Address(), channel);
@@ -657,7 +657,7 @@ public class NetworkModuleImpl extends NetworkModule {
    *
    * @param address
    */
-  private void removeSelectionKey(PCEPAddress address) {
+  private void removeSelectionKey(PceAddress address) {
     logger.debug("Entering: removeSelectionKey(Address address)");
     logger.debug("| address: " + address.getIPv4Address());
 
@@ -669,7 +669,7 @@ public class NetworkModuleImpl extends NetworkModule {
    *
    * @param address
    */
-  private void removeSocketChannel(PCEPAddress address) {
+  private void removeSocketChannel(PceAddress address) {
     logger.debug("Entering: removeSocketChannelToHashMap(Address address)");
     logger.debug("| address: " + address.getIPv4Address());
 
@@ -682,7 +682,7 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @return
    */
-  private String getPartialMessageFromHashMap(PCEPAddress address) {
+  private String getPartialMessageFromHashMap(PceAddress address) {
     logger.debug("Entering: getPartialMessageFromHashMap(Address address)");
     logger.debug("| address: " + address.getIPv4Address());
 
@@ -700,7 +700,7 @@ public class NetworkModuleImpl extends NetworkModule {
    * @param address
    * @param partialMessage
    */
-  private void insertPartialMessageToHashMap(PCEPAddress address, String partialMessage) {
+  private void insertPartialMessageToHashMap(PceAddress address, String partialMessage) {
     logger.debug("Entering: insertPartialMessageToHashMap(Address address, String partialMessage)");
     logger.debug("| address: " + address.getIPv4Address());
     logger.debug("| Partial Message: " + partialMessage);
@@ -716,7 +716,7 @@ public class NetworkModuleImpl extends NetworkModule {
    *
    * @param address
    */
-  private void removePartialMessageFromHashMap(PCEPAddress address) {
+  private void removePartialMessageFromHashMap(PceAddress address) {
     logger.debug("Entring: removePartialMessageFromHashMap(Address address)");
     logger.debug("| address: " + address.getIPv4Address());
 
