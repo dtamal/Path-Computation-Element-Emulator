@@ -1,0 +1,28 @@
+name: Verify that maven builds are running successfully by running maven install
+on:
+  # Call from other workflows.
+  workflow_call:
+  # Commits to folders other than the actual workflows
+  push:
+    paths-ignore:
+      - '.github/**'
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v5
+      # Setup Java Temurin LTS
+      - uses: actions/setup-java@v5.2.0
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      # Validate maven install action
+      - name: Validate all tests
+        run: mvn --batch-mode -P deployment-checks verify
