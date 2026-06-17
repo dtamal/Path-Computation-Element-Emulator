@@ -37,7 +37,7 @@
     <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
     <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>13.5.0</checkstyle.version>
+    <checkstyle.version>13.6.0</checkstyle.version>
     <spotbugs-maven-plugin.version>4.10.2.0</spotbugs-maven-plugin.version>
     <spotbugs.version>4.10.2</spotbugs.version>
     <spotbugs-exclusion-configuration-file>${maven.multiModuleProjectDirectory}/config/spotbugs-exclude.xml</spotbugs-exclusion-configuration-file>
