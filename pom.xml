@@ -27,7 +27,7 @@
     <jdsl.version>2.1</jdsl.version>
     <jackson.version>2.21.2</jackson.version>
     <jackson-annotations.version>2.22</jackson-annotations.version>
-    <jetty.version>12.1.10</jetty.version>
+    <jetty.version>12.1.11</jetty.version>
     <jersey.version>4.0.2</jersey.version>
     <junit.version>6.1.1</junit.version>
     <assertj.version>3.27.7</assertj.version>
