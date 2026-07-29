@@ -32,12 +32,12 @@
     <junit.version>6.1.2</junit.version>
     <assertj.version>3.27.7</assertj.version>
     <maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
-    <maven-flatten-plugin.version>1.7.3</maven-flatten-plugin.version>
+    <maven-flatten-plugin.version>1.8.0</maven-flatten-plugin.version>
     <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
     <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
     <maven-surefire-plugin.version>3.5.6</maven-surefire-plugin.version>
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-    <checkstyle.version>13.8.0</checkstyle.version>
+    <checkstyle.version>13.9.0</checkstyle.version>
     <spotbugs-maven-plugin.version>4.10.3.0</spotbugs-maven-plugin.version>
     <spotbugs.version>4.10.3</spotbugs.version>
     <spotbugs-exclusion-configuration-file>${maven.multiModuleProjectDirectory}/config/spotbugs-exclude.xml</spotbugs-exclusion-configuration-file>
